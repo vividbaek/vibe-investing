@@ -1,0 +1,106 @@
+DUAL LICENSE NOTICE
+====================
+
+This repository contains material under two different licenses:
+
+1. SOURCE CODE (in scripts/) - MIT License
+2. PAPER, DATA, AND FIGURES (in paper/, data/, figures/) - Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+
+================================================================================
+PART 1: MIT LICENSE (applies to all .py source files in scripts/)
+================================================================================
+
+MIT License
+
+Copyright (c) 2026 HoKwang Kim (Dennis Kim)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+================================================================================
+PART 2: CREATIVE COMMONS ATTRIBUTION 4.0 INTERNATIONAL (CC BY 4.0)
+   (applies to paper/, data/, figures/, and docs/)
+================================================================================
+
+Copyright (c) 2026 HoKwang Kim (Dennis Kim)
+
+This work is licensed under the Creative Commons Attribution 4.0 International
+License. To view a copy of this license, visit
+https://creativecommons.org/licenses/by/4.0/
+
+Summary of CC BY 4.0:
+
+You are free to:
+  - SHARE — copy and redistribute the material in any medium or format
+  - ADAPT — remix, transform, and build upon the material for any purpose,
+    even commercially.
+
+Under the following terms:
+  - ATTRIBUTION — You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made. You may do so in any
+    reasonable manner, but not in any way that suggests the licensor
+    endorses you or your use.
+
+  - NO ADDITIONAL RESTRICTIONS — You may not apply legal terms or
+    technological measures that legally restrict others from doing anything
+    the license permits.
+
+Suggested attribution format:
+
+  Kim, H. (2026). Distribution Asymmetry of Centralized Exchange Airdrops
+  and the BNB Chain Ecosystem [Working paper and dataset]. GitHub.
+  https://github.com/gameworkerkim/distribution-asymmetry-cex-airdrops
+  Licensed under CC BY 4.0.
+
+
+================================================================================
+DATA SOURCE ATTRIBUTION
+================================================================================
+
+The data files in data/ aggregate publicly available information from the
+following sources. Original data ownership remains with these sources:
+
+  - Binance: Token listing announcements, prices
+  - CoinGecko: Quarterly closing prices, market data
+  - CoinMarketCap: Market capitalization data
+  - Messari: "State of BNB" Q1-Q3 2025 quarterly reports
+  - tokenomist.ai: Tokenomics breakdowns
+  - CoinLaw: Industry analysis reports
+
+Users of this dataset are encouraged to cite the original sources where
+appropriate. Aggregation, harmonization, and corrections by HoKwang Kim are
+licensed under CC BY 4.0 as described above.
+
+
+================================================================================
+DISCLAIMER
+================================================================================
+
+This repository represents a preliminary working paper and is provided for
+academic research purposes only. The findings should not be construed as
+financial advice, investment recommendations, or trading strategies. The
+author makes no warranties, express or implied, about the accuracy,
+reliability, or fitness for a particular purpose of the data, code, or
+analysis contained herein.
+
+Cryptocurrency and digital asset investments carry significant risk,
+including the risk of total loss. Readers should conduct their own due
+diligence and consult qualified financial and legal advisors before making
+any investment decisions.
