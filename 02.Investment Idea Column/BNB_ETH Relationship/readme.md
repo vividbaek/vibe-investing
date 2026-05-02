@@ -8,13 +8,13 @@
 [![JEL](https://img.shields.io/badge/JEL-G12_G14_G15_C58-orange)](#)
 [![Data](https://img.shields.io/badge/Data-CoinMetrics-green)](https://coinmetrics.io/)
 
-**Languages**: [🇬🇧 English](#-english) · [🇰🇷 한국어](#-한국어) · [🇨🇳 中文](#-中文)
+🌐 **Languages**: [🇬🇧 English](#-english) · [🇰🇷 한국어](#-한국어) · [🇨🇳 中文](#-中文)
 
-**Quick links**: [Repository contents →](#-repository-contents) · [Citation →](#-citation) · [Author →](#-author) · [Contact →](#-contact)
+📌 **Quick links**: [Repository contents →](#-repository-contents) · [Citation →](#-citation) · [Author →](#-author) · [Contact →](#-contact)
 
 ---
 
-## English
+## 🇬🇧 English
 
 ### Abstract
 
@@ -107,7 +107,7 @@ The paper's research trajectory was reshaped by two strategic turning points tha
 
 ---
 
-## 한국어
+## 🇰🇷 한국어
 
 ### 초록
 
@@ -200,7 +200,7 @@ BNB-ETH는 베타 분해 현상 연구에 특히 유익한 사례이다:
 
 ---
 
-## 中文
+## 🇨🇳 中文
 
 ### 摘要
 
@@ -293,7 +293,7 @@ BNB-ETH 是研究 Beta 分解现象特别有用的案例:
 
 ---
 
-## Repository Contents
+## 📂 Repository Contents
 
 | File | Description |
 |---|---|
@@ -314,7 +314,7 @@ BNB-ETH 是研究 Beta 分解现象特别有用的案例:
 
 ---
 
-## Citation
+## 📊 Citation
 
 ```bibtex
 @unpublished{kim2026directional,
@@ -342,7 +342,7 @@ Dennis Kim has worked in the blockchain industry since 2017, serving as a long-s
 
 ---
 
-## Related Literature
+## 📚 Related Literature
 
 - **Cryptocurrency asset pricing**: Liu & Tsyvinski (2021, RFS); Liu, Tsyvinski & Wu (2024, JoF); Sockin & Xiong (2023, JoF)
 - **Exchange tokens**: Lee, Li & Shin (2023); Howell, Niessner & Yermack (2020, RFS)
