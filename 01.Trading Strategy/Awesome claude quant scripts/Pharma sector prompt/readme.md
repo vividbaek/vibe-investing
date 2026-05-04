@@ -1,393 +1,310 @@
-# Pharma Sector Long/Short Prompt — 4-LLM Comparative Analysis
+# Pharma Sector Long/Short Prompt — 4-LLM × 2-Language Cross-Validation
 
 **비교 대상 모델:** ChatGPT · Claude · DeepSeek · Gemini
+**비교 대상 언어:** 한국어 (KR) · 중국어 (CN)
 **프롬프트 일자:** 2026-05-04
 **프롬프트 종류:** 미국 제약 섹터 Long/Short 포트폴리오 (12–24개월 horizon)
-**비교 방법:** 동일 프롬프트, 동일 시점, 동일 페르소나 — 출력물의 정성·정량 비교
+**비교 방법:** 동일 프롬프트, 동일 시점, 동일 페르소나, **언어만 변경** — 출력물의 정성·정량 비교
 
 ---
 
 ## Executive Summary (TL;DR)
 
-### 분량/구조 — 4개 모델 모두 다른 양식
+### 가장 충격적인 발견 — 같은 LLM이 언어에 따라 정반대 포지션을 출력한다
 
-- **Gemini**: 4.13 KB — **가장 짧음** (compressed summary, 2-3분 만에 의사결정 가능)
-- **ChatGPT**: 5.16 KB — outline 수준 (사실상 메모)
-- **Claude**: 28.5 KB — 한국어 풀리포트 (audit-ready)
-- **DeepSeek**: 38.6 KB — 영어 풀리포트 + 기관양식
+| LLM | 종목 | 한국어 출력 | 중국어 출력 |
+|-----|------|------------|------------|
+| **DeepSeek** | **AMGN** | **SHORT** | **LONG #4** |
+| **DeepSeek** | **JNJ** | **LONG #5** | **SHORT** |
+| **Claude** | **BMY** | **LONG #4** | **SHORT** |
+| **Claude** | **ABBV** | **LONG #3** | 미언급 |
+| **Claude** | **GILD** | **LONG #6** | 미언급 |
+| **Gemini** | **MRK** | **SHORT (단독)** | **LONG #3 ($155 목표)** |
 
-### DeepSeek의 특이성
-DeepSeek의 모회사는 HFT 회사이고 중국의 헤지펀드이다. 딥씨크가 출력한 금융 리포트는 상당히 전문적인 데이터 양식으로 일반적으로 미국의 유료 금융 리포트 양식으로 보인다.
-모회사의 특성상 금융 도메인에 대한 이해도가 높기 때문에 리포트 양식 및 분석이 더 뛰어날수도 있다고 추정하고 있다. 
-中国人常说一句很有意思的话：“上有政策，下有对策”。这句话放在这里也颇为贴切。至于是否像“山寨”一样的方式去获取数据用于训练，其实仍然值得打一个问号。另一方面，DeepSeek 的母公司本身就是一家专注于高频交易（HFT）的对冲基金，这意味着它很可能本就拥有相当丰富且高质量的数据资源。
+→ **단일 LLM × 단일 언어 의존은 사실상 "언어별 룰렛 게임"입니다.** 4개 LLM × 2개 언어 = 최대 8개의 서로 다른 포트폴리오가 산출됩니다.
 
-### 가장 충격적인 발견 — 5개 양극화 종목 (4-LLM 확장판)
+### 분량/구조 — KR/CN 모두 모델별로 다름
+
+| 모델 | KR 분량 | CN 분량 | 변화 |
+|------|---------|---------|------|
+| **Gemini** | 4.13 KB | 3.6 KB | 압축 유지 |
+| **DeepSeek** | 38.6 KB (영어) | **4.64 KB** | **8배 압축** (영어 institutional → 중국어 outline) |
+| **ChatGPT** | 5.16 KB | (CN 미발행) | — |
+| **Claude** | 28.5 KB | **37.9 KB** | **35% 증가** (CN이 더 상세함) |
+
+**특이점**: Claude만 CN 출력이 KR보다 길어졌습니다 — DeepSeek과 정반대 패턴입니다.
+
+### DeepSeek의 특이성 (데니스 직접 코멘트 인용)
+
+> DeepSeek의 모회사는 HFT 회사이고 중국의 헤지펀드입니다. 딥씨크가 출력한 금융 리포트는 상당히 전문적인 데이터 양식으로 일반적으로 미국의 유료 금융 리포트 양식으로 보입니다. 모회사의 특성상 금융 도메인에 대한 이해도가 높기 때문에 리포트 양식 및 분석이 더 뛰어날 수도 있다고 추정하고 있습니다.
+>
+> 中国人常说一句很有意思的话："上有政策，下有对策"。这句话放在这里也颇为贴切。至于是否像"山寨"一样的方式去获取数据用于训练，其实仍然值得打一个问号。另一方面，DeepSeek 的母公司本身就是一家专注于高频交易（HFT）的对冲基金，这意味着它很可能本就拥有相当丰富且高质量的数据资源。
+
+흥미롭게도, DeepSeek는 **한국어 프롬프트엔 영어로**, **중국어 프롬프트엔 중국어로** 응답했습니다. 이는 모회사가 중국 HFT 회사라는 사실과 일치하는 도메인-언어 정렬 패턴입니다.
+
+### 양극화 종목 5개 (KR 4-LLM 기준 — CN까지 확장하면 더 늘어남)
 
 | 종목 | ChatGPT | Claude | DeepSeek | Gemini |
 |------|---------|--------|----------|--------|
-| **BMY** | SHORT | **LONG** | SHORT | SHORT |
-| **AMGN** | LONG | 미언급 | **SHORT** | LONG |
-| **GILD** | SHORT | **LONG** | 미언급 | 미언급 |
+| **BMY** | SHORT | **LONG (KR) / SHORT (CN)** | SHORT | SHORT |
+| **AMGN** | LONG | 미언급 | **SHORT (KR) / LONG (CN)** | LONG |
+| **GILD** | SHORT | **LONG (KR) / 미언급 (CN)** | 미언급 | 미언급 |
 | **NVO** | LONG #2 | 사실상 부정 | LONG #7 | LONG |
-| **MRK** | LONG #3 | 미언급 | LONG #6 | **SHORT (단독)** |
+| **MRK** | LONG #3 | 미언급 | LONG #6 (KR) / **LONG (CN)** | **SHORT (KR) / LONG (CN)** |
 
-→ **단일 LLM에 의존하면 정반대 포지션이 나올 수 있다는 결정적 증거 (모델이 늘어날수록 더 명확해짐).**
+→ **MRK는 단일 LLM(Gemini)이 KR/CN에서 정반대 포지션을 출력한 가장 극명한 사례**입니다.
 
-### 단독 발굴 종목 (Contrarian Picks)
+### 단독 발굴 종목 (KR과 CN 합쳐서)
 
-| 종목 | 발굴 모델 | 이유 |
-|------|----------|------|
-| **ARGX** | **Claude 단독** | VYVGART 라벨 확장 모멘텀 — 미드캡 자가면역 |
-| **AZN, JNJ** | **DeepSeek 단독** | 다중 Phase 3 readout density (AZN), Icotrokinra 출시 (JNJ) |
-| **MDGL (Madrigal)** | **Gemini 단독** | Rezdiffra MASH 시장 first-mover, $270 → $390 target |
-| **MRK SHORT** | **Gemini 단독** | Keytruda 2028 LOE + IRA 노출 — contrarian thesis |
+| 종목 | 발굴 모델 / 언어 | 이유 |
+|------|----------------|------|
+| **ARGX** | Claude (KR + CN 공통) | VYVGART 라벨 확장 PDUFA 5/10/2026 |
+| **AZN, JNJ** | DeepSeek (KR 단독) | 다중 Phase 3 readout density |
+| **MDGL** | Gemini (KR), Claude (CN) | Rezdiffra MASH first-in-class |
+| **INSM** | **Claude CN 단독** | Brinsupri DPP1 inhibitor first-in-class |
+| **ALNY** | **Claude CN 단독** | Amvuttra ATTR-CM 시장 확대 |
+| **ASND** | **Gemini CN 단독** | TransCon 기술, 희귀병 시장 |
+| **BIIB SHORT** | **Gemini CN 단독** | 알츠하이머 상업화 실패 |
+| **MRK SHORT** | Gemini KR 단독 | Keytruda 2028 LOE + IRA |
 
-### DeepSeek 영어 출력 문제 (6가지 메커니즘 — 변동 없음)
+### DeepSeek 영어 출력 문제 (KR 프롬프트 한정)
+
+DeepSeek은 한국어 프롬프트엔 영어로 응답했지만, 중국어 프롬프트엔 정확한 중국어로 응답했습니다. 이는 **모델의 언어 지원이 코퍼스 비중에 비례**한다는 강한 증거입니다. 6가지 메커니즘:
 
 1. **훈련 데이터 편향**: 중국+영어 코퍼스 주력, 한국어 instruction-following 약함
 2. **명시적 언어 강제 부재**: 프롬프트에 "한국어로"라는 지정 없음
-3. **도메인 활성화 효과**: "S&P 500/PDUFA/FDA" 등 영문 약어 70+ 등장 → 모델이 영어 도메인으로 인식
+3. **도메인 활성화 효과**: "S&P 500/PDUFA/FDA" 등 영문 약어 70+ 등장
 4. **Reasoning Mode 특성**: DeepSeek-R1/V3는 사고 과정 자체가 영어
 5. **Token 효율 학습**: 한·영 혼합보다 영어 통일이 토큰 효율적
 6. **페르소나 효과**: "Senior Healthcare Portfolio Manager"가 영문 도메인 트리거
 
-> **해결법**: 프롬프트 끝에 **"모든 출력은 반드시 한국어로 작성"** 명시 한 줄이면 99% 해결.
+> **해결법**: 프롬프트 끝에 **"모든 출력은 반드시 한국어로 작성"** 명시 한 줄.
 
-### 데니스의 워크플로우 추천 (4-LLM 버전)
+### 데니스의 4-LLM × 2-Language 워크플로우
 
-이미 multi-LLM cross-validation을 하고 계신 점은 **best practice**입니다. CTI 리포트의 KR/EN/CN/JP 4개국어 발행 노하우와 정확히 같은 패턴 — Gemini로 핵심 종목 hint 빠르게 잡고, DeepSeek로 facts/numbers 풀 채우고, Claude로 한국어 narrative + audit-ready 1차 출처 확보, ChatGPT로 sanity check, **BMY·AMGN·GILD·MRK 같은 양극화 종목은 사람이 결정**하는 구조입니다.
+이미 multi-LLM cross-validation을 하고 계신 점은 **best practice**이며, **CN 발행을 추가한 것은 한 단계 더 진화한 패턴**입니다. CTI 리포트의 KR/EN/CN/JP 4개국어 발행 노하우와 정확히 같은 패턴입니다.
 
-> **특이점**: ChatGPT와 Gemini는 모두 **stale data** 흔적이 명확합니다 (LLY $820/$780 vs 실제 ~$960). Q1 2026 실적(4월 30일 발표)과 Foundayo 승인(4월 1일)이 두 모델 모두 누락. **Web search 활용은 Claude/DeepSeek만 적극적**입니다.
+> **특이점**: ChatGPT와 Gemini는 모두 stale data 흔적이 명확합니다. Web search 활용은 Claude/DeepSeek만 적극적입니다.
 
 ---
 
 ## 비교 대상 파일
 
-| 모델 | 파일 크기 | 라인 수 | 출력 언어 | 분량 평가 |
-|------|----------|---------|----------|-----------|
-| **Gemini** | 4.13 KB | 73 lines (실제 ~55) | 한국어 | 가장 짧음 (compressed) |
-| **ChatGPT** | 5.16 KB | 240 lines (실제 ~166) | 한국어 + 영어 혼용 | outline 수준 |
-| **Claude** | 28.5 KB | 492 lines (실제 ~373) | 한국어 | 풀리포트 (중간) |
-| **DeepSeek** | 38.6 KB | 555 lines (실제 ~400) | **영어 (전체)** | 풀리포트 (가장 긺) |
+### 한국어 (KR) 출력
+
+| 모델 | 파일 크기 | 라인 수 | 출력 언어 | 비고 |
+|------|----------|---------|----------|------|
+| **Gemini** | 4.13 KB | 73 lines | 한국어 | 가장 짧음 |
+| **ChatGPT** | 5.16 KB | 240 lines | 한국어 + 영어 혼용 | outline |
+| **Claude** | 28.5 KB | 492 lines | 한국어 | 풀리포트 |
+| **DeepSeek** | 38.6 KB | 555 lines | **영어 (전체)** | 영어 institutional |
+
+### 중국어 (CN) 출력
+
+| 모델 | 파일 크기 | 라인 수 | 출력 언어 | 비고 |
+|------|----------|---------|----------|------|
+| **Gemini** | 3.6 KB | 224 lines | 중국어 | 가장 짧음 |
+| **DeepSeek** | 4.64 KB | 247 lines | 중국어 | **영어 → 중국어 전환 + 8배 압축** |
+| **Claude** | **37.9 KB** | 792 lines | 중국어 + 한국어 혼용 | **CN 출력 중 가장 긺 (KR보다 +35%)** |
+| **ChatGPT** | (미발행) | — | — | — |
+
+**관찰**: Claude의 KR/CN 분량이 정반대 패턴 (KR 28KB → CN 38KB), DeepSeek은 정반대 (KR 38KB 영어 → CN 4.6KB 중국어 압축)입니다. 같은 모델이라도 언어에 따라 출력 양식이 근본적으로 달라집니다.
 
 ---
 
-## 종목 선정 — 핵심 차이 (4-LLM)
+## 종목 선정 — KR vs CN 차이 (모델별)
 
-### LONG 후보 비교
+### Claude — KR vs CN
 
-| 티커 | ChatGPT | Claude | DeepSeek | Gemini | 합치/분기 |
-|------|---------|--------|----------|--------|----------|
-| **LLY** | #1 (92) | #1 (85) | #1 (89) | #1 (95) | **4사 만장일치 1순위** |
-| **VRTX** | #6 (83) | #2 (86) | #4 (83) | #2 (92) | 4사 LONG |
-| **ABBV** | #4 (85) | #3 (86) | #2 (88) | #4 (87) | 4사 LONG |
-| **REGN** | #5 (84) | #5 (80) | 미언급 | #3 (89) | DeepSeek만 누락 |
-| **NVO** | #2 (91) | 미언급 (부정) | #7 (78) | #6 (86) | Claude만 부정 |
-| **MRK** | #3 (88) | 미언급 | #6 (80) | **SHORT** | **Gemini SHORT, 나머지 LONG** |
-| **AMGN** | #7 (82) | 미언급 | **SHORT** | #5 (84) | ChatGPT/Gemini LONG vs DeepSeek SHORT |
-| **AZN** | 미언급 | 미언급 | #3 (86) | 미언급 | DeepSeek 단독 |
-| **JNJ** | 미언급 | 미언급 | #5 (81) | 미언급 | DeepSeek 단독 |
-| **BMY** | SHORT | #4 (83) | SHORT | SHORT | Claude만 LONG |
-| **GILD** | SHORT | #6 (82) | 미언급 | 미언급 | Claude만 LONG |
-| **ARGX** | 미언급 | #7 (79) | 미언급 | 미언급 | Claude 단독 |
-| **MDGL** | 미언급 | 미언급 | 미언급 | #7 (80) | **Gemini 단독** |
+**가장 큰 변화를 보인 모델**입니다. KR과 CN의 LONG 7개 중 **4개만 겹침** (LLY/VRTX/ARGX/REGN).
 
-### SHORT 후보 비교
+| 티커 | KR Claude | CN Claude | 변화 |
+|------|-----------|-----------|------|
+| **LLY** | LONG #1 (85) | LONG #1 (85) | 동일 |
+| **VRTX** | LONG #2 (86) | LONG #2 (85) | 동일 |
+| **ARGX** | LONG #7 (79) | LONG #3 (83) | **CN에서 순위 상승** |
+| **REGN** | LONG #5 (80) | LONG #4 (84) | 동일 LONG |
+| **ABBV** | LONG #3 (86) | **미언급** | **KR LONG → CN 제외** |
+| **BMY** | **LONG #4 (83)** | **SHORT #3 (74)** | **정반대 이동** |
+| **GILD** | LONG #6 (82) | **미언급** | **KR LONG → CN 제외** |
+| **MDGL** | 미언급 | LONG #5 (78) | **CN에서 신규 발굴** |
+| **INSM** | 미언급 | LONG #6 (74) | **CN에서 신규 발굴** |
+| **ALNY** | 미언급 | LONG #7 (76) | **CN에서 신규 발굴** |
 
-| 티커 | ChatGPT | Claude | DeepSeek | Gemini | 비고 |
-|------|---------|--------|----------|--------|------|
-| **PFE** | #2 (87) | #1 (80) | #2 (79) | 미언급 | 3사 SHORT, Gemini 미언급 |
-| **BMY** | #1 (91) | LONG | #3 (76) | #1 (63) | Claude만 반대 |
-| **BIIB** | 미언급 | #2 (73) | 미언급 | #2 (67) | Claude/Gemini 합치 |
-| **MRK** | LONG #3 | 미언급 | LONG #6 | **#3 (68)** | **Gemini 단독 SHORT** |
-| **AMGN** | LONG | 미언급 | #1 (85) | LONG | DeepSeek 단독 SHORT |
-| **GILD** | #3 (85) | LONG | 미언급 | 미언급 | ChatGPT 단독 SHORT |
-| **MRNA** | 미언급 | #3 (75) | 미언급 | 미언급 | Claude 단독 |
+→ **Claude의 CN 버전은 KR보다 더 미드캡/희귀병 위주의 다각화된 포트폴리오**를 산출했습니다. ABBV·BMY·GILD 같은 메가캡을 빼고, MDGL·INSM·ALNY 같은 specialty pharma를 추가했습니다.
 
-### 가장 극명하게 갈린 5개 종목
+### DeepSeek — KR vs CN
 
-1. **BMY**: 3사 SHORT vs **Claude는 LONG** (Forward P/E ~9x + 후반 readout 집중)
-2. **AMGN**: ChatGPT/Gemini LONG (MariTide 비만 옵션) vs **DeepSeek SHORT** (denosumab biosimilar 9개)
-3. **GILD**: ChatGPT SHORT (HIV 포화) vs **Claude LONG** (Yeztugo 5배 가이던스) — DeepSeek/Gemini 미언급
-4. **NVO**: ChatGPT 91점 LONG vs Claude 사실상 부정 vs DeepSeek/Gemini 약하게 LONG
-5. **MRK**: 3사 LONG (Winrevair, Keytruda Qlex) vs **Gemini SHORT** (Keytruda 2028 LOE + IRA 노출)
+| 티커 | KR DeepSeek (영어) | CN DeepSeek (중국어) | 변화 |
+|------|-------------------|---------------------|------|
+| **LLY** | LONG #1 (89) | LONG #1 (89) | 동일 |
+| **ABBV** | LONG #2 (88) | LONG #2 (87) | 동일 |
+| **AZN** | LONG #3 (86) | LONG #3 (83) | 동일 |
+| **AMGN** | **SHORT #1 (85)** | **LONG #4 (80)** | **정반대 이동** |
+| **MRK** | LONG #6 (80) | LONG #5 (78) | 동일 |
+| **VRTX** | LONG #4 (83) | LONG #6 (77) | 동일 LONG |
+| **JNJ** | LONG #5 (81) | **SHORT #3 (75)** | **정반대 이동** |
+| **GILD** | 미언급 | LONG #7 (76) | **CN 신규** |
+| **PFE** | SHORT #2 (79) | SHORT #1 (90) | SHORT 강화 |
+| **BMY** | SHORT #3 (76) | SHORT #2 (84) | SHORT 강화 |
 
-> **시사점**: 모델 수가 늘수록 양극화 종목이 더 드러난다. BMY, MRK, AMGN, GILD, NVO 등 **전체 미국 제약 메가캡의 절반 이상**이 LLM 간 의견이 갈린다. 단일 모델 의존은 사실상 *모델별 룰렛 게임*.
+→ **DeepSeek의 CN 버전은 SHORT 풀이 PFE/BMY/JNJ로 변경** (KR은 PFE/BMY/AMGN). AMGN은 KR SHORT → CN LONG, JNJ는 KR LONG → CN SHORT로 **두 종목이 정확히 자리 교환**되었습니다.
 
----
+### Gemini — KR vs CN
 
-## 정량 평가 — 점수 인플레이션 패턴 (4-LLM)
+| 티커 | KR Gemini | CN Gemini | 변화 |
+|------|-----------|-----------|------|
+| **LLY** | LONG #1 (95) | LONG #1 ($1,020 목표) | 동일 |
+| **VRTX** | LONG #2 (92) | LONG #2 ($530 목표) | 동일 |
+| **REGN** | LONG #3 (89) | LONG #5 ($1,280 목표) | 동일 LONG |
+| **ABBV** | LONG #4 (87) | **미언급** | **CN 제외** |
+| **AMGN** | LONG #5 (84) | **미언급** | **CN 제외** |
+| **NVO** | LONG #6 (86) | LONG #6 ($165 목표) | 동일 |
+| **MDGL** | LONG #7 (80) | **미언급** | **CN 제외** |
+| **MRK** | **SHORT #3 (68, 단독)** | **LONG #3 ($155 목표)** | **정반대 이동** |
+| **AZN** | 미언급 | LONG #4 ($92 목표) | **CN 신규** |
+| **ASND** | 미언급 | LONG #7 ($210 목표) | **CN 단독 발굴** |
+| **BIIB** | SHORT #2 (67) | SHORT #2 ($140 목표) | 동일 |
+| **MRNA** | 미언급 | SHORT #3 ($60 목표) | **CN 신규 SHORT** |
+| **BMY** | SHORT #1 (63) | SHORT #1 ($35 목표) | 동일 SHORT |
 
-| 모델 | LONG 최고 | LONG 최저 | 점수 범위 | 평균 | SHORT 점수 | 인플레이션 |
-|------|----------|----------|----------|------|-----------|----------|
-| ChatGPT | 92 | 82 | 10 | 86.4 | 85, 87, 91 | **높음** (모두 80후반~90대) |
-| Claude | 86 | 79 | 7 | 82.6 | 73, 75, 80 | **보수적** (정규분포 가까움) |
-| DeepSeek | 89 | 78 | 11 | 83.6 | 76, 79, 85 | **중간** |
-| **Gemini** | **95** | **80** | **15** | **87.6** | **63, 67, 68** | **이중 성격** (LONG 인플레/SHORT 압축) |
-
-**관찰**:
-- **Gemini의 점수 폭이 가장 넓다 (15점)** — LONG에서 95점이라는 매우 자신감 있는 점수까지 부여
-- **Gemini의 SHORT 점수는 60대로 매우 낮음 (63~68)** — SHORT 포지션에 대한 conviction이 약함을 시사. 이는 squeeze 위험을 암묵적으로 반영한 보수적 자세로 해석 가능
-- ChatGPT는 LONG·SHORT 모두 80~90대 클러스터 → 가장 변별력 부족
-- Claude는 모든 점수가 70대 후반~80대 후반 → 가장 균형 잡힌 분포
-
----
-
-## 시나리오 수익률 — 모델별 낙관/비관 편차
-
-| 모델 | Bull | Base | Bear | 형식 |
-|------|------|------|------|------|
-| ChatGPT | +18% | +11% | -6% | 단일값, 단순 |
-| Claude | +20.5% | +9.9% | -5.0% | 단일값 + 계산식 명시 |
-| DeepSeek | **+22~28%** | **+10~16%** | **-5~-12%** | **레인지 + 가정 명시** |
-| **Gemini** | **미제시** | **+15%** | **미제시** | **Base만 단일값** |
-
-**평가**:
-- DeepSeek만 레인지로 제시 → 학술/기관 IC 보고서 스타일
-- Claude는 계산식 ("+25% × 0.7 + +10% × 0.3 = +20.5%") 노출 → 백테스트 추적성
-- **Gemini는 Bull/Bear 시나리오 자체가 없음** → 의사결정 보조 도구로서는 불완전. 다만 "S&P Healthcare 대비 Alpha 8%"라는 *상대수익률* 지표 추가 → 단순함 속의 명확함
+→ **Gemini의 가장 충격적인 변화**: KR에서 4개 LLM 중 유일하게 MRK SHORT를 주장했던 Gemini가, CN에서는 MRK를 LONG #3 ($155 목표)로 정반대 출력. 동일 모델·동일 시점·동일 프롬프트에서 **단지 출력 언어만 바뀌어도** 가장 contrarian한 thesis가 사라집니다.
 
 ---
 
-## 1차 출처 (Primary Sources) 인용 깊이
+## 메타 분석 — 왜 같은 LLM이 언어에 따라 다른 포지션을 출력하는가?
 
-| 항목 | ChatGPT | Claude | DeepSeek | Gemini |
-|------|---------|--------|----------|--------|
-| 종목별 SEC EDGAR 링크 | LLY만 | **모든 종목** | **모든 종목** | 일반 검색 링크만 |
-| ClinicalTrials.gov NCT 번호 | 1건 | 다수 (NCT05051579 등) | 다수 (NCT06564142 등) | **3건** (LLY/VRTX/AMGN) |
-| 회사 IR URL | LLY만 | 모든 종목 | 모든 종목 | 없음 |
-| 회사 8-K 직접 링크 | 없음 | **다수** (LLY/ABBV/BMY/GILD) | 없음 | 없음 |
-| 재확인 필요 표시 | 일부 | **체계적** | **체계적** + Compliance Checklist | 일부 |
-| Q1 2026 실적 데이터 | 없음 | **풍부** | **풍부** | **없음** |
+### 가설 1: 훈련 코퍼스의 도메인-언어 정렬
+각 언어별 훈련 코퍼스가 다른 종목·다른 narrative를 강하게 학습합니다.
+- **중국어 금융 코퍼스**는 메가캡(LLY/MRK/AZN/JNJ)에 더 친화적 — 글로벌 빅파마가 중국 시장 점유율 보고서에 자주 등장
+- **한국어 금융 코퍼스**는 contrarian/value 픽(BMY/GILD)에 더 친화적 — 가치투자 담론이 강함
 
-**평가**:
-- ChatGPT/Gemini: 사실상 **출처 인용이 부재** → 검증 비용 매우 높음
-- Claude/DeepSeek: audit-ready 수준
-- **Claude만 8-K 직접 링크** → 가장 깊은 추적성
+### 가설 2: 페르소나의 언어별 해석
+"Senior Healthcare Portfolio Manager"라는 페르소나가 한국어로는 "한국 운용사 시니어"로, 중국어로는 "글로벌 자산운용사"로 다르게 해석되어 종목 선정 기준이 달라질 수 있습니다.
 
----
+### 가설 3: 출력 양식의 언어 의존성
+중국어 금융 보고서는 **간결한 outline 양식**이 표준이고, 한국어 보고서는 **상세 내러티브 양식**이 표준입니다. DeepSeek은 이를 정확히 반영했고 (KR 38KB 영어 → CN 4.6KB 중국어), Claude는 정반대 (KR 28KB → CN 38KB)로 반응했습니다.
 
-## 데이터 정확성 — 학습 cutoff 활용 비교 (4-LLM)
+### 가설 4: BMY 양극화의 의미
+BMY가 KR Claude에서 LONG, CN Claude에서 SHORT로 이동한 것은:
+- **KR narrative**: Forward P/E 9배 + 후반 readout = value 발굴
+- **CN narrative**: Eliquis + Opdivo 동시 LOE = 패턴 클리프 stock
 
-### 가격 데이터 정확도 (2026-05-04 기준)
-
-| 종목 | ChatGPT | Claude | DeepSeek | Gemini | 실제 |
-|------|---------|--------|----------|--------|------|
-| LLY | $820 (오류) | $963 (정확) | $963 (정확) | **$780 (오류, 가장 큼)** | ~$961 |
-| NVO | $125 (오류) | 미평가 | $68 (정확) | **$130 (오류)** | ~$40~68 |
-| VRTX | $470 (편차) | $430 (정확) | $436 (정확) | $420 (정확) | ~$429~436 |
-| ABBV | $165 (편차) | $185 (편차) | $206 (정확) | $175 (편차) | ~$190~206 |
-| AMGN | 미평가 | 미평가 | $300 (정확) | $305 (정확) | ~$300 |
-| REGN | 미평가 | $750 | 미평가 | $940 | ~$750~940 |
-| MRK | $135 | 미평가 | $112 (정확) | $125 (편차) | ~$112 |
-| BIIB | 미평가 | 미평가 | 미평가 | $210 (편차) | ~$160~200 |
-| BMY | $55 (편차) | 미평가 | $58 (정확) | $46 (오류) | ~$58 |
-
-**핵심 관찰**:
-- **Claude/DeepSeek은 web search 활용 → Q1 2026 실적 발표 후 가격 반영**
-- **ChatGPT/Gemini는 stale data 의존 → LLY $820/$780 등 명백한 cutoff data 출력**
-- Gemini의 LLY $780은 4개 모델 중 가장 부정확 — 학습 cutoff가 더 이른 시점일 가능성
-
-### Q1 2026 실적 반영도
-
-| 데이터 포인트 | ChatGPT | Claude | DeepSeek | Gemini |
-|-------------|---------|--------|----------|--------|
-| LLY Q1 매출 $19.8B (+56%) | 누락 | 반영 | 반영 | 누락 |
-| LLY 가이던스 상향 ($82~85B) | 누락 | 반영 | 반영 | 누락 |
-| ABBV Skyrizi $4.483B (+30.9%) | 누락 | 반영 | 반영 | 누락 |
-| BMY Camzyos $314M (+97%) | 누락 | 반영 | 누락 | 누락 |
-| Foundayo (Orforglipron) FDA 승인 | 누락 | 반영 | 반영 (4/1, "294 days early") | 누락 |
-| VRTX Povetacicept RAINIER 데이터 | 누락 | 누락 | 반영 (52% proteinuria 감소) | 누락 |
-| VX-548 / Suzetrigine 통증 | 일반 | 반영 | 반영 | **반영** |
-| AbbVie Cerevel ($8.7B 인수) | 누락 | 누락 | 반영 | 누락 |
-| Madrigal Rezdiffra MASH | 누락 | 누락 | 누락 | **반영 (단독)** |
-
-**평가**:
-- **DeepSeek > Claude >> Gemini > ChatGPT** 순으로 Q1 2026 데이터 반영도
-- Gemini는 **VX-548 PDUFA(2026-09)와 MDGL Rezdiffra**에는 정확하지만, 그 외 Q1 실적은 거의 누락
-- ChatGPT는 사실상 학습 데이터 그대로 출력
+→ 같은 사실을 두 언어가 다른 방식으로 가중하는 것을 보여줍니다.
 
 ---
 
-## 모델 별 강점·약점 종합 (4-LLM)
+## 데니스의 4-LLM × 2-Language 워크플로우 (확장 버전)
 
-### Gemini (신규 분석)
-**강점**:
-- **분량 효율의 정점** — 4KB로 핵심 결론 모두 전달
-- **MDGL 단독 발굴** — MASH 시장 first-mover (Rezdiffra) 식별 능력
-- **MRK SHORT thesis** — Keytruda 2028 LOE + IRA 노출을 contrarian 시각으로 수용한 유일한 모델
-- SHORT 점수 60대 압축 → squeeze 위험을 암묵적으로 인식
-- 카탈리스트 캘린더는 **3개 핵심 이벤트만** 추출 (5월/6월/9월) → 의사결정 효율적
+> 사용자가 BetaLabs CEO + Web3Paper 운영 + CTI 리포트 KR/EN/CN/JP 4국어 발행 등 멀티-모달 분석가임을 고려한 권장.
 
-**약점**:
-- **가격 데이터가 가장 부정확** (LLY $780 등) — Web search 미활용 추정
-- Bull/Bear 시나리오 부재 → 리스크 매니지먼트 도구 미흡
-- 출처 인용 얕음 (NCT 3건, SEC/IR URL 부재)
-- Q1 2026 실적 거의 누락 → 알파 판단 근거 약함
-- 단일 분자/단일 카탈리스트 의존도 분석 부족 (예: VRTX의 VX-548 외 파이프라인 언급 없음)
+### 시나리오별 모델·언어 선택
 
-### ChatGPT
-- 강점: 빠른 outline, 프롬프트 의도 파악
-- 약점: stale data, 점수 인플레, 출처 부재, Q1 2026 누락
-
-### Claude
-- 강점: 한국어 + audit-ready + 8-K 직접 인용 + contrarian (BMY/GILD LONG) + ARGX 단독 픽
-- 약점: Risk Dashboard 부재, M&A 정보 부족
-
-### DeepSeek
-- 강점: 가장 풍부 + 기관양식 (Risk Dashboard, Compliance Checklist) + M&A 정보 + 레인지 시나리오
-- 약점: 한국어 프롬프트에 영어 답변 (운영 이슈)
-
----
-
-## 모델별 "캐릭터" 한 줄 요약
-
-| 모델 | 캐릭터 | 비유 |
-|------|--------|------|
-| **ChatGPT** | 빠르지만 학습 데이터 의존 | 작년 데이터로 답변하는 인턴 |
-| **Claude** | 한국어 audit-ready + contrarian | 꼼꼼한 한국 운용사 시니어 분석가 |
-| **DeepSeek** | 영문 기관양식 + 풍부한 M&A 정보 | 글로벌 IC 미팅 자료 작성하는 글로벌 컨설턴트 |
-| **Gemini** | 짧고 contrarian + 단독 픽 | 핵심만 짚는 미니멀리스트 + 컨트래리언 픽커 |
-
----
-
-## 데니스(사용자) 관점에서의 활용 가이드 (4-LLM 버전)
-
-> 사용자가 BetaLabs CEO + Web3Paper 운영 + CTI 리포트 발행 등 멀티-모달 분석가임을 고려한 권장.
-
-### 시나리오별 모델 선택
-
-| 사용 목적 | 추천 모델 | 이유 |
+| 사용 목적 | 추천 조합 | 이유 |
 |----------|----------|------|
-| **한국어 클라이언트용 리포트 초안** | **Claude** | 한국어 자연성 + 8-K 직접 인용 + audit 가능 |
-| **글로벌 IC/펀드 매니저 양식** | **DeepSeek** | Risk Dashboard + Compliance Checklist + 영어 |
-| **빠른 outline / 아이디어 brain-dump** | **ChatGPT** | 간결, 다만 출처는 별도 검증 필요 |
-| **Contrarian 발굴 / 컴팩트 요약** | **Gemini** | MDGL/MRK SHORT 같은 단독 픽 + 짧은 분량 |
-| **Web3Paper 같은 미디어 컨텐츠 / 한·영·중 4개국어** | **Claude + DeepSeek 병행** | 한국어는 Claude, 영어 풀버전은 DeepSeek |
-| **CTI 리포트 양식 (KR/EN/CN/JP) 적용** | **DeepSeek 기반 + Claude 한국어 번역** | DeepSeek 영문 정확도 + Claude 한국어 톤 |
-| **30초 이내 의사결정 sketch** | **Gemini** | 4KB 안에 핵심 종목 + 점수 + 카탈리스트 모두 포함 |
+| **한국어 클라이언트 리포트** | **Claude KR** | 한국어 자연성 + 8-K 직접 인용 + audit 가능 |
+| **중국어/홍콩 IC 보고서** | **Claude CN + DeepSeek CN** | Claude CN은 KR보다 더 길고 다각화, DeepSeek은 모회사 HFT 배경의 도메인 지식 |
+| **글로벌 영어 IC 미팅** | **DeepSeek KR (영어 출력)** | 가장 풍부 + 기관양식 + Risk Dashboard |
+| **빠른 outline / brain-dump** | **ChatGPT** | 간결, 다만 출처는 별도 검증 필요 |
+| **Contrarian 발굴** | **Gemini KR + Claude CN** | Gemini KR의 MRK SHORT, Claude CN의 INSM/ALNY/MDGL |
+| **CTI 리포트 KR/EN/CN/JP 적용** | **4-LLM × 4-Lang 매트릭스** | 16개 출력 후 합치/분기 종목만 인간 결정 |
+| **30초 이내 sketch** | **Gemini (KR 또는 CN)** | 4KB로 핵심 + 카탈리스트 |
 
-### 데니스의 4-LLM 워크플로우 추천
+### 데니스의 4-LLM × 2-Lang 워크플로우 다이어그램
 
 <p align="center">
   <img src="./assets/multi_llm_pharma_workflow.svg" alt="4-LLM Pharma Long/Short Workflow — Gemini contrarian 픽 → DeepSeek facts/M&A 풀 → Claude 한국어 audit-ready 베이스 → ChatGPT sanity check → 사람의 최종 결정 → KR/EN 양본 발행" width="680">
 </p>
 
 <details>
-<summary>워크플로우 텍스트 버전 (접근성용)</summary>
+<summary>워크플로우 텍스트 버전 (4-LLM × 2-Lang 확장)</summary>
 
 ```
-[1] Gemini = 30초 내 종목 hint + contrarian 픽 (MDGL, MRK SHORT 같은 idea)
+[1] Gemini = 30초 내 종목 hint (KR + CN 양쪽)
+   ↓ (KR: MRK SHORT / CN: MRK LONG → 양극화 인지)
+[2] DeepSeek = 글로벌 facts/M&A 풀 (KR 영어 풍부 + CN 중국어 압축)
+   ↓ (KR: AMGN SHORT / CN: AMGN LONG → 또 다른 양극화)
+[3] Claude = 한국어 audit-ready (KR) + 중국어 다각화 (CN)
+   ↓ (KR: BMY/GILD LONG / CN: BMY SHORT, INSM/ALNY 신규 → 다층 cross-check)
+[4] ChatGPT = sanity check / outline 비교 (KR만)
    ↓
-[2] DeepSeek = 글로벌 facts/numbers/M&A 풀 (Cerevel, Alpine, Metsera 같은 누락 정보)
+[5] 양극화 종목 사람 결정 (BMY·AMGN·GILD·MRK·NVO·JNJ — CN 추가로 6개)
    ↓
-[3] Claude = 한국어 narrative + Q1 8-K 1차 인용 베이스
-   ↓
-[4] ChatGPT = 빠른 sanity check / outline 비교 (오류 검증용)
-   ↓
-[5] BMY·AMGN·GILD·MRK·NVO 같은 양극화 종목은 사람이 최종 결정
-   ↓
-[6] CTI 리포트 양식처럼 KR/EN 양본을 모두 발행
+[6] CTI 리포트 양식처럼 KR/EN/CN/JP 4국어 발행
 ```
 
 </details>
 
-이 워크플로우는 데니스의 기존 Multi-LLM Cross-Validation 패턴과 정확히 호환됩니다. 4번째 모델 추가 비용은 거의 없지만, **양극화 종목이 1개 더 발견** (MRK)되었고 **단독 픽 1개** (MDGL)을 추가 확보했습니다 — ROI 측면에서 4-LLM이 3-LLM보다 명확히 우월합니다.
-
 ---
 
-## 중요 발견 — 단일 LLM 의존의 위험성 (4-LLM 확장)
+## 부록: 4-LLM × 2-Lang 종합 매트릭스
 
-### 1. 종목 선정 자체가 뒤집힘 (5개 종목으로 확장)
-- **BMY**: Claude 매수 / 나머지 3사 매도
-- **AMGN**: ChatGPT/Gemini 매수 / DeepSeek 매도
-- **GILD**: Claude 매수 / ChatGPT 매도
-- **MRK**: 3사 매수 / **Gemini 매도 (단독)**
-- 단일 모델만 사용했다면 *완전 정반대 포지션*을 잡을 수 있다.
+### LONG 후보 — KR vs CN 통합 (상위 빈도순)
 
-### 2. 데이터 cutoff 의존도 차이 (Web Search 정책 분기)
-- **활용 적극**: Claude, DeepSeek (Q1 2026 실적, Foundayo 승인 모두 반영)
-- **활용 미흡**: ChatGPT, Gemini (LLY 가격 $820/$780 stale data)
-- 같은 프롬프트라도 **모델의 web search 활용 정책이 출력의 알파를 좌우**
+| 티커 | KR ChatGPT | KR Claude | KR DeepSeek | KR Gemini | CN Claude | CN DeepSeek | CN Gemini | LONG 등장 횟수 |
+|------|-----------|-----------|-------------|-----------|-----------|-------------|-----------|--------------|
+| **LLY** | #1 | #1 | #1 | #1 | #1 | #1 | #1 | **7/7 (만장일치)** |
+| **VRTX** | #6 | #2 | #4 | #2 | #2 | #6 | #2 | **7/7 (만장일치)** |
+| **REGN** | #5 | #5 | 미 | #3 | #4 | 미 | #5 | 5/7 |
+| **ABBV** | #4 | #3 | #2 | #4 | 미 | #2 | 미 | 5/7 |
+| **MRK** | #3 | 미 | #6 | **SHORT** | 미 | #5 | **#3** | 4/7 (Gemini 분기) |
+| **AMGN** | #7 | 미 | **SHORT** | #5 | 미 | **#4** | 미 | 3/7 (DeepSeek 분기) |
+| **NVO** | #2 | 부정 | #7 | #6 | 미 | 미 | #6 | 4/7 |
+| **AZN** | 미 | 미 | #3 | 미 | 미 | #3 | **#4** | 3/7 |
+| **ARGX** | 미 | #7 | 미 | 미 | **#3** | 미 | 미 | 2/7 |
+| **MDGL** | 미 | 미 | 미 | #7 | **#5** | 미 | 미 | 2/7 |
+| **JNJ** | 미 | 미 | #5 | 미 | 미 | **SHORT** | 미 | 1/7 (DeepSeek 분기) |
+| **GILD** | **SHORT** | #6 | 미 | 미 | 미 | #7 | 미 | 2/7 (ChatGPT 분기) |
+| **BMY** | **SHORT** | #4 | **SHORT** | **SHORT** | **SHORT** | **SHORT** | **SHORT** | 1/7 (Claude KR만) |
+| **INSM** | 미 | 미 | 미 | 미 | **#6** | 미 | 미 | 1/7 (Claude CN 단독) |
+| **ALNY** | 미 | 미 | 미 | 미 | **#7** | 미 | 미 | 1/7 (Claude CN 단독) |
+| **ASND** | 미 | 미 | 미 | 미 | 미 | 미 | **#7** | 1/7 (Gemini CN 단독) |
 
-### 3. Linguistic Bias (DeepSeek 특이점)
-- DeepSeek의 영어 출력은 모델 내부 **도메인-언어 정렬 메커니즘**의 노출
-- 한국어 도메인 작업 시 명시적 언어 강제는 RAG/Agent 시스템 설계에서 first-class 변수
+### 만장일치 vs 분기 정리
 
-### 4. Score Inflation은 의사결정 노이즈
-- ChatGPT의 90점 클러스터링 = *자신감의 가짜 신호*
-- Gemini의 LONG 95점 vs SHORT 63점 = **이중 성격** (LONG 인플레, SHORT 보수적)
-- 정량 점수 비교 시 **모델별 정규화** 필수
+- **7/7 만장일치 LONG**: LLY, VRTX (4개 LLM × KR/CN 모두)
+- **5/7 강한 LONG**: REGN, ABBV
+- **분기 종목 (LLM 또는 언어로 인해 정반대 포지션 발생)**: BMY, AMGN, MRK, JNJ, GILD
+- **단독 발굴 종목 (1개 LLM × 1개 언어)**: INSM, ALNY, ASND, ARGX, MDGL
 
-### 5. 분량과 정보 밀도는 별개
-- Gemini 4KB < ChatGPT 5KB이지만, **Gemini가 contrarian 픽을 더 많이 포함**
-- DeepSeek 38KB가 가장 길지만, REGN 미언급 등 **분량이 곧 완전성을 보장하지 않음**
-- **분량보다 *발굴 다양성*이 alpha의 원천**
+### 핵심 인사이트
 
----
-
-## 부록: 4-LLM 비교 매트릭스 한눈에 보기
-
-| 평가 차원 | ChatGPT | Claude | DeepSeek | Gemini |
-|----------|---------|--------|----------|--------|
-| 분량 | 부족 | 충분 | 매우 충분 | **압축적** |
-| 한국어 적합도 | 양호 | **우수** | 미흡 (영어) | **우수** |
-| 출처 깊이 | 부족 | **우수** (8-K) | 우수 | 부족 |
-| Q1 2026 반영 | 부족 | **우수** | **우수** | 부족 |
-| 가격 정확도 | 부족 (stale) | 우수 | **우수** | 부족 (가장 stale) |
-| 점수 변별력 | 부족 | 양호 | 양호 | 우수 (15점 폭) |
-| 구조/포맷 | 부족 | 양호 | **우수** (기관양식) | 양호 (압축) |
-| 시나리오 정밀도 | 부족 | 양호 | **우수** (레인지) | 부족 (Base만) |
-| Risk Mgmt 도구 | 부족 | 양호 | **우수** | 부족 |
-| Contrarian 시각 | 부족 | **우수** (BMY/GILD LONG) | 부족 | **우수** (MRK SHORT) |
-| 미드캡 발굴 | 부족 | **우수** (ARGX) | 부족 | **우수** (MDGL) |
-| M&A 정보 | 부족 | 부족 | **우수** (Cerevel/Alpine) | 부족 |
-| 의사결정 효율 | 양호 | 양호 | 부족 (긺) | **우수** (4KB) |
-| **종합 (Pharma 전용)** | **2.0 / 10** | **7.5 / 10** | **7.5 / 10** | **6.0 / 10** |
+1. **만장일치는 LLY/VRTX 단 2개**: 4개 LLM × KR/CN 모두에서 LONG으로 평가받은 종목은 단 2개. 나머지는 어디선가 의견이 갈렸다.
+2. **분기 종목 5개**: BMY, AMGN, MRK, JNJ, GILD — **단일 LLM × 단일 언어 의존 시 5개 메가캡에서 잘못된 방향 베팅 가능**.
+3. **단독 발굴 5개**: INSM, ALNY, ASND, ARGX, MDGL — **CN 추가로 미드캡/희귀병 발굴 능력이 명확히 증가** (Claude CN 단독 INSM/ALNY는 CN 추가 없이는 발굴 불가능했던 종목).
+4. **4-LLM × 2-Lang ROI 분명**: 단일 LLM × 단일 언어 대비, 4-LLM × 2-Lang 매트릭스는 **양극화 종목 5개 식별 + 단독 발굴 5개 추가**라는 정량 가치를 보여준다.
 
 ---
 
 ## 결론
 
-> **"동일 프롬프트, 동일 시점, 4개 모델 → 4개 다른 포트폴리오"**
+> **"동일 프롬프트, 동일 시점, 4개 모델 × 2개 언어 → 최대 8개의 다른 포트폴리오"**
 
-4개 모델은 **구조적으로 다른 종목 선정 결과**를 산출했다:
-- ChatGPT: outline + stale data
-- Claude: 한국어 audit-ready + contrarian (BMY/GILD/ARGX)
-- DeepSeek: 영어 기관양식 + M&A 풍부 + AZN/JNJ 픽
-- **Gemini: 압축적 + MDGL 단독 + MRK SHORT (4사 중 유일)**
+세 단계의 발견:
 
-가장 흥미로운 발견은:
+1. **3-LLM 비교 (KR만)**: 양극화 종목 4개 발견 (BMY/AMGN/GILD/NVO)
+2. **4-LLM 비교 (KR만)**: 양극화 종목 **5개**로 확장 (+ MRK, Gemini KR이 단독 SHORT)
+3. **4-LLM × 2-Lang 비교 (KR + CN)**: 양극화 종목 **6개+**로 추가 확장 (+ JNJ, DeepSeek이 KR LONG / CN SHORT)
 
-1. **양극화 종목이 4-LLM 비교에서 5개로 확장** (BMY, AMGN, GILD, NVO, **MRK**) — 단일 LLM 의존 시 알파 손실 또는 손실 발생 위험 상승
-2. **Gemini의 MDGL 단독 발굴** — 미드캡 contrarian 픽 능력은 분량과 무관 (4KB로도 가능)
-3. **Gemini의 MRK SHORT** — 다른 3사가 Winrevair 모멘텀에 가려진 *Keytruda 2028 LOE 위험*을 정면 인식
-4. **Web search 정책이 정확도를 결정** — Claude/DeepSeek vs ChatGPT/Gemini로 양분
-5. **Multi-LLM cross-validation은 비용이 아니라 보험** — 데니스의 기존 워크플로우는 이미 best practice이며, **4-LLM 확장 시 ROI는 더 높음**
+이는 데니스 님의 기존 multi-LLM cross-validation 패턴이 **multi-language cross-validation**으로 진화한 결과이며, **CTI 리포트의 KR/EN/CN/JP 4국어 발행과 정확히 같은 패턴**입니다. 단일 LLM × 단일 언어 의존은 사실상 *언어별 룰렛 게임*이며, 4-LLM × 4-Lang 매트릭스는 정량적으로:
 
-투자 결정 전 4개 모델 모두 동시 실행:
-- **Gemini**: 30초 contrarian 픽 발굴
-- **Claude**: 한국어 audit 베이스
-- **DeepSeek**: 영어 facts/numbers 풀
-- **ChatGPT**: sanity check
+- **만장일치 종목** (LLY/VRTX): 100% conviction LONG → 핵심 비중
+- **분기 종목** (BMY/AMGN/MRK/JNJ/GILD): 사람이 결정 → 보수적 비중 또는 회피
+- **단독 발굴 종목** (INSM/ALNY/ASND/ARGX/MDGL): 미드캡/희귀병 알파 → 위성 비중
 
-양극화된 종목(BMY, AMGN, GILD, MRK, NVO)은 사람이 결정.
+DeepSeek가 한국어 프롬프트엔 영어로, 중국어 프롬프트엔 정확한 중국어로 답한 사실은 **모델의 언어 지원이 코퍼스 비중에 비례**한다는 강한 증거이고, 이는 DeepSeek 모회사가 중국 HFT 회사라는 사실과 맞물려 **금융 도메인 × 언어 정렬의 자연스러운 결과**입니다.
 
-## Gemini 특이점 4가지
-
-가장 짧음 (4.13KB) — ChatGPT보다도 짧지만 핵심은 더 풍부합니다. "압축적 효율"의 정점이고, 30초 의사결정 sketch에 적합합니다.
-MDGL (Madrigal) 단독 발굴 — Rezdiffra(MASH 시장 first-mover, 2024년 첫 FDA 승인)를 픽한 유일한 모델입니다. Claude의 ARGX, DeepSeek의 AZN/JNJ와 같은 "단독 발굴 능력" — 분량과는 무관하게 contrarian 미드캡 발굴 가능성을 보여주는 사례입니다.
-MRK를 SHORT로 분류한 4사 중 유일 — ChatGPT/DeepSeek가 모두 LONG으로 본 Merck를 Gemini는 Keytruda 2028 LOE + IRA 노출을 이유로 SHORT로 분류했습니다. 다른 3사가 Winrevair 모멘텀에 가려진 구조적 위험을 정면으로 인식한 contrarian thesis입니다.
-이중 성격 점수 분포 — LONG 80~95점 (15점 폭, 가장 넓음) vs SHORT 63~68점 (5점 폭, 매우 압축). LONG에는 자신감, SHORT에는 squeeze 위험을 암묵적으로 반영한 보수적 자세를 보입니다.
-
-## 4-LLM 핵심 인사이트 갱신
-
-양극화 종목이 4개 → 5개로 확장: BMY, AMGN, GILD, NVO에 MRK 추가
-데이터 정확도 양분 명확화: Claude·DeepSeek (web search 활용) vs ChatGPT·Gemini (stale data) — Gemini의 LLY $780은 4사 중 가장 부정확
-종합 점수: Claude/DeepSeek 7.5점, Gemini 6.0점, ChatGPT 2.0점 — Gemini는 분량 부족과 출처 얕음으로 감점되었지만 contrarian 발굴 능력으로 ChatGPT를 크게 앞섭니다.
+투자 결정 전 권장:
+- **Gemini KR + CN**: 30초 contrarian 픽 비교 (MRK 양극화 발견)
+- **DeepSeek KR (영어) + CN**: facts/numbers 풀 + JNJ/AMGN 양극화 발견
+- **Claude KR + CN**: 한국어 audit + 중국어 다각화 (INSM/ALNY/MDGL 단독 픽)
+- **ChatGPT KR**: sanity check
+- **양극화 종목 6개** (BMY, AMGN, GILD, MRK, NVO, JNJ): 사람이 결정
 
 ---
 
-*본 비교 분석은 2026-05-04 시점 동일 프롬프트로 산출된 4개 LLM 출력물을 대조 분석한 결과입니다. 분석 자체는 투자 자문이 아니며, 실제 투자 결정은 1차 출처 재확인 후 자격 있는 자문가와 상의하시기 바랍니다.*
+*본 비교 분석은 2026-05-04 시점 동일 프롬프트로 산출된 4개 LLM × 2개 언어 (KR + CN) 출력물을 대조 분석한 결과입니다. 분석 자체는 투자 자문이 아니며, 실제 투자 결정은 1차 출처 재확인 후 자격 있는 자문가와 상의하시기 바랍니다.*
 
 *Repository: [vibe-investing/Pharma sector prompt](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts/Pharma%20sector%20prompt)*
+
+*KR results: [/result](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts/Pharma%20sector%20prompt/result) · CN results: [/result/CN_report](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts/Pharma%20sector%20prompt/result/CN_report)*
