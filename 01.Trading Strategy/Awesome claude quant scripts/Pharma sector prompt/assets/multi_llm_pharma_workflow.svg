@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="560" viewBox="0 0 680 560" role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">4-LLM Pharma Long/Short Workflow</title>
+  <desc id="diagramDesc">여섯 단계 수직 워크플로우: Gemini 30초 contrarian 픽 → DeepSeek facts/M&amp;A 풀 → Claude 한국어 audit-ready 베이스 → ChatGPT sanity check → 양극화 5개 종목 사람 결정 → KR/EN 양본 발행. LLM 단계는 보라색, 사람 결정은 황색, 최종 발행은 청록색.</desc>
+
+  <style>
+    .ttext { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-size: 14px; font-weight: 500; }
+    .stext { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-size: 12px; font-weight: 400; }
+
+    .b-llm    { fill: #EEEDFE; stroke: #534AB7; }
+    .t-llm-h  { fill: #26215C; }
+    .t-llm-s  { fill: #534AB7; }
+
+    .b-human   { fill: #FAEEDA; stroke: #BA7517; }
+    .t-human-h { fill: #412402; }
+    .t-human-s { fill: #854F0B; }
+
+    .b-output   { fill: #E1F5EE; stroke: #1D9E75; }
+    .t-output-h { fill: #04342C; }
+    .t-output-s { fill: #0F6E56; }
+
+    .arr-line { stroke: #888780; stroke-width: 1.5; fill: none; }
+
+    @media (prefers-color-scheme: dark) {
+      .b-llm    { fill: #3C3489; stroke: #AFA9EC; }
+      .t-llm-h  { fill: #EEEDFE; }
+      .t-llm-s  { fill: #CECBF6; }
+
+      .b-human   { fill: #854F0B; stroke: #EF9F27; }
+      .t-human-h { fill: #FAEEDA; }
+      .t-human-s { fill: #FAC775; }
+
+      .b-output   { fill: #085041; stroke: #5DCAA5; }
+      .t-output-h { fill: #E1F5EE; }
+      .t-output-s { fill: #9FE1CB; }
+
+      .arr-line { stroke: #B4B2A9; }
+    }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect class="b-llm" x="120" y="30" width="440" height="56" rx="8" stroke-width="0.5"/>
+  <text class="ttext t-llm-h" x="340" y="48" text-anchor="middle" dominant-baseline="central">1. Gemini · 30초 contrarian 픽</text>
+  <text class="stext t-llm-s" x="340" y="66" text-anchor="middle" dominant-baseline="central">MDGL · MRK SHORT 같은 단독 idea</text>
+  <line class="arr-line" x1="340" y1="86" x2="340" y2="116" marker-end="url(#arrow)"/>
+
+  <rect class="b-llm" x="120" y="116" width="440" height="56" rx="8" stroke-width="0.5"/>
+  <text class="ttext t-llm-h" x="340" y="134" text-anchor="middle" dominant-baseline="central">2. DeepSeek · facts/M&amp;A 풀</text>
+  <text class="stext t-llm-s" x="340" y="152" text-anchor="middle" dominant-baseline="central">Cerevel · Alpine · Metsera 등 누락 정보 보강</text>
+  <line class="arr-line" x1="340" y1="172" x2="340" y2="202" marker-end="url(#arrow)"/>
+
+  <rect class="b-llm" x="120" y="202" width="440" height="56" rx="8" stroke-width="0.5"/>
+  <text class="ttext t-llm-h" x="340" y="220" text-anchor="middle" dominant-baseline="central">3. Claude · 한국어 narrative</text>
+  <text class="stext t-llm-s" x="340" y="238" text-anchor="middle" dominant-baseline="central">Q1 8-K 1차 인용 audit-ready 베이스</text>
+  <line class="arr-line" x1="340" y1="258" x2="340" y2="288" marker-end="url(#arrow)"/>
+
+  <rect class="b-llm" x="120" y="288" width="440" height="56" rx="8" stroke-width="0.5"/>
+  <text class="ttext t-llm-h" x="340" y="306" text-anchor="middle" dominant-baseline="central">4. ChatGPT · sanity check</text>
+  <text class="stext t-llm-s" x="340" y="324" text-anchor="middle" dominant-baseline="central">outline 비교 · 오류 검증</text>
+  <line class="arr-line" x1="340" y1="344" x2="340" y2="374" marker-end="url(#arrow)"/>
+
+  <rect class="b-human" x="120" y="374" width="440" height="56" rx="8" stroke-width="0.5"/>
+  <text class="ttext t-human-h" x="340" y="392" text-anchor="middle" dominant-baseline="central">5. 사람의 최종 결정</text>
+  <text class="stext t-human-s" x="340" y="410" text-anchor="middle" dominant-baseline="central">BMY · AMGN · GILD · MRK · NVO 양극화 종목</text>
+  <line class="arr-line" x1="340" y1="430" x2="340" y2="460" marker-end="url(#arrow)"/>
+
+  <rect class="b-output" x="120" y="460" width="440" height="56" rx="8" stroke-width="0.5"/>
+  <text class="ttext t-output-h" x="340" y="478" text-anchor="middle" dominant-baseline="central">6. KR/EN 양본 발행</text>
+  <text class="stext t-output-s" x="340" y="496" text-anchor="middle" dominant-baseline="central">CTI 리포트 양식 적용</text>
+
+</svg>
