@@ -51,7 +51,7 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
   }
 }
 
-var containerNames = ['users', 'reports', 'logs', 'analysis']
+var containerNames = ['users', 'reports', 'logs', 'analysis', 'deployment']
 resource containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [for name in containerNames: {
   parent: blobService
   name: name
