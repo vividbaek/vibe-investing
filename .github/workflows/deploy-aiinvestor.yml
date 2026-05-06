@@ -83,7 +83,11 @@ jobs:
           az keyvault secret set --vault-name "$KEYVAULTNAME" --name deepseek-api-key         --value "${{ secrets.DEEPSEEK_API_KEY }}"          --output none
           az keyvault secret set --vault-name "$KEYVAULTNAME" --name telegram-webhook-secret  --value "${{ secrets.TELEGRAM_WEBHOOK_SECRET }}"   --output none
           az keyvault secret set --vault-name "$KEYVAULTNAME" --name user-id-salt             --value "${{ secrets.USER_ID_SALT }}"              --output none
-          az keyvault secret set --vault-name "$KEYVAULTNAME" --name dashboard-access-key    --value "${{ secrets.DASHBOARD_ACCESS_KEY }}"      --output none
+          if [ -n "${{ secrets.DASHBOARD_ACCESS_KEY }}" ]; then
+            az keyvault secret set --vault-name "$KEYVAULTNAME" --name dashboard-access-key  --value "${{ secrets.DASHBOARD_ACCESS_KEY }}"      --output none
+          else
+            echo "DASHBOARD_ACCESS_KEY GitHub secret not set; skipping KV sync (operator can run 'gh secret set DASHBOARD_ACCESS_KEY' later)"
+          fi
 
       - name: Build Functions package
         run: |
