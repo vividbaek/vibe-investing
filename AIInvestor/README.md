@@ -20,6 +20,7 @@ OpenAI에서 DeepSeek로 전환한 이유: ChatGPT는 실시간 데이터성 미
 → **[paper_plan.md — 아키텍처 및 개발 계획 (v2.0)](paper_plan.md)**
 
 함께 보는 자료:
+- **[postmortem.md — 6초 응답 지연 진단·수정 기록](postmortem.md)** — Azure 배포 9회 실패→성공 + App Insights timeline 분해 + 두 핵심 병목(`async with` per-request, DeepSeek body 스트리밍) 식별. 같은 실수를 피하기 위한 체크리스트 포함.
 - [LLM cost analysis.md](LLM%20cost%20analysis.md) — DeepSeek vs OpenAI/Anthropic/Qwen 비용 비교
 - [.env.example](.env.example) — 환경 변수 템플릿
 
