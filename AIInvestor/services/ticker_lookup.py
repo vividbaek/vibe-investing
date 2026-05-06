@@ -102,17 +102,23 @@ class TickerLookup:
             token = token.strip(" ?!.,~()[]")
             if not token:
                 continue
+            # Strip trailing Korean topic markers / object particles attached to
+            # a Latin-letter root: "AMD는?" → "AMD", "TSLA가" → "TSLA".
+            stripped_kr = re.sub(r"^([a-zA-Z\-.]+)(는|은|이|가|을|를|도|만)$", r"\1", token)
+            if stripped_kr in self._aliases:
+                return self._aliases[stripped_kr]
             if token in self._aliases:
                 return self._aliases[token]
             # bare uppercase ticker pattern inside the token
-            up = token.upper()
-            if up == token.upper() and _TICKER_RE.match(up):
+            up = stripped_kr.upper() if stripped_kr != token else token.upper()
+            if _TICKER_RE.match(up):
                 return up
 
         # 5. Already-uppercase ticker (user typed in caps)
         first_token = cleaned.split()[0]
-        if first_token == first_token.upper() and _TICKER_RE.match(first_token):
-            return first_token
+        first_token_kr = re.sub(r"^([a-zA-Z\-.]+)(는|은|이|가|을|를|도|만)\??$", r"\1", first_token)
+        if _TICKER_RE.match(first_token_kr.upper()):
+            return first_token_kr.upper()
 
         # 6. Fallback
         return first_token.upper()

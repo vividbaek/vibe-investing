@@ -96,14 +96,16 @@ async def _bootstrap() -> None:
     try:
         from telegram import BotCommand
         await _ptb_app.bot.set_my_commands([
-            BotCommand("start",    "Start onboarding"),
-            BotCommand("persona",  "Switch investor persona"),
-            BotCommand("personas", "List personas"),
-            BotCommand("lang",     "Switch language (ko/en/ja/zh)"),
-            BotCommand("feedback", "Send feedback to the dev"),
-            BotCommand("policy",   "Data handling & disclaimer"),
-            BotCommand("forget",   "Delete all my data"),
-            BotCommand("help",     "Show command list"),
+            BotCommand("start",     "Start onboarding"),
+            BotCommand("persona",   "Switch investor persona"),
+            BotCommand("personas",  "List personas"),
+            BotCommand("lang",      "Switch language (ko/en/ja/zh)"),
+            BotCommand("recommend", "Top tickers in a sector"),
+            BotCommand("compare",   "Side-by-side ticker fundamentals"),
+            BotCommand("feedback",  "Send feedback to the dev"),
+            BotCommand("policy",    "Data handling & disclaimer"),
+            BotCommand("forget",    "Delete all my data"),
+            BotCommand("help",      "Show command list"),
         ])
     except Exception:
         logger.exception("set_my_commands failed (non-fatal)")
@@ -259,6 +261,64 @@ async def prewarm_commentaries(timer: func.TimerRequest) -> None:
         await svc.refresh_commentaries(snapshots, top50)
     finally:
         await svc.aclose()
+
+
+# ---------------------------------------------------------------------
+# 2b) Slot reports (§report-generation-policy §2) — 6 KST time slots
+#     × 3 personas × 4 languages = 72 reports/day, ~$1.13/month LLM
+#     Skips on Saturday/Sunday KST (both markets idle).
+# ---------------------------------------------------------------------
+
+async def _run_slot(slot_id: str) -> None:
+    await _bootstrap()
+    if not _config or not _config.storage_account_name:
+        return
+    from services.slot_report import SlotReportService, SLOTS_BY_ID
+    slot = SLOTS_BY_ID.get(slot_id)
+    if slot is None:
+        logger.error("unknown slot_id=%s", slot_id)
+        return
+    svc = SlotReportService(persona_engine=_persona_engine)
+    try:
+        await svc.build_and_upload_slot(slot, _config.storage_account_name)
+    except Exception:
+        logger.exception("slot %s build_and_upload_slot failed", slot_id)
+
+
+# Slot 1 — KST 06:00 (UTC 21:00 prev day) — 미국 마감 요약
+@app.timer_trigger(schedule="0 0 21 * * *", arg_name="timer", run_on_startup=False, use_monitor=True)
+async def slot_06_us_close(timer: func.TimerRequest) -> None:
+    await _run_slot("06_us_close")
+
+
+# Slot 2 — KST 08:00 (UTC 23:00 prev day) — 한국 개장 전 예측
+@app.timer_trigger(schedule="0 0 23 * * *", arg_name="timer", run_on_startup=False, use_monitor=True)
+async def slot_08_kr_pred(timer: func.TimerRequest) -> None:
+    await _run_slot("08_kr_pred")
+
+
+# Slot 3 — KST 12:00 (UTC 03:00) — 한국 오전 + 아시아 요약
+@app.timer_trigger(schedule="0 0 3 * * *", arg_name="timer", run_on_startup=False, use_monitor=True)
+async def slot_12_asia(timer: func.TimerRequest) -> None:
+    await _run_slot("12_asia")
+
+
+# Slot 4 — KST 15:30 (UTC 06:30) — 한국 마감 요약
+@app.timer_trigger(schedule="0 30 6 * * *", arg_name="timer", run_on_startup=False, use_monitor=True)
+async def slot_15_30_kr_close(timer: func.TimerRequest) -> None:
+    await _run_slot("15_30_kr_close")
+
+
+# Slot 5 — KST 21:00 (UTC 12:00) — 미국 개장 전 포인트
+@app.timer_trigger(schedule="0 0 12 * * *", arg_name="timer", run_on_startup=False, use_monitor=True)
+async def slot_21_us_open(timer: func.TimerRequest) -> None:
+    await _run_slot("21_us_open")
+
+
+# Slot 6 — KST 23:00 (UTC 14:00) — 미국 개장 후 시황
+@app.timer_trigger(schedule="0 0 14 * * *", arg_name="timer", run_on_startup=False, use_monitor=True)
+async def slot_23_us_after(timer: func.TimerRequest) -> None:
+    await _run_slot("23_us_after")
 
 
 # ---------------------------------------------------------------------

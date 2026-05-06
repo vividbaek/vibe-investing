@@ -76,6 +76,8 @@ def build_application(token: str, deps: BotDependencies) -> Application:
     app.add_handler(CommandHandler("policy", _cmd_policy))
     app.add_handler(CommandHandler("feedback", _cmd_feedback))
     app.add_handler(CommandHandler("whoami", _cmd_whoami))
+    app.add_handler(CommandHandler("recommend", _cmd_recommend))
+    app.add_handler(CommandHandler("compare", _cmd_compare))
 
     app.add_handler(CallbackQueryHandler(_on_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _on_message))
@@ -221,6 +223,8 @@ async def _cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "/persona — persona keyboard\n"
         "/personas — list personas\n"
         "/lang — switch language (ko / en / ja / zh)\n"
+        "/recommend [sector] — top tickers in a sector (no LLM call)\n"
+        "/compare T1 T2 [T3 T4] — side-by-side fundamentals (no LLM call)\n"
         "/feedback <message> — send feedback to dev (피드백 alias works too)\n"
         "/policy — data handling & disclaimer\n"
         "/forget — delete all my stored data\n"
@@ -286,6 +290,202 @@ async def _cmd_whoami(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         f"TELEGRAM_OWNER_CHAT_ID on func-aiinvestor-prod."
     )
     await update.message.reply_text(text)
+
+
+# ── /recommend [sector|interest] — list top tickers, no LLM call ──
+# Sector aliases (Korean + lowercase English) → sector key in SECTOR_RELATED
+_SECTOR_ALIAS = {
+    "tech": "Technology", "기술": "Technology", "테크": "Technology", "반도체": "Technology",
+    "comm": "Communication Services", "통신": "Communication Services", "미디어": "Communication Services",
+    "consumer": "Consumer Cyclical", "소비": "Consumer Cyclical", "유통": "Consumer Cyclical",
+    "defensive": "Consumer Defensive", "필수소비": "Consumer Defensive",
+    "finance": "Financial Services", "금융": "Financial Services", "은행": "Financial Services",
+    "health": "Healthcare", "헬스케어": "Healthcare", "바이오": "Healthcare",
+    "energy": "Energy", "에너지": "Energy", "오일": "Energy",
+    "industrial": "Industrials", "산업재": "Industrials",
+    "utility": "Utilities", "유틸리티": "Utilities",
+    "realestate": "Real Estate", "부동산": "Real Estate",
+    "material": "Basic Materials", "소재": "Basic Materials",
+    "crypto": "Crypto", "암호화폐": "Crypto", "코인": "Crypto",
+}
+
+# Crypto isn't in SECTOR_RELATED; we synthesize a small list.
+_CRYPTO_PEERS = ["BTC-USD", "ETH-USD", "MSTR", "COIN", "MARA", "RIOT"]
+_CRYPTO_ETFS = ["IBIT", "FBTC"]
+
+
+async def _cmd_recommend(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """List top tickers — by sector arg, or by user's revealed interests.
+    No LLM call: pure data lookup. Validates the cache-first hypothesis.
+    """
+    profile = await _profile(update, context)
+    lang = profile.language
+    s = t(lang)
+    arg = " ".join(context.args or []).strip().lower()
+
+    from services.sector_tracker import SECTOR_RELATED
+
+    sector_key: str | None = None
+    if arg:
+        sector_key = _SECTOR_ALIAS.get(arg)
+        if not sector_key:
+            for alias, sec in _SECTOR_ALIAS.items():
+                if alias in arg:
+                    sector_key = sec
+                    break
+
+    if not sector_key:
+        # Use user's most-asked sector from profile.sector_count
+        if profile.sector_count:
+            sector_key = max(profile.sector_count.items(), key=lambda kv: kv[1])[0]
+
+    header = {
+        "ko": "📋 추천 종목",
+        "en": "📋 Recommended tickers",
+        "ja": "📋 推奨銘柄",
+        "zh": "📋 推荐股票",
+    }.get(lang, "📋 Recommended tickers")
+    sector_label = {
+        "ko": "섹터", "en": "Sector", "ja": "セクター", "zh": "行业",
+    }.get(lang, "Sector")
+    no_section = {
+        "ko": "관심 섹터가 없네요. 예) /recommend 기술 또는 /recommend 헬스케어",
+        "en": "No sector context yet. Try /recommend tech or /recommend health.",
+        "ja": "セクター指定なし。/recommend tech などをお試しください。",
+        "zh": "未指定行业。可输入 /recommend tech 等。",
+    }.get(lang, "No sector context.")
+
+    if sector_key == "Crypto":
+        peers = _CRYPTO_PEERS
+        etfs = _CRYPTO_ETFS
+    elif sector_key and sector_key in SECTOR_RELATED:
+        peers = SECTOR_RELATED[sector_key]["peers"][:8]
+        etfs = SECTOR_RELATED[sector_key]["etfs"]
+    else:
+        await update.message.reply_text(no_section)
+        return
+
+    lines = [f"{header}", f"{sector_label}: {sector_key}", ""]
+    deps = _deps(context)
+
+    # Render each peer with whatever cached price we can get cheaply (no yfinance hit if miss)
+    peers_label = {"ko": "📌 핵심 종목", "en": "📌 Peers", "ja": "📌 主要銘柄", "zh": "📌 核心股票"}.get(lang, "📌 Peers")
+    etfs_label = {"ko": "🧺 ETF", "en": "🧺 ETFs", "ja": "🧺 ETF", "zh": "🧺 ETF"}.get(lang, "🧺 ETFs")
+    lines.append(peers_label)
+    for tk in peers:
+        try:
+            snap = deps.stock_service.get_snapshot(tk)
+            price = f"{snap.price:,.2f}" if snap.price else "—"
+            m1 = f"{snap.price_change_1m_pct:+.1f}%" if snap.price_change_1m_pct is not None else "—"
+            lines.append(f"• {tk}: {price}  1M {m1}")
+        except Exception:
+            lines.append(f"• {tk}: —")
+    if etfs:
+        lines.append("")
+        lines.append(etfs_label)
+        for tk in etfs:
+            try:
+                snap = deps.stock_service.get_snapshot(tk)
+                price = f"{snap.price:,.2f}" if snap.price else "—"
+                m1 = f"{snap.price_change_1m_pct:+.1f}%" if snap.price_change_1m_pct is not None else "—"
+                lines.append(f"• {tk}: {price}  1M {m1}")
+            except Exception:
+                lines.append(f"• {tk}: —")
+    lines.append("")
+    lines.append(f"⚠ {s.short_disclaimer}")
+    await update.message.reply_text("\n".join(lines))
+
+
+async def _cmd_compare(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """/compare AAPL MSFT [GOOGL …] — side-by-side fundamentals snapshot.
+    No LLM call. 2–4 tickers supported.
+    """
+    profile = await _profile(update, context)
+    lang = profile.language
+    s = t(lang)
+
+    raw_args = [a.strip().upper() for a in (context.args or []) if a.strip()]
+    if len(raw_args) < 2:
+        usage = {
+            "ko": "사용법: /compare AAPL MSFT GOOGL  (2~4개 티커)",
+            "en": "Usage: /compare AAPL MSFT GOOGL  (2–4 tickers)",
+            "ja": "使い方: /compare AAPL MSFT GOOGL  (2〜4銘柄)",
+            "zh": "用法: /compare AAPL MSFT GOOGL  (2-4 支股票)",
+        }.get(lang, "Usage: /compare AAPL MSFT GOOGL")
+        await update.message.reply_text(usage)
+        return
+
+    tickers = raw_args[:4]
+    deps = _deps(context)
+    snapshots = []
+    for tk in tickers:
+        try:
+            snapshots.append(deps.stock_service.get_snapshot(tk))
+        except StockServiceError:
+            await update.message.reply_text(s.ticker_not_found.format(q=tk))
+            return
+        except Exception:
+            logger.exception("compare snapshot failed for %s", tk)
+
+    if len(snapshots) < 2:
+        await update.message.reply_text(s.error_market_data)
+        return
+
+    # Localized header
+    header = {
+        "ko": "⚖️ 비교", "en": "⚖️ Comparison",
+        "ja": "⚖️ 比較",  "zh": "⚖️ 对比",
+    }.get(lang, "⚖️ Comparison")
+    rows: list[str] = [header + ": " + " vs ".join(s.ticker for s in snapshots), ""]
+
+    def _fmt(v, suffix=""):
+        if v is None:
+            return "—"
+        return f"{v:,.2f}{suffix}" if isinstance(v, float) else f"{v}{suffix}"
+
+    fields = [
+        ("Price",       lambda x: _fmt(x.price)),
+        ("Market Cap",  lambda x: _fmt_market_cap(x.market_cap)),
+        ("P/E",         lambda x: _fmt(x.pe_ratio)),
+        ("Fwd P/E",     lambda x: _fmt(x.forward_pe)),
+        ("ROE",         lambda x: _fmt_pct(x.return_on_equity)),
+        ("D/E",         lambda x: _fmt(x.debt_to_equity)),
+        ("Margin",      lambda x: _fmt_pct(x.profit_margin)),
+        ("Rev growth",  lambda x: _fmt_pct(x.revenue_growth)),
+        ("1M",          lambda x: _fmt_pct_signed(x.price_change_1m_pct)),
+        ("6M",          lambda x: _fmt_pct_signed(x.price_change_6m_pct)),
+        ("1Y",          lambda x: _fmt_pct_signed(x.price_change_1y_pct)),
+    ]
+
+    # Header row + per-field row
+    rows.append(" | ".join(["metric"] + [snap.ticker for snap in snapshots]))
+    rows.append("-" * 12)
+    for label, fn in fields:
+        rows.append(" | ".join([label] + [fn(snap) for snap in snapshots]))
+    rows.append("")
+    rows.append(f"⚠ {s.short_disclaimer}")
+    await update.message.reply_text("\n".join(rows))
+
+
+def _fmt_market_cap(v):
+    if v is None: return "—"
+    if v >= 1e12: return f"{v/1e12:.2f}T"
+    if v >= 1e9:  return f"{v/1e9:.2f}B"
+    if v >= 1e6:  return f"{v/1e6:.1f}M"
+    return f"{v:,.0f}"
+
+
+def _fmt_pct(v):
+    if v is None: return "—"
+    # If looks like fraction (0.18) → 18.0%; otherwise treat as already percent
+    if abs(v) < 5:
+        return f"{v*100:.1f}%"
+    return f"{v:.1f}%"
+
+
+def _fmt_pct_signed(v):
+    if v is None: return "—"
+    return f"{v:+.1f}%"
 
 
 async def _cmd_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -779,6 +979,45 @@ _NL_KEYWORDS = (
 )
 
 
+# Follow-up patterns — short or pronoun-heavy queries that ride on the last ticker.
+_FOLLOWUP_DEEP = (
+    "자세히", "자세하게", "더 알", "더 자세", "deeper", "deep dive", "전문 분석",
+    "もっと詳しく", "詳しく", "更多", "详细",
+)
+_FOLLOWUP_COMPARE = (
+    "비교", "compare", " vs ", "vs.", "비교해", "比較", "比较",
+)
+_FOLLOWUP_GENERAL = (
+    "그건", "그것", "이건", "이거", "그게", "그래서", "그럼",
+    "위험", "리스크", "전망", "1년", "5년", "후엔", "미래",
+    "what about", "그 종목",
+    "リスク", "見通し",
+    "风险", "前景",
+)
+
+
+def _followup_intent(text: str) -> str | None:
+    """Detect a follow-up phrase that should reuse the user's last ticker.
+    Returns 'compare' | 'deep' | 'general' | None.
+    """
+    t_low = text.lower().strip()
+    if not t_low:
+        return None
+    for kw in _FOLLOWUP_COMPARE:
+        if kw in t_low:
+            return "compare"
+    for kw in _FOLLOWUP_DEEP:
+        if kw in t_low:
+            return "deep"
+    for kw in _FOLLOWUP_GENERAL:
+        if kw in t_low:
+            return "general"
+    # Very short message ending with a question mark — almost always a follow-up.
+    if len(text) <= 8 and text.endswith(("?", "?")):
+        return "general"
+    return None
+
+
 def _classify_intent(text: str) -> str:
     """Return 'natural_language' for non-ticker asks, 'ticker' otherwise."""
     lowered = text.lower()
@@ -834,10 +1073,78 @@ async def _handle_ticker_query(
     persona = get_persona(profile.persona_key)
 
     # ────────────────────────────────────────────────────────────────
+    # Context retention — pronoun-only / vague follow-ups ("리스크는?",
+    # "더 자세히", "?") reuse the user's last ticker. We only enter this
+    # branch when the text DOES NOT resolve to a known ticker — so e.g.
+    # "AMD 어때?" still flows to a fresh AMD lookup.
+    # ────────────────────────────────────────────────────────────────
+    pre_resolved = deps.stock_service._lookup.resolve(text).upper() if text else ""
+    # Resolver falls back to first-token-uppercase even when nothing matches —
+    # so "리스크는?" returns "리스크는?". Only treat as a real ticker if the
+    # output passes the ticker shape regex (1–5 caps, optional .XX suffix).
+    pre_valid = bool(re.match(r"^[A-Z]{1,5}(?:[.\-][A-Z]{1,3})?$", pre_resolved))
+    fu = None if pre_valid else (_followup_intent(text) if text else None)
+    if fu and profile.recent_tickers:
+        last_ticker = profile.recent_tickers[0]
+
+        if fu == "compare" and len(profile.recent_tickers) >= 2:
+            # Auto-compare last 2-3 tickers — no LLM call
+            context.args = profile.recent_tickers[:3]
+            await _cmd_compare(update, context)
+            await _log_usage(deps, profile, last_ticker, "followup_compare",
+                             int((time.monotonic() - started) * 1000))
+            return
+
+        if fu == "deep":
+            # Surface the deep-analysis confirm keyboard for the last ticker.
+            # Quota gate runs inside the deeper:<ticker> callback handler.
+            ack = {
+                "ko": f"💡 {last_ticker}에 대한 전문 분석을 보여드릴까요? (일일 5회 한도)",
+                "en": f"💡 Show deeper analysis on {last_ticker}? (daily limit 5)",
+                "ja": f"💡 {last_ticker} の詳細分析を表示しますか? (1日5回)",
+                "zh": f"💡 显示 {last_ticker} 的深度分析? (每日 5 次)",
+            }.get(lang, f"💡 Deeper analysis on {last_ticker}?")
+            keyboard = InlineKeyboardMarkup([[
+                InlineKeyboardButton(s.deeper_analysis_yes, callback_data=f"deeper:{last_ticker}"),
+                InlineKeyboardButton(s.deeper_analysis_no,  callback_data="deeper:no"),
+            ]])
+            await update.message.reply_text(ack, reply_markup=keyboard)
+            await _log_usage(deps, profile, last_ticker, "followup_deep_offer",
+                             int((time.monotonic() - started) * 1000))
+            return
+
+        # general → ack + treat the last ticker as the current query
+        ack = {
+            "ko": f"💡 {last_ticker} 에 대한 후속 질문으로 이해했어요.",
+            "en": f"💡 Treating that as a follow-up about {last_ticker}.",
+            "ja": f"💡 {last_ticker} の続きの質問として処理します。",
+            "zh": f"💡 视为关于 {last_ticker} 的后续提问。",
+        }.get(lang, f"💡 Follow-up about {last_ticker}.")
+        await update.message.reply_text(ack)
+        text = last_ticker  # rewrite — falls through into normal cache path
+
+    # ────────────────────────────────────────────────────────────────
     # Intent classifier — natural-language queries we don't yet support
     # ────────────────────────────────────────────────────────────────
     if _classify_intent(text) == "natural_language":
-        await update.message.reply_text(s.intent_unrecognized)
+        # Suggest the explicit commands when we recognize the intent
+        lowered = text.lower()
+        suggestion = None
+        if any(k in lowered for k in ("추천", "recommend", "おすすめ", "推荐")):
+            suggestion = {
+                "ko": "💡 /recommend 또는 /recommend 기술 처럼 입력해 보세요.",
+                "en": "💡 Try /recommend or /recommend tech.",
+                "ja": "💡 /recommend や /recommend tech をお試しください。",
+                "zh": "💡 试试 /recommend 或 /recommend tech。",
+            }.get(lang)
+        elif any(k in lowered for k in ("비교", "compare", "比較", "比较")):
+            suggestion = {
+                "ko": "💡 /compare AAPL MSFT 처럼 2개 이상 티커를 입력하세요.",
+                "en": "💡 Try /compare AAPL MSFT (2 or more tickers).",
+                "ja": "💡 /compare AAPL MSFT のように2銘柄以上を入力してください。",
+                "zh": "💡 试试 /compare AAPL MSFT (2 支以上)。",
+            }.get(lang)
+        await update.message.reply_text(suggestion or s.intent_unrecognized)
         await _log_usage(deps, profile, "", "intent_unrecognized",
                          int((time.monotonic() - started) * 1000))
         return
@@ -1005,22 +1312,34 @@ async def _try_prewarmed_snapshot(ticker: str):
 
 
 async def _try_blob_cached_report(persona_key: str, language: str) -> str | None:
-    """In Azure (STORAGE_BACKEND=blob), fetch the pre-rendered report from Blob/CDN.
+    """Fetch the most recent pre-rendered report from Blob.
 
-    Falls back to None on any error or when not running on Azure — caller
-    will then build the report on-demand via DeepSeek.
+    Lookup order:
+      1. Latest 6-slot report (KST timezone, walks backward through today's slots
+         then yesterday's). 1차 cache hit per the §report-generation-policy §2.
+      2. Legacy daily_report blob (single per-day, KST 06:30).
+      3. None — caller builds on-demand via DeepSeek.
     """
     backend = os.getenv("STORAGE_BACKEND", "sqlite").lower()
     account = os.getenv("STORAGE_ACCOUNT_NAME", "").strip()
     if backend != "blob" or not account:
         return None
+    # 1. Slot-based report (latest)
+    try:
+        from services.slot_report import fetch_latest_slot_report
+        result = await fetch_latest_slot_report(account, persona_key, language)
+        if result:
+            return result[1]
+    except Exception:
+        logger.exception("slot report fetch failed (will try legacy)")
+    # 2. Legacy daily report
     try:
         from datetime import datetime, timezone
         from services.blob_report_writer import fetch_cached_report
         date_str = datetime.now(timezone.utc).date().isoformat()
         return await fetch_cached_report(account, date_str, persona_key, language)
     except Exception:
-        logger.exception("blob report fetch failed")
+        logger.exception("legacy blob report fetch failed")
         return None
 
 
