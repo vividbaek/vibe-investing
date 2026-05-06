@@ -1017,15 +1017,12 @@ def _check_dashboard_key(req: func.HttpRequest) -> bool:
 
 _CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Telegram-Init-Data",
+    "Access-Control-Max-Age": "3600",
 }
 
-_CORS_HEADERS_POST = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, X-Telegram-Init-Data",
-}
+_CORS_HEADERS_POST = _CORS_HEADERS  # alias for clarity at POST endpoints
 
 
 @app.route(route="stats", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
