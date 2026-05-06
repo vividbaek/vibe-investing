@@ -10,7 +10,8 @@
     },
     {
       "route": "/data/*",
-      "rewrite": "https://func-aiinvestor-prod.azurewebsites.net/api/data/{*path}"
+      "redirect": "https://func-aiinvestor-prod.azurewebsites.net/api/data/{*path}",
+      "statusCode": 302
     }
   ],
   "responseOverrides": {
