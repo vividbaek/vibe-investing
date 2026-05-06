@@ -17,14 +17,14 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
        background:var(--bg); color:#e0e0e0; }
 .container-xl { max-width:1280px; }
 h1 { font-weight:700; font-size:1.6rem; }
-.muted { color:#888; font-size:13px; }
-.card { background:var(--card); border:none; border-radius:12px; }
+.muted { color:#b0b0b0; font-size:13px; }
+.card { background:var(--card); border:none; border-radius:12px; color:#e8e8e8; }
 .card-header { background:transparent; border-bottom:1px solid var(--border);
-               font-weight:700; padding:14px 18px; font-size:14px; color:#ddd; }
+               font-weight:700; padding:14px 18px; font-size:14px; color:#f0f0f0; }
 .kpi { padding:18px; }
-.kpi .label { font-size:12px; color:#aaa; text-transform:uppercase; letter-spacing:.5px; }
+.kpi .label { font-size:12px; color:#c8c8c8; text-transform:uppercase; letter-spacing:.5px; }
 .kpi .num { font-size:1.9rem; font-weight:800; line-height:1.1; margin-top:4px; }
-.kpi .sub { font-size:12px; color:#999; margin-top:4px; }
+.kpi .sub { font-size:12px; color:#b8b8b8; margin-top:4px; }
 .kpi.llm-call  .num { color:var(--c-llm-call); }
 .kpi.llm-cache .num { color:var(--c-llm-cache); }
 .kpi.obj-cache .num { color:var(--c-obj-cache); }
@@ -32,8 +32,15 @@ h1 { font-weight:700; font-size:1.6rem; }
 .kpi.total     .num { color:var(--accent); }
 .section-title { font-size:1.1rem; font-weight:700; margin:30px 0 12px; padding-left:8px;
                  border-left:4px solid var(--accent); }
-.table { color:#e0e0e0; --bs-table-bg:transparent; }
-.table thead { color:#aaa; font-size:12px; text-transform:uppercase; letter-spacing:.5px; }
+/* Bootstrap 5 reads cell color from these CSS variables — overriding `.table { color }`
+   alone is not enough because tbody cells use --bs-table-color-state. */
+.table { --bs-table-bg:transparent; --bs-table-color:#f0f0f0;
+         --bs-table-color-state:#f0f0f0; --bs-table-hover-color:#ffffff;
+         --bs-table-hover-bg:#33334a; color:#f0f0f0; }
+.table thead, .table thead th {
+  color:#e0e0e0; font-size:12px; text-transform:uppercase; letter-spacing:.5px; font-weight:700;
+}
+.table tbody, .table tbody td { color:#f0f0f0; }
 .table tbody tr:hover { background:#33334a; }
 .heatmap-cell { display:inline-block; width:34px; height:34px; line-height:34px;
                 text-align:center; font-size:11px; border-radius:4px; margin:1px; color:#eee; }
@@ -165,10 +172,13 @@ canvas { max-height: 240px; }
       </div>
       <div class="card mt-3">
         <div class="card-header">티커 집중도 지표</div>
-        <div class="p-3">
-          <div>Top 10 점유율: <strong id="conc-top10">—</strong>%</div>
-          <div>HHI 지수: <strong id="conc-hhi">—</strong> <span class="muted">(0~1, 높을수록 집중)</span></div>
-          <div>시간 Gini: <strong id="conc-gini">—</strong> <span class="muted">(0~1, 높을수록 시간 편중)</span></div>
+        <div class="p-3" style="color:#f0f0f0; line-height:1.9;">
+          <div>Top 10 점유율: <strong id="conc-top10" style="color:var(--accent); font-size:1.1rem;">—</strong>
+               <span style="color:#f0f0f0;">%</span></div>
+          <div>HHI 지수: <strong id="conc-hhi" style="color:var(--accent); font-size:1.1rem;">—</strong>
+               <span style="color:#c8c8c8;">(0~1, 높을수록 집중)</span></div>
+          <div>시간 Gini: <strong id="conc-gini" style="color:var(--accent); font-size:1.1rem;">—</strong>
+               <span style="color:#c8c8c8;">(0~1, 높을수록 시간 편중)</span></div>
         </div>
       </div>
     </div>
@@ -408,9 +418,15 @@ function renderV2(d) {
 
   // Persona × ticker tables
   const pt = d.persona_ticker || {};
+  const personaColor = { buffett:'#74b9ff', dalio:'#a29bfe', wood:'#fd79a8' };
   ['buffett','dalio','wood'].forEach(p => {
+    const col = personaColor[p];
     const rows = (pt[p] || []).map(([t,n], i) =>
-      `<tr><td>${i+1}</td><td><strong>${escapeHtml(t)}</strong></td><td class="text-end">${n}</td></tr>`
+      `<tr>
+        <td style="color:#c8c8c8;">${i+1}</td>
+        <td><strong style="color:${col};font-size:14px;">${escapeHtml(t)}</strong></td>
+        <td class="text-end" style="color:#f0f0f0;font-weight:600;">${n}</td>
+      </tr>`
     ).join('');
     document.querySelector(`#persona-${p}-table tbody`).innerHTML =
       rows || '<tr><td colspan="3" class="muted text-center">데이터 없음</td></tr>';
