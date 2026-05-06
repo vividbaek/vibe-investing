@@ -831,6 +831,19 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await query.message.reply_text("\n".join(lines), reply_markup=keyboard)
         return
 
+    if data.startswith("search:"):
+        # AI ticker discovery — user confirmed they want us to LLM-search the
+        # ambiguous query. Original text lives in user_data["pending_search_query"].
+        choice = data.split(":", 1)[1]
+        lang = profile.language
+        s = t(lang)
+        pending = (context.user_data.pop("pending_search_query", "") or "").strip()
+        if choice == "no" or not pending:
+            await query.message.reply_text(s.search_cancelled)
+            return
+        await _run_llm_ticker_search(update, context, profile, pending)
+        return
+
     if data.startswith("subscribe:"):
         # §17.2 stub — full email-verify flow lands in next sub-task.
         choice = data.split(":", 1)[1]
@@ -1190,8 +1203,17 @@ async def _handle_ticker_query(
         try:
             snapshot = deps.stock_service.get_snapshot(text)
         except StockServiceError:
-            # Localize the not-found error
-            await update.message.reply_text(s.ticker_not_found.format(q=text))
+            # Instead of giving up, offer to AI-search for the right ticker.
+            # Stash the original query in user_data so the callback can retrieve it.
+            context.user_data["pending_search_query"] = text
+            keyboard = InlineKeyboardMarkup([[
+                InlineKeyboardButton(s.search_confirm_yes, callback_data="search:yes"),
+                InlineKeyboardButton(s.search_confirm_no,  callback_data="search:no"),
+            ]])
+            await update.message.reply_text(
+                s.search_confirm_prompt.format(q=text),
+                reply_markup=keyboard,
+            )
             await _log_usage(deps, profile, ticker_key or text[:8], "ticker_not_found",
                              int((time.monotonic() - started) * 1000))
             return
@@ -1282,6 +1304,176 @@ async def _record_and_maybe_offer_sector(
     await deps.profile_repo.update(
         profile.user_key, last_followup_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
+
+
+# ────────────────────────────────────────────────────────────
+# AI ticker discovery — when natural-language ticker resolution
+# fails locally, fall back to a one-shot LLM lookup that maps the
+# query to a yfinance ticker (e.g. 삼성전자 → 005930.KS).
+# ────────────────────────────────────────────────────────────
+
+import asyncio as _asyncio_search
+
+
+async def _progress_dots(message, base_text: str, stop_event) -> None:
+    """Edit `message` to "<base>." → ".." → "..." every ~700ms until stop_event set.
+    Lets users feel the search is alive when LLM > 2s.
+    """
+    n = 1
+    while not stop_event.is_set():
+        try:
+            await _asyncio_search.wait_for(stop_event.wait(), timeout=0.7)
+            break
+        except _asyncio_search.TimeoutError:
+            try:
+                await message.edit_text(f"{base_text}{'.' * n}")
+            except Exception:
+                pass
+            n = (n % 3) + 1
+
+
+async def _llm_resolve_ticker(deps, query: str) -> str:
+    """Ask DeepSeek to map a natural-language stock query → yfinance ticker.
+    Returns "" if the LLM call fails or returns garbage. Caller must verify
+    the ticker by attempting a yfinance fetch.
+    """
+    system = (
+        "You are a stock-ticker mapping service. Given a user query in any language "
+        "(Korean / English / Japanese / Chinese), return the single best yfinance "
+        "ticker symbol. Use exchange suffixes correctly:\n"
+        "  .KS for KOSPI Korean stocks (e.g. 삼성전자 → 005930.KS)\n"
+        "  .KQ for KOSDAQ\n"
+        "  .T for Tokyo (e.g. トヨタ → 7203.T)\n"
+        "  .HK for Hong Kong\n"
+        "  .SS / .SZ for Shanghai / Shenzhen\n"
+        "Crypto uses -USD suffix (BTC-USD, ETH-USD).\n"
+        "If ambiguous, pick the most-traded match. "
+        "Respond with the TICKER ONLY — no quotes, no explanation, no prefix."
+    )
+    user = f"User query: {query}\nReturn the yfinance ticker:"
+    try:
+        response = await deps.persona_engine._client.chat.completions.create(
+            model=deps.persona_engine._model,
+            temperature=0.0,
+            max_tokens=20,
+            timeout=15.0,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": user},
+            ],
+        )
+    except Exception:
+        logger.exception("LLM ticker resolve call failed query=%r", query)
+        return ""
+
+    raw = (response.choices[0].message.content or "").strip()
+    # Take first line, strip quotes/markdown, uppercase
+    raw = raw.split("\n")[0].strip()
+    for ch in ("`", '"', "'", "*", "(", ")"):
+        raw = raw.replace(ch, "")
+    raw = raw.strip(" .,;:").upper()
+    # Validate yfinance-shape ticker
+    if re.match(r"^[A-Z0-9]{1,8}(?:[.\-][A-Z]{1,4})?$", raw):
+        return raw
+    logger.warning("LLM returned non-ticker response query=%r raw=%r", query, raw)
+    return ""
+
+
+async def _run_llm_ticker_search(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    profile: UserProfile,
+    query_text: str,
+) -> None:
+    """Full search flow: progressive dots → LLM lookup → yfinance verify →
+    persona analysis. Reuses _handle_ticker_query downstream when possible.
+    """
+    import time
+    started = time.monotonic()
+    deps = _deps(context)
+    lang = profile.language
+    s = t(lang)
+    persona = get_persona(profile.persona_key)
+    callback_query = update.callback_query
+    chat_id = callback_query.message.chat_id if callback_query else update.effective_chat.id
+
+    # Animated progress message — runs in parallel with the LLM call
+    progress_msg = await context.bot.send_message(chat_id, f"{s.search_in_progress}.")
+    stop_event = _asyncio_search.Event()
+    progress_task = _asyncio_search.create_task(
+        _progress_dots(progress_msg, s.search_in_progress, stop_event)
+    )
+
+    try:
+        ticker = await _llm_resolve_ticker(deps, query_text)
+    except Exception:
+        ticker = ""
+    finally:
+        # Stop animator before any further IO so the message is steady
+        stop_event.set()
+        try:
+            await progress_task
+        except Exception:
+            pass
+
+    if not ticker:
+        try:
+            await progress_msg.edit_text(s.search_failed.format(q=query_text))
+        except Exception:
+            pass
+        await _log_usage(deps, profile, query_text[:8], "search_failed",
+                         int((time.monotonic() - started) * 1000))
+        return
+
+    # Verify the LLM's answer by attempting a yfinance fetch
+    try:
+        snapshot = await _asyncio_search.to_thread(deps.stock_service.get_snapshot, ticker)
+    except StockServiceError:
+        try:
+            await progress_msg.edit_text(s.search_failed.format(q=query_text))
+        except Exception:
+            pass
+        await _log_usage(deps, profile, ticker, "search_failed",
+                         int((time.monotonic() - started) * 1000))
+        return
+    except Exception:
+        logger.exception("yfinance verify failed for LLM-resolved ticker=%s", ticker)
+        try:
+            await progress_msg.edit_text(s.error_market_data)
+        except Exception:
+            pass
+        return
+
+    # Replace the dots message with a ✓ found notice
+    try:
+        await progress_msg.edit_text(f"✓ {ticker} — {snapshot.name}")
+    except Exception:
+        pass
+
+    interests = [_localize_tag(tag, lang) for tag in profile.interest_tags] + profile.watchlist_tickers
+    try:
+        reply = await deps.persona_engine.generate(
+            persona=persona, snapshot=snapshot, language=lang, interests=interests,
+        )
+    except Exception:
+        logger.exception("Persona generation failed after AI search ticker=%s", ticker)
+        await context.bot.send_message(chat_id, s.error_llm)
+        return
+
+    header = f"[{persona.name(lang)} · {snapshot.ticker}]"
+    await context.bot.send_message(chat_id, f"{header}\n\n{_strip_md(reply)}")
+    await _log_usage(deps, profile, snapshot.ticker, "ai_search_live",
+                     int((time.monotonic() - started) * 1000))
+    try:
+        await _record_and_maybe_offer_sector(update, context, profile, snapshot.ticker, snapshot)
+    except Exception:
+        logger.exception("sector tracking after AI search failed (non-fatal)")
+    # Fake an Update so _offer_deeper still works — re-use callback_query.message
+    if callback_query:
+        # Pretend the original message is the user's — _offer_deeper only needs reply_text
+        class _Stub:
+            def __init__(self, m): self.message = m
+        await _offer_deeper(_Stub(callback_query.message), context, snapshot.ticker, persona, lang)
 
 
 async def _try_prewarmed_commentary(ticker: str, persona_key: str, language: str) -> str | None:

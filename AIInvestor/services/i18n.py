@@ -70,6 +70,12 @@ class _Bundle:
     daily_limit_reached: str
     subscribe_offer_yes: str
     subscribe_offer_no: str
+    search_confirm_prompt: str
+    search_confirm_yes: str
+    search_confirm_no: str
+    search_in_progress: str
+    search_failed: str
+    search_cancelled: str
 
 
 _KO = _Bundle(
@@ -163,6 +169,12 @@ _KO = _Bundle(
     ),
     subscribe_offer_yes="✅ 구독 예약하기",
     subscribe_offer_no="나중에",
+    search_confirm_prompt="🔍 '{q}' 주식이 맞나요? AI가 검색해볼까요?",
+    search_confirm_yes="✅ 예, 검색해볼까요?",
+    search_confirm_no="❌ 아니요",
+    search_in_progress="🔎 검색 중",
+    search_failed="'{q}' 에 해당하는 종목을 찾지 못했어요. 다른 표현(예: 005930.KS, Samsung)을 시도해 주세요.",
+    search_cancelled="검색을 취소했습니다.",
 )
 
 _EN = _Bundle(
@@ -256,6 +268,12 @@ _EN = _Bundle(
     ),
     subscribe_offer_yes="✅ Reserve subscription",
     subscribe_offer_no="Maybe later",
+    search_confirm_prompt="🔍 Did you mean stock '{q}'? Search via AI?",
+    search_confirm_yes="✅ Yes, search",
+    search_confirm_no="❌ No",
+    search_in_progress="🔎 Searching",
+    search_failed="Couldn't find a match for '{q}'. Try a different form (e.g. 005930.KS, Samsung).",
+    search_cancelled="Search cancelled.",
 )
 
 _JA = _Bundle(
@@ -349,6 +367,12 @@ _JA = _Bundle(
     ),
     subscribe_offer_yes="✅ サブスク予約",
     subscribe_offer_no="あとで",
+    search_confirm_prompt="🔍 '{q}' という銘柄ですか? AIで検索しますか?",
+    search_confirm_yes="✅ はい、検索する",
+    search_confirm_no="❌ いいえ",
+    search_in_progress="🔎 検索中",
+    search_failed="'{q}' の該当銘柄が見つかりませんでした。別の表現(例: 005930.KS, Samsung)をお試しください。",
+    search_cancelled="検索をキャンセルしました。",
 )
 
 _ZH = _Bundle(
@@ -442,6 +466,12 @@ _ZH = _Bundle(
     ),
     subscribe_offer_yes="✅ 预约订阅",
     subscribe_offer_no="稍后",
+    search_confirm_prompt="🔍 您是指 '{q}' 这支股票吗? AI 搜索?",
+    search_confirm_yes="✅ 是,搜索",
+    search_confirm_no="❌ 否",
+    search_in_progress="🔎 搜索中",
+    search_failed="未找到 '{q}' 对应的股票。请尝试其他形式(例如 005930.KS, Samsung)。",
+    search_cancelled="已取消搜索。",
 )
 
 _BUNDLES: dict[str, _Bundle] = {"ko": _KO, "en": _EN, "ja": _JA, "zh": _ZH}
