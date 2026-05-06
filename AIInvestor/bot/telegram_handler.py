@@ -78,6 +78,11 @@ def build_application(token: str, deps: BotDependencies) -> Application:
     app.add_handler(CommandHandler("whoami", _cmd_whoami))
     app.add_handler(CommandHandler("recommend", _cmd_recommend))
     app.add_handler(CommandHandler("compare", _cmd_compare))
+    # Owner-only operator commands (gated by TELEGRAM_OWNER_CHAT_ID)
+    app.add_handler(CommandHandler("total_user", _cmd_total_user))
+    app.add_handler(CommandHandler("today_user", _cmd_today_user))
+    app.add_handler(CommandHandler("new_user", _cmd_new_user))
+    app.add_handler(CommandHandler("today_feedback", _cmd_today_feedback))
 
     app.add_handler(CallbackQueryHandler(_on_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _on_message))
@@ -289,6 +294,213 @@ async def _cmd_whoami(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         f"Operators: copy chat_id above into the App Setting "
         f"TELEGRAM_OWNER_CHAT_ID on func-aiinvestor-prod."
     )
+    await update.message.reply_text(text)
+
+
+# ────────────────────────────────────────────────────────────
+# Owner-only operator commands. Gated by TELEGRAM_OWNER_CHAT_ID.
+# Silent-deny on non-owner: avoid leaking the existence of the
+# command surface (callers see nothing — no error, no echo).
+# ────────────────────────────────────────────────────────────
+
+def _is_owner(update: Update) -> bool:
+    owner = os.getenv("TELEGRAM_OWNER_CHAT_ID", "").strip()
+    if not owner:
+        return False
+    try:
+        return int(owner) == update.effective_user.id
+    except (ValueError, AttributeError):
+        return False
+
+
+async def _cmd_total_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Total registered users (count of blobs in users/ container)."""
+    if not _is_owner(update):
+        return
+    account = os.getenv("STORAGE_ACCOUNT_NAME", "").strip()
+    if not account:
+        await update.message.reply_text("⚠ STORAGE_ACCOUNT_NAME not set")
+        return
+    from azure.identity.aio import DefaultAzureCredential
+    from azure.storage.blob.aio import BlobServiceClient
+    creds = DefaultAzureCredential()
+    count = 0
+    try:
+        async with BlobServiceClient(
+            account_url=f"https://{account}.blob.core.windows.net",
+            credential=creds,
+        ) as svc:
+            container = svc.get_container_client("users")
+            async for _ in container.list_blobs():
+                count += 1
+    except Exception as exc:
+        logger.exception("total_user count failed")
+        await update.message.reply_text(f"⚠ 조회 실패: {type(exc).__name__}")
+        return
+    finally:
+        await creds.close()
+    await update.message.reply_text(f"👥 누적 가입자: {count:,}명")
+
+
+async def _cmd_today_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Distinct anon_user_ids active today (KST) — read from logs/."""
+    if not _is_owner(update):
+        return
+    account = os.getenv("STORAGE_ACCOUNT_NAME", "").strip()
+    if not account:
+        await update.message.reply_text("⚠ STORAGE_ACCOUNT_NAME not set")
+        return
+    from datetime import datetime, timezone, timedelta
+    from azure.identity.aio import DefaultAzureCredential
+    from azure.storage.blob.aio import BlobServiceClient
+    import json as _json
+    today_kst = (datetime.now(timezone.utc) + timedelta(hours=9)).date().isoformat()
+    seen: set[str] = set()
+    creds = DefaultAzureCredential()
+    try:
+        async with BlobServiceClient(
+            account_url=f"https://{account}.blob.core.windows.net",
+            credential=creds,
+        ) as svc:
+            container = svc.get_container_client("logs")
+            # Read last 36h of logs (KST day spans 2 UTC days)
+            now = datetime.now(timezone.utc)
+            earliest = now - timedelta(hours=36)
+            async for blob in container.list_blobs():
+                try:
+                    parts = blob.name.split("/")
+                    bdt = datetime(int(parts[0]), int(parts[1]), int(parts[2]),
+                                   int(parts[3].split(".")[0]), tzinfo=timezone.utc)
+                    if bdt < earliest:
+                        continue
+                except (ValueError, IndexError):
+                    continue
+                try:
+                    bclient = container.get_blob_client(blob.name)
+                    stream = await bclient.download_blob()
+                    body = await stream.readall()
+                    for line in body.decode("utf-8").splitlines():
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            evt = _json.loads(line)
+                            ts = evt.get("ts", "")
+                            kst_d = ((datetime.fromisoformat(ts.replace("Z","+00:00"))
+                                      + timedelta(hours=9)).date().isoformat())
+                            if kst_d == today_kst:
+                                a = evt.get("anon")
+                                if a:
+                                    seen.add(a)
+                        except (ValueError, KeyError):
+                            continue
+                except Exception:
+                    continue
+    finally:
+        await creds.close()
+    await update.message.reply_text(f"🔥 오늘 활성 사용자: {len(seen):,}명 (KST {today_kst})")
+
+
+async def _cmd_new_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Users whose profile.created_at falls on today's KST date."""
+    if not _is_owner(update):
+        return
+    account = os.getenv("STORAGE_ACCOUNT_NAME", "").strip()
+    if not account:
+        await update.message.reply_text("⚠ STORAGE_ACCOUNT_NAME not set")
+        return
+    from datetime import datetime, timezone, timedelta
+    from azure.identity.aio import DefaultAzureCredential
+    from azure.storage.blob.aio import BlobServiceClient
+    import json as _json
+    today_kst = (datetime.now(timezone.utc) + timedelta(hours=9)).date().isoformat()
+    new_count = 0
+    creds = DefaultAzureCredential()
+    try:
+        async with BlobServiceClient(
+            account_url=f"https://{account}.blob.core.windows.net",
+            credential=creds,
+        ) as svc:
+            container = svc.get_container_client("users")
+            async for blob in container.list_blobs():
+                # Cheap filter — if last_modified date is older than today KST,
+                # skip download. The created_at in the JSON is the source of truth.
+                try:
+                    bclient = container.get_blob_client(blob.name)
+                    stream = await bclient.download_blob()
+                    body = await stream.readall()
+                    doc = _json.loads(body)
+                    created = doc.get("created_at", "")
+                    if not created:
+                        continue
+                    kst_d = ((datetime.fromisoformat(created.replace("Z","+00:00"))
+                              + timedelta(hours=9)).date().isoformat())
+                    if kst_d == today_kst:
+                        new_count += 1
+                except Exception:
+                    continue
+    finally:
+        await creds.close()
+    await update.message.reply_text(f"🆕 오늘 신규 가입: {new_count:,}명 (KST {today_kst})")
+
+
+async def _cmd_today_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """List today's feedback messages from feedback/<KST_date>/*.json."""
+    if not _is_owner(update):
+        return
+    account = os.getenv("STORAGE_ACCOUNT_NAME", "").strip()
+    if not account:
+        await update.message.reply_text("⚠ STORAGE_ACCOUNT_NAME not set")
+        return
+    from datetime import datetime, timezone, timedelta
+    from azure.identity.aio import DefaultAzureCredential
+    from azure.storage.blob.aio import BlobServiceClient
+    import json as _json
+    today_kst = (datetime.now(timezone.utc) + timedelta(hours=9)).date().isoformat()
+    items: list[dict] = []
+    creds = DefaultAzureCredential()
+    try:
+        async with BlobServiceClient(
+            account_url=f"https://{account}.blob.core.windows.net",
+            credential=creds,
+        ) as svc:
+            container = svc.get_container_client("feedback")
+            async for blob in container.list_blobs(name_starts_with=f"{today_kst}/"):
+                try:
+                    bclient = container.get_blob_client(blob.name)
+                    stream = await bclient.download_blob()
+                    body = await stream.readall()
+                    items.append(_json.loads(body))
+                except Exception:
+                    continue
+    except Exception as exc:
+        # Container might not exist yet
+        logger.exception("today_feedback container read failed")
+        await update.message.reply_text(f"💬 오늘 피드백: 0건 (KST {today_kst}) — feedback 컨테이너 없음")
+        return
+    finally:
+        await creds.close()
+
+    if not items:
+        await update.message.reply_text(f"💬 오늘 피드백: 0건 (KST {today_kst})")
+        return
+
+    items.sort(key=lambda x: x.get("ts", ""), reverse=True)
+    lines = [f"💬 오늘 피드백: {len(items)}건 (KST {today_kst})", ""]
+    for it in items[:10]:  # cap at 10 to avoid >4096-byte messages
+        ts = (it.get("ts") or "").replace("T", " ")[:19]
+        usr = it.get("from_username") or f"id={it.get('from_user_id','?')}"
+        lang = it.get("language", "?")
+        prs = it.get("persona", "?")
+        body = (it.get("body") or "").strip()
+        if len(body) > 200:
+            body = body[:200] + "…"
+        lines.append(f"• [{ts}] @{usr} ({lang}/{prs})\n  {body}")
+    if len(items) > 10:
+        lines.append(f"\n…외 {len(items) - 10}건")
+    text = "\n".join(lines)
+    if len(text) > 4000:
+        text = text[:3990] + "\n…(잘림)"
     await update.message.reply_text(text)
 
 
@@ -538,6 +750,49 @@ async def _forward_feedback(update, context, profile, body: str, s) -> None:
     logger.warning("USER_FEEDBACK from=%s anon=%s lang=%s persona=%s body=%r",
                    user_label, profile.anon_user_id, profile.language,
                    profile.persona_key, body)
+
+    # Persist to Blob so the operator's /today_feedback command can recall it
+    # later (App Insights KQL is heavyweight; Blob is straightforward).
+    try:
+        from datetime import datetime, timezone, timedelta
+        import uuid as _uuid
+        kst_date = (datetime.now(timezone.utc) + timedelta(hours=9)).date().isoformat()
+        from azure.identity.aio import DefaultAzureCredential
+        from azure.storage.blob.aio import BlobServiceClient
+        account = os.getenv("STORAGE_ACCOUNT_NAME", "").strip()
+        if account:
+            payload = {
+                "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "kst_date": kst_date,
+                "from_username": user.username or None,
+                "from_user_id": user.id,
+                "anon": profile.anon_user_id,
+                "language": profile.language,
+                "persona": profile.persona_key,
+                "body": body,
+            }
+            blob_path = f"{kst_date}/{_uuid.uuid4().hex}.json"
+            creds = DefaultAzureCredential()
+            try:
+                async with BlobServiceClient(
+                    account_url=f"https://{account}.blob.core.windows.net",
+                    credential=creds,
+                ) as svc:
+                    container = svc.get_container_client("feedback")
+                    try:
+                        await container.create_container()
+                    except Exception:
+                        pass  # already exists
+                    blob = svc.get_blob_client("feedback", blob_path)
+                    import json as _json
+                    await blob.upload_blob(
+                        _json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                        overwrite=True, content_type="application/json",
+                    )
+            finally:
+                await creds.close()
+    except Exception:
+        logger.exception("feedback Blob persistence failed (non-fatal)")
 
     if not owner_id:
         # No DM target configured — say it was received (the log captured it)

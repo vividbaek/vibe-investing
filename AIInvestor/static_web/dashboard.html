@@ -135,6 +135,57 @@ canvas { max-height: 240px; }
     💰 절감 LLM 호출은 LLM 캐시 히트 수 (DeepSeek API 사용 안 됨).
   </p>
 
+  <!-- DeepSeek API spend + balance -->
+  <h2 class="section-title">DeepSeek API 사용량 & 비용</h2>
+  <div class="row g-3">
+    <div class="col-md-3 col-6"><div class="card kpi">
+      <div class="label">📊 오늘 토큰</div>
+      <div class="num" id="kpi-tok-today" style="color:var(--accent);">—</div>
+      <div class="sub">입력 <span id="kpi-tok-today-in">—</span> · 출력 <span id="kpi-tok-today-out">—</span></div>
+    </div></div>
+    <div class="col-md-3 col-6"><div class="card kpi">
+      <div class="label">📅 어제 토큰</div>
+      <div class="num" id="kpi-tok-yest" style="color:#c8c8c8;">—</div>
+      <div class="sub">입력 <span id="kpi-tok-yest-in">—</span> · 출력 <span id="kpi-tok-yest-out">—</span></div>
+    </div></div>
+    <div class="col-md-3 col-6"><div class="card kpi">
+      <div class="label">🌐 누적 토큰 (30일)</div>
+      <div class="num" id="kpi-tok-total" style="color:var(--c-fn-cache);">—</div>
+      <div class="sub">입력 <span id="kpi-tok-total-in">—</span> · 출력 <span id="kpi-tok-total-out">—</span></div>
+    </div></div>
+    <div class="col-md-3 col-6"><div class="card kpi" style="border-top:3px solid var(--good);">
+      <div class="label">💵 30일 추정 비용</div>
+      <div class="num" id="kpi-cost-total" style="color:var(--good);">—</div>
+      <div class="sub">오늘 $<span id="kpi-cost-today">—</span> · 어제 $<span id="kpi-cost-yest">—</span></div>
+    </div></div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-md-6"><div class="card p-3">
+      <div class="label muted mb-2">💰 DeepSeek 잔액 (실시간)</div>
+      <div style="font-size:1.4rem;font-weight:700;">
+        <span id="balance-amount" style="color:var(--good);">—</span>
+        <span id="balance-currency" class="muted" style="font-size:1rem;"></span>
+        <span id="balance-status" class="muted" style="font-size:.85rem;margin-left:10px;"></span>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:6px;">
+        충전 잔액 <span id="balance-topped">—</span> · 무료 잔액 <span id="balance-granted">—</span>
+      </div>
+      <div class="muted" style="font-size:11px;margin-top:4px;" id="balance-meta">로딩 중…</div>
+    </div></div>
+    <div class="col-md-6"><div class="card p-3">
+      <div class="label muted mb-2">📈 단가 (per 1M tokens, USD)</div>
+      <div class="muted" style="font-size:13px;line-height:1.7;">
+        입력: <strong style="color:var(--c-fn-cache);" id="price-in">—</strong> ·
+        출력: <strong style="color:var(--c-llm-call);" id="price-out">—</strong>
+      </div>
+      <div class="muted" style="font-size:11px;margin-top:6px;">
+        ENV <code>DEEPSEEK_PRICE_IN_PER_M</code> / <code>DEEPSEEK_PRICE_OUT_PER_M</code> 로 조정 가능. <br>
+        기본값 = deepseek-chat 2026 표준 단가
+      </div>
+    </div></div>
+  </div>
+
   <!-- Statistical interpretation -->
   <h2 class="section-title">통계적 유의성 — 가설 검증</h2>
   <div id="signif-area"></div>
@@ -280,6 +331,39 @@ if (!KEY) {
 async function loadAll() {
   await loadV2();
   await loadDates(1);
+  await loadBalance();
+}
+
+async function loadBalance() {
+  try {
+    const r = await fetch(`${FUNC_BASE}/deepseek_balance?key=${encodeURIComponent(KEY)}`,
+                          { mode: 'cors' });
+    if (!r.ok) {
+      document.getElementById('balance-meta').textContent = `로딩 실패 (HTTP ${r.status})`;
+      return;
+    }
+    const b = await r.json();
+    if (b.error) {
+      document.getElementById('balance-meta').textContent = '오류: ' + b.error;
+      return;
+    }
+    // DeepSeek response shape: { is_available, balance_infos:[{currency,total_balance,granted_balance,topped_up_balance}] }
+    const infos = b.balance_infos || [];
+    const usd = infos.find(x => (x.currency || '').toUpperCase() === 'USD') || infos[0] || {};
+    document.getElementById('balance-amount').textContent =
+      usd.total_balance != null ? Number(usd.total_balance).toFixed(2) : '—';
+    document.getElementById('balance-currency').textContent = usd.currency || '';
+    document.getElementById('balance-topped').textContent =
+      usd.topped_up_balance != null ? '$' + Number(usd.topped_up_balance).toFixed(2) : '—';
+    document.getElementById('balance-granted').textContent =
+      usd.granted_balance != null ? '$' + Number(usd.granted_balance).toFixed(2) : '—';
+    document.getElementById('balance-status').textContent =
+      b.is_available ? '✓ 사용 가능' : '⚠ 사용 불가';
+    const src = r.headers.get('X-Cache-Source') || '?';
+    document.getElementById('balance-meta').textContent = `출처: ${src}`;
+  } catch (e) {
+    document.getElementById('balance-meta').textContent = '로딩 실패: ' + e.message;
+  }
 }
 
 async function loadV2() {
@@ -331,6 +415,34 @@ function renderV2(d) {
   // Saved LLM calls — exposed by aggregator at totals.llm_calls_saved_*
   document.getElementById('kpi-saved-total').textContent = fmtNum(t.llm_calls_saved_total);
   document.getElementById('kpi-saved-today').textContent = fmtNum(t.llm_calls_saved_today);
+
+  // DeepSeek tokens + cost — driven by d.deepseek block
+  const ds = d.deepseek || {};
+  const tokToday = (ds.tokens_today_in || 0) + (ds.tokens_today_out || 0);
+  const tokYest  = (ds.tokens_yest_in  || 0) + (ds.tokens_yest_out  || 0);
+  const tokTotal = (ds.tokens_total_in || 0) + (ds.tokens_total_out || 0);
+  document.getElementById('kpi-tok-today').textContent = fmtNum(tokToday);
+  document.getElementById('kpi-tok-today-in').textContent  = fmtNum(ds.tokens_today_in);
+  document.getElementById('kpi-tok-today-out').textContent = fmtNum(ds.tokens_today_out);
+  document.getElementById('kpi-tok-yest').textContent  = fmtNum(tokYest);
+  document.getElementById('kpi-tok-yest-in').textContent  = fmtNum(ds.tokens_yest_in);
+  document.getElementById('kpi-tok-yest-out').textContent = fmtNum(ds.tokens_yest_out);
+  document.getElementById('kpi-tok-total').textContent = fmtNum(tokTotal);
+  document.getElementById('kpi-tok-total-in').textContent  = fmtNum(ds.tokens_total_in);
+  document.getElementById('kpi-tok-total-out').textContent = fmtNum(ds.tokens_total_out);
+  document.getElementById('kpi-cost-total').textContent =
+    '$' + (ds.cost_total_usd != null ? Number(ds.cost_total_usd).toFixed(2) : '—');
+  document.getElementById('kpi-cost-today').textContent =
+    ds.cost_today_usd != null ? Number(ds.cost_today_usd).toFixed(4) : '—';
+  document.getElementById('kpi-cost-yest').textContent =
+    ds.cost_yest_usd != null ? Number(ds.cost_yest_usd).toFixed(4) : '—';
+  // Prices come from env vars on the server side; we infer them from
+  // cost / tokens. If both daily values exist we can derive but it's noisy —
+  // just show defaults the aggregator used.
+  const inPrice  = ds.price_in_per_m  || 0.27;
+  const outPrice = ds.price_out_per_m || 1.10;
+  document.getElementById('price-in').textContent  = '$' + Number(inPrice).toFixed(2);
+  document.getElementById('price-out').textContent = '$' + Number(outPrice).toFixed(2);
 
   // Significance bullets
   const sig = document.getElementById('signif-area');

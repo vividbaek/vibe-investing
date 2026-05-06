@@ -219,6 +219,20 @@ async def fetch_dashboard_json(
 VALID_PERSONAS = ("buffett", "dalio", "wood")
 
 
+def _deepseek_cost_usd(tokens_in: int, tokens_out: int) -> float:
+    """Estimate DeepSeek API cost from token counts. Defaults match
+    deepseek-chat 2026 published pricing; override via env vars
+    DEEPSEEK_PRICE_IN_PER_M / DEEPSEEK_PRICE_OUT_PER_M (USD per 1M tokens).
+    """
+    import os
+    try:
+        in_per_m  = float(os.getenv("DEEPSEEK_PRICE_IN_PER_M",  "0.27"))
+        out_per_m = float(os.getenv("DEEPSEEK_PRICE_OUT_PER_M", "1.10"))
+    except ValueError:
+        in_per_m, out_per_m = 0.27, 1.10
+    return round((tokens_in / 1_000_000) * in_per_m + (tokens_out / 1_000_000) * out_per_m, 4)
+
+
 def _build_persona_breakdown(
     events: list[dict],
     persona_filter: str | None,
@@ -460,6 +474,15 @@ def _aggregate_v2(events: list[dict], days: int = 30) -> dict[str, Any]:
     cat_today: dict[str, int] = _empty_cats()
     cat_total: dict[str, int] = _empty_cats()
 
+    # DeepSeek token counters — total / today / yesterday for the dashboard's
+    # cost section. We also accumulate per-day to drive a daily token chart.
+    tokens_today_in = 0
+    tokens_today_out = 0
+    tokens_yest_in = 0
+    tokens_yest_out = 0
+    tokens_total_in = 0
+    tokens_total_out = 0
+
     # daily_series[date_key] → {function_cache, llm_call, llm_cache, obj_cache, other, users(set), p50_pool}
     daily: dict[str, dict[str, Any]] = {}
 
@@ -479,6 +502,7 @@ def _aggregate_v2(events: list[dict], days: int = 30) -> dict[str, Any]:
     persona_ticker: dict[str, dict[str, int]] = {p: {} for p in VALID_PERSONAS}
 
     today_key = (now + timedelta(hours=9)).strftime("%Y-%m-%d")
+    yest_key  = ((now + timedelta(hours=9)).date() - timedelta(days=1)).isoformat()
 
     for e in events:
         ts = e.get("ts", "")
@@ -490,12 +514,26 @@ def _aggregate_v2(events: list[dict], days: int = 30) -> dict[str, Any]:
         if date_key == today_key:
             cat_today[cat] = cat_today.get(cat, 0) + 1
 
+        # DeepSeek token counters
+        ein = int(e.get("llm_in", 0) or 0)
+        eout = int(e.get("llm_out", 0) or 0)
+        tokens_total_in += ein
+        tokens_total_out += eout
+        if date_key == today_key:
+            tokens_today_in += ein
+            tokens_today_out += eout
+        elif date_key == yest_key:
+            tokens_yest_in += ein
+            tokens_yest_out += eout
+
         # daily series
         d = daily.setdefault(date_key, {
             "function_cache": 0, "llm_cache": 0, "obj_cache": 0, "llm_call": 0, "other": 0,
-            "users": set(), "durations": [],
+            "users": set(), "durations": [], "llm_in": 0, "llm_out": 0,
         })
         d[cat] = d.get(cat, 0) + 1
+        d["llm_in"] += ein
+        d["llm_out"] += eout
         anon = e.get("anon")
         if anon:
             d["users"].add(anon)
@@ -651,6 +689,19 @@ def _aggregate_v2(events: list[dict], days: int = 30) -> dict[str, Any]:
             # LLM 호출 절감 = commentary_hit (LLM 결과 캐시 히트, DeepSeek 호출 안 됨)
             "llm_calls_saved_today": cat_today["llm_cache"],
             "llm_calls_saved_total": cat_total["llm_cache"],
+        },
+        "deepseek": {
+            "tokens_today_in":  tokens_today_in,
+            "tokens_today_out": tokens_today_out,
+            "tokens_yest_in":   tokens_yest_in,
+            "tokens_yest_out":  tokens_yest_out,
+            "tokens_total_in":  tokens_total_in,
+            "tokens_total_out": tokens_total_out,
+            "cost_today_usd":  _deepseek_cost_usd(tokens_today_in, tokens_today_out),
+            "cost_yest_usd":   _deepseek_cost_usd(tokens_yest_in,  tokens_yest_out),
+            "cost_total_usd":  _deepseek_cost_usd(tokens_total_in, tokens_total_out),
+            "price_in_per_m":  float(__import__("os").getenv("DEEPSEEK_PRICE_IN_PER_M",  "0.27")),
+            "price_out_per_m": float(__import__("os").getenv("DEEPSEEK_PRICE_OUT_PER_M", "1.10")),
         },
         "daily_series": daily_list,
         "hourly_routine": hourly_list,

@@ -669,6 +669,78 @@ async def dashboard_stats_persona(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
+@app.route(route="deepseek_balance", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def deepseek_balance(req: func.HttpRequest) -> func.HttpResponse:
+    """Operator-only: query DeepSeek's /user/balance endpoint with our API key.
+    Returns the OpenAI-compat balance object. Cached 30 min server-side.
+    """
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    if not _check_dashboard_key(req):
+        return func.HttpResponse(
+            json.dumps({"error": "forbidden"}),
+            status_code=403, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+
+    api_key = (_config.deepseek_api_key if _config else "") or ""
+    if not api_key:
+        return func.HttpResponse(
+            json.dumps({"error": "DEEPSEEK_API_KEY not configured"}),
+            status_code=500, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+
+    # Process-local 30-min cache to avoid hammering DeepSeek
+    import time
+    global _balance_cache
+    try:
+        _balance_cache  # noqa: F823
+    except NameError:
+        _balance_cache = {"ts": 0.0, "data": None}
+    if time.time() - _balance_cache["ts"] < 1800 and _balance_cache["data"] is not None:
+        cached_data = _balance_cache["data"]
+        headers = dict(_CORS_HEADERS)
+        headers["Cache-Control"] = "public, max-age=600"
+        headers["X-Cache-Source"] = "memory"
+        return func.HttpResponse(
+            json.dumps(cached_data, ensure_ascii=False),
+            status_code=200, mimetype="application/json", headers=headers,
+        )
+
+    import aiohttp
+    url = "https://api.deepseek.com/user/balance"
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url,
+                headers={"Authorization": f"Bearer {api_key}", "Accept": "application/json"},
+                timeout=aiohttp.ClientTimeout(total=15),
+            ) as resp:
+                if resp.status != 200:
+                    err_body = await resp.text()
+                    logger.warning("DeepSeek balance HTTP %d: %s", resp.status, err_body[:200])
+                    return func.HttpResponse(
+                        json.dumps({"error": f"deepseek http {resp.status}"}),
+                        status_code=502, mimetype="application/json", headers=_CORS_HEADERS,
+                    )
+                body = await resp.json()
+    except Exception as exc:
+        logger.exception("DeepSeek balance fetch failed")
+        return func.HttpResponse(
+            json.dumps({"error": str(exc)[:200]}),
+            status_code=502, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+
+    _balance_cache = {"ts": time.time(), "data": body}
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "public, max-age=600"
+    headers["X-Cache-Source"] = "origin"
+    return func.HttpResponse(
+        json.dumps(body, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers,
+    )
+
+
 @app.route(route="dashboard_v2", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
 async def dashboard_v2(req: func.HttpRequest) -> func.HttpResponse:
     """V2 observability dashboard JSON. Read pre-computed dashboard/v2.json.
