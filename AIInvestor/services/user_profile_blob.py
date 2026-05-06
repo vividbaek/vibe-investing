@@ -21,6 +21,7 @@ import time
 from dataclasses import asdict
 from datetime import datetime, timezone
 
+from azure.core import MatchConditions
 from azure.core.exceptions import ResourceNotFoundError, ResourceModifiedError
 from azure.identity.aio import DefaultAzureCredential
 from azure.storage.blob.aio import BlobServiceClient
@@ -201,11 +202,16 @@ class BlobUserProfileRepo:
         client = (await self._client()).get_blob_client(CONTAINER, path)
         body = json.dumps(asdict(profile), ensure_ascii=False).encode("utf-8")
         kwargs: dict = {"overwrite": True, "content_type": "application/json"}
+        # azure-storage-blob requires MatchConditions enum, not raw strings.
+        # IfNotModified = If-Match: <etag>     (overwrite only if unchanged)
+        # IfMissing     = If-None-Match: *     (create only if blob absent)
         if if_match:
             kwargs["etag"] = if_match
-            kwargs["match_condition"] = "IfMatch"
-        elif if_none_match:
-            kwargs["etag"] = if_none_match
-            kwargs["match_condition"] = "IfNoneMatch"
+            kwargs["match_condition"] = MatchConditions.IfNotModified
+        elif if_none_match == "*":
+            # Concurrent-create guard. overwrite=True conflicts with IfMissing
+            # because the SDK interprets it as "always overwrite". Drop it.
+            kwargs["overwrite"] = False
+            kwargs["match_condition"] = MatchConditions.IfMissing
         result = await client.upload_blob(body, **kwargs)
         return result["etag"]
