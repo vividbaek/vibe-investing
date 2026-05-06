@@ -15,6 +15,17 @@ from typing import Any
 import azure.functions as func
 from telegram import Update
 
+# OpenTelemetry — routes all Python logging + auto-instruments outgoing
+# HTTP calls (DeepSeek, yfinance, Telegram) into Application Insights.
+# Must be configured BEFORE any other module imports `logging.getLogger`
+# so handlers attach correctly.
+try:
+    from azure.monitor.opentelemetry import configure_azure_monitor
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+        configure_azure_monitor(logger_name="ai_investor")
+except Exception as exc:  # pragma: no cover
+    print(f"OpenTelemetry init skipped: {exc}")
+
 from bot.telegram_handler import BotDependencies, build_application
 from config import Config, configure_logging
 from services.market_report import MarketReportService

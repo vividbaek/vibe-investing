@@ -131,13 +131,13 @@ class PersonaEngine:
             f"Here is the most recent fundamental and price data (from yfinance). "
             f"Reason ONLY from these numbers — do not invent additional figures.\n\n"
             f"```\n{snapshot.to_prompt_block()}\n```\n\n"
-            "Please respond with:\n"
-            "1. A one-paragraph plain-language summary of what the company does.\n"
-            "2. A value-vs-growth read on the fundamentals above.\n"
-            "3. Your persona's stance (lean toward accumulating / hold / would pass), "
-            "with the reasoning rooted in the data.\n"
-            "4. The recent price trend (1M / 6M / 1Y) interpreted in context.\n"
-            "5. The mandatory disclaimer line."
+            "Please respond CONCISELY (under 700 tokens / about 5 short paragraphs):\n"
+            "1. ONE sentence on what the company does.\n"
+            "2. Value-vs-growth read on the fundamentals — 2–3 sentences.\n"
+            "3. Your persona's stance (lean accumulate / hold / pass) with reasoning — 2–3 sentences.\n"
+            "4. Brief 1M / 6M / 1Y price trend in context — 1–2 sentences.\n"
+            "5. The mandatory disclaimer line.\n"
+            "Do not pad with introductions or repeat the data block."
         )
 
         logger.info(
@@ -148,7 +148,7 @@ class PersonaEngine:
         response = await self._client.chat.completions.create(
             model=self._model,
             temperature=0.4,
-            max_tokens=500,
+            max_tokens=800,
             timeout=20.0,
             messages=[
                 {"role": "system", "content": f"{persona.system_prompt}\n\n{lang_instruction}"},
