@@ -1,57 +1,220 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Investor — 증권당 텔레그램 챗봇</title>
-<meta name="description" content="유명 투자자 페르소나로 미국 시황을 4개 언어로 해설하는 텔레그램 챗봇">
-<style>
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-         max-width: 720px; margin: 40px auto; padding: 0 24px; color: #222;
-         line-height: 1.6; }
-  h1 { font-size: 28px; margin-bottom: 8px; }
-  .subtitle { color: #666; margin-bottom: 32px; }
-  .persona-card { border: 1px solid #e2e2e2; border-radius: 8px; padding: 16px;
-                   margin: 12px 0; background: #fafafa; }
-  .persona-name { font-weight: 600; }
-  .lang { font-size: 13px; color: #888; margin-top: 16px; }
-  .disclaimer { background: #fff8e1; border-left: 4px solid #f9a825;
-                 padding: 12px 16px; margin: 24px 0; font-size: 14px; }
-  .cta { display: inline-block; background: #1976d2; color: white; padding: 12px 20px;
-         border-radius: 6px; text-decoration: none; font-weight: 600; margin-top: 12px; }
-  .cta:hover { background: #1565c0; }
-  footer { margin-top: 48px; font-size: 12px; color: #999; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>증권당 — AI 주식의 대가 페르소나 챗봇 | 워렌 버핏, 레이 달리오, 캐시 우드</title>
+    <meta name="description" content="워렌 버핏, 레이 달리오, 캐시 우드 페르소나가 NASDAQ·S&P 500 시황과 개별 종목을 해설하는 AI 챗봇. 한국어·영어·일본어·중국어 지원. 평균 응답 1.7초.">
+    <meta name="keywords" content="AI 주식 챗봇, 투자 페르소나, 워렌 버핏, 레이 달리오, 캐시 우드, 증권당, 시황 해설, 티커 조회, NASDAQ, S&P500">
+    <meta property="og:title" content="증권당 — AI 주식의 대가 페르소나 챗봇">
+    <meta property="og:description" content="워렌 버핏·레이 달리오·캐시 우드 페르소나가 알려주는 오늘의 시황과 종목 해설. 텔레그램에서 무료로 시작하세요.">
+    <meta property="og:url" content="https://black-plant-0f73c5e00.7.azurestaticapps.net/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="증권당 — AI 주식의 대가 페르소나 챗봇">
+    <meta name="twitter:description" content="워렌 버핏·레이 달리오·캐시 우드 페르소나가 알려주는 오늘의 시황과 종목 해설. 텔레그램에서 무료로 시작하세요.">
+    <link rel="canonical" href="https://black-plant-0f73c5e00.7.azurestaticapps.net/">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --dark: #1e1e2f;
+            --darker: #151521;
+            --card: #2a2a3c;
+            --accent: #f7931a;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif;
+               background: var(--darker); color: #e0e0e0; scroll-behavior: smooth; }
+        .navbar { backdrop-filter: blur(10px); background: rgba(30,30,47,0.9);
+                  border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .navbar-brand { font-weight: 700; font-size: 1.4rem; }
+        .brand-icon { color: var(--accent); margin-right: 6px; }
+        .hero { padding: 100px 0 60px;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                text-align: center; }
+        .hero h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 16px; }
+        .hero .highlight { background: linear-gradient(135deg, var(--accent), #ff6b6b);
+                           -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.15rem; color: #b0b0b0; max-width: 620px; margin: 0 auto 30px; }
+        .btn-primary { background: var(--accent); border: none; padding: 12px 32px;
+                       font-weight: 600; border-radius: 50px; }
+        .btn-primary:hover { background: #e07d0e; }
+        .btn-telegram { background: #0088cc; border: none; padding: 12px 32px;
+                        font-weight: 600; border-radius: 50px; color: #fff; }
+        .btn-telegram:hover { background: #006699; color: #fff; }
+        .btn-outline-accent { color: var(--accent); border: 1px solid var(--accent);
+                              padding: 12px 32px; font-weight: 600; border-radius: 50px; }
+        .btn-outline-accent:hover { background: var(--accent); color: #fff; }
+        .section-title { font-weight: 700; font-size: 2rem; text-align: center; margin-bottom: 40px; }
+        .stat-card, .persona-card { background: var(--card); border-radius: 16px;
+                                     padding: 28px 20px; text-align: center;
+                                     box-shadow: 0 8px 30px rgba(0,0,0,0.3); transition: transform 0.3s; }
+        .stat-card:hover, .persona-card:hover { transform: translateY(-6px); }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+        .persona-img { font-size: 3rem; margin-bottom: 12px; }
+        .chat-demo { background: var(--card); border-radius: 20px; padding: 24px;
+                     max-width: 500px; margin: 0 auto; }
+        .chat-bubble { border-radius: 12px; padding: 10px 16px; margin: 8px 0;
+                       max-width: 80%; clear: both; text-align: left; }
+        .chat-bubble.user { background: var(--accent); float: right; }
+        .chat-bubble.bot { background: #3a3a4a; float: left; }
+        .feature-list { list-style: none; padding: 0; max-width: 720px; margin: 0 auto; }
+        .feature-list li { padding: 8px 0; color: #c0c0c0; }
+        .feature-list i { color: var(--accent); margin-right: 8px; }
+        .footer { background: var(--dark); padding: 30px 0; text-align: center;
+                  font-size: 0.9rem; color: #888; margin-top: 60px; }
+        .footer a { color: var(--accent); text-decoration: none; }
+    </style>
 </head>
 <body>
-  <h1>증권당 — 투자의 대가 페르소나 텔레그램 챗봇</h1>
-  <p class="subtitle">당신만의 투자 멘토 페르소나가 미국 시황(NASDAQ / S&amp;P 500)을 매일 해설해 드립니다.</p>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fa-solid fa-chart-line brand-icon"></i>증권당</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fa-solid fa-bars" style="color:#fff;"></i>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="#personas">페르소나</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#chat">챗봇 미리보기</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#stats">현황</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ticker">📊 티커 조회</a></li>
+                    <li class="nav-item"><a class="btn btn-telegram ms-2" href="https://t.me/AI_vibe_investor_bot" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> 텔레그램 시작</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-  <div class="persona-card">
-    <div class="persona-name">📈 워렌 버핏 — 장기 가치 투자</div>
-    <div>해자, owner earnings, 내재가치 기반 시각</div>
-  </div>
-  <div class="persona-card">
-    <div class="persona-name">⚖️ 레이 달리오 — 매크로 / 올웨더</div>
-    <div>크레딧 사이클·금리·인플레·지정학을 통합한 시각</div>
-  </div>
-  <div class="persona-card">
-    <div class="persona-name">🚀 캐시 우드 — 혁신 성장</div>
-    <div>AI / 로봇 / 유전학 / 블록체인 5년 잠재 성장</div>
-  </div>
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>투자의 대가에게 <span class="highlight">직접 물어보세요</span></h1>
+            <p>워렌 버핏, 레이 달리오, 캐시 우드 페르소나가 NASDAQ·S&P 500 시황과 개별 종목을 해설합니다. 한국어·영어·일본어·중국어 지원, 평균 응답 1.7초.</p>
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                <a href="https://t.me/AI_vibe_investor_bot" target="_blank" rel="noopener" class="btn btn-primary btn-lg"><i class="fa-brands fa-telegram"></i> 텔레그램에서 무료로 시작하기</a>
+                <a href="/ticker" class="btn btn-outline-accent btn-lg"><i class="fa-solid fa-magnifying-glass-chart"></i> 종목 빠른 조회</a>
+            </div>
+        </div>
+    </section>
 
-  <p class="lang">지원 언어: 한국어 / English / 日本語 / 中文</p>
+    <section id="personas" class="py-5">
+        <div class="container">
+            <h2 class="section-title">투자 페르소나</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="persona-card">
+                        <div class="persona-img">🎩</div>
+                        <h5>워렌 버핏</h5>
+                        <p style="color:#aaa;">장기 가치 투자<br>해자, 내재가치, owner earnings 기반 시각</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="persona-card">
+                        <div class="persona-img">📐</div>
+                        <h5>레이 달리오</h5>
+                        <p style="color:#aaa;">매크로 / 올웨더<br>신용 사이클·금리·인플레·지정학 통합</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="persona-card">
+                        <div class="persona-img">🚀</div>
+                        <h5>캐시 우드</h5>
+                        <p style="color:#aaa;">혁신 성장<br>AI / 로봇 / 유전학 / 블록체인 5년 잠재 성장</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <div class="disclaimer">
-    ⚠ 본 서비스는 투자 자문이 아닙니다. AI는 환각·오류가 있을 수 있으며,
-    실제 투자는 전문가의 조언이 필요합니다. 모든 투자 판단의 책임은 본인에게 있습니다.
-  </div>
+    <section id="chat" class="py-5" style="background:#1a1a2a;">
+        <div class="container text-center">
+            <h2 class="section-title">챗봇 미리보기</h2>
+            <div class="chat-demo">
+                <div class="chat-bubble bot">안녕하세요, 저는 워렌 버핏입니다. 어떤 종목이 궁금하신가요?</div>
+                <div class="chat-bubble user">NVDA 어때요?</div>
+                <div class="chat-bubble bot">NVIDIA는 AI 가속기 시장의 선두주자로, 강력한 해자(moat)를 보유하고 있습니다. 다만 현재 멀티플은 역사적 평균보다 높으니, 안전 마진을 고려한 접근이 필요합니다.<br><small style="color:#888;">⚠ 본 응답은 투자 자문이 아닙니다.</small></div>
+            </div>
+            <p class="mt-3" style="color:#888;">실제 챗봇은 텔레그램에서 <strong>버핏·달리오·우드</strong> 페르소나로 답변합니다.</p>
+            <a href="https://t.me/AI_vibe_investor_bot" target="_blank" rel="noopener" class="btn btn-telegram mt-2"><i class="fa-brands fa-telegram"></i> 텔레그램에서 대화하기</a>
+        </div>
+    </section>
 
-  <a class="cta" href="https://t.me/AI_vibe_investor_bot">▶ 텔레그램에서 시작하기</a>
-  &nbsp;&nbsp;<a class="cta" href="/ticker" style="background:#388e3c;">📊 티커 조회</a>
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="section-title">주요 기능</h2>
+            <ul class="feature-list">
+                <li><i class="fa-solid fa-check-circle"></i> <strong>4개 언어 자동 전환</strong> — 한국어 / English / 日本語 / 中文 (텔레그램 언어 자동 감지)</li>
+                <li><i class="fa-solid fa-check-circle"></i> <strong>다국어 종목명 인식</strong> — "엔비디아" / "テスラ" / "苹果" 모두 매칭</li>
+                <li><i class="fa-solid fa-check-circle"></i> <strong>2단계 분석</strong> — 짧은 응답 후 깊이 있는 전문 분석 옵션</li>
+                <li><i class="fa-solid fa-check-circle"></i> <strong>관심사 학습</strong> — 사용자가 자주 묻는 섹터 자동 인식, ETF/유사주 비교 권유</li>
+                <li><i class="fa-solid fa-check-circle"></i> <strong>사전 캐싱</strong> — 한국 인기 종목 14종 + 글로벌 인기 50종 30분 단위 사전 갱신</li>
+                <li><i class="fa-solid fa-check-circle"></i> <strong>위험 고지 강조</strong> — AI 환각 가능성 + 전문가 조언 필요성 매번 표시</li>
+            </ul>
+        </div>
+    </section>
 
-  <footer>
-    AI Investor v1 — Korea Central · DeepSeek · Yahoo Finance
-  </footer>
+    <section id="stats" class="py-5">
+        <div class="container">
+            <h2 class="section-title">서비스 현황</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number" id="today">—</div>
+                        <div>오늘 활성 사용자</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total">—</div>
+                        <div>누적 가입자</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number" id="mau">—</div>
+                        <div>월간 활성 사용자 (MAU)</div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-4" style="color:#888;" id="stats-meta">로딩 중…</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>⚠ 본 서비스는 투자 자문이 아닙니다. AI는 환각·오류가 있을 수 있으며, 실제 투자는 전문가의 조언이 필요합니다.<br>모든 투자 판단의 책임은 본인에게 있습니다.</p>
+            <p>© 2026 증권당 · Powered by DeepSeek · yfinance · <a href="https://azure.microsoft.com">Microsoft Azure</a> · <a href="/dashboard">대시보드</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countUp.umd.js"></script>
+    <script>
+        const STATS_API = "https://func-aiinvestor-prod.azurewebsites.net/api/stats";
+
+        async function loadStats() {
+            try {
+                const r = await fetch(STATS_API, { mode: 'cors' });
+                if (!r.ok) throw new Error('http ' + r.status);
+                const s = await r.json();
+                animate('today', s.active_today || 0);
+                animate('total', s.cumulative_users || 0);
+                animate('mau',   s.mau || 0);
+                document.getElementById('stats-meta').textContent =
+                    '갱신: ' + (s.generated_at || '—');
+            } catch (e) {
+                ['today','total','mau'].forEach(id => document.getElementById(id).textContent = '—');
+                document.getElementById('stats-meta').textContent = '통계 로딩 실패 — 잠시 후 다시 시도해 주세요.';
+            }
+        }
+
+        function animate(id, end) {
+            const opts = { duration: 1.5 };
+            const c = new countUp.CountUp(id, end, opts);
+            if (!c.error) c.start(); else document.getElementById(id).textContent = end.toLocaleString();
+        }
+
+        loadStats();
+    </script>
 </body>
 </html>

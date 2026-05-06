@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+
+Sitemap: https://black-plant-0f73c5e00.7.azurestaticapps.net/sitemap.xml
