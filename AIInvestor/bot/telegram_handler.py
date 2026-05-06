@@ -265,13 +265,14 @@ async def _cmd_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 async def _forward_feedback(update, context, profile, body: str, s) -> None:
-    """Shared sender used by /feedback and the '피드백' text-prefix shortcut."""
-    owner_id = os.getenv("TELEGRAM_OWNER_CHAT_ID", "").strip()
-    if not owner_id:
-        logger.warning("TELEGRAM_OWNER_CHAT_ID not set; feedback dropped")
-        await update.message.reply_text(s.feedback_error)
-        return
+    """Shared sender used by /feedback and the '피드백' text-prefix shortcut.
 
+    Fallback chain: if TELEGRAM_OWNER_CHAT_ID is unset OR the chat_id is invalid
+    (Telegram returns 400 'chat not found'), the feedback is logged at WARNING
+    level so it shows up in App Insights — operator can pull it via KQL even
+    without DM delivery.
+    """
+    owner_id = os.getenv("TELEGRAM_OWNER_CHAT_ID", "").strip()
     user = update.effective_user
     user_label = f"@{user.username}" if user.username else f"id={user.id}"
     forwarded = (
@@ -282,13 +283,24 @@ async def _forward_feedback(update, context, profile, body: str, s) -> None:
         f"{body}"
     )
 
+    # Always log the feedback so it survives DM-delivery failures.
+    logger.warning("USER_FEEDBACK from=%s anon=%s lang=%s persona=%s body=%r",
+                   user_label, profile.anon_user_id, profile.language,
+                   profile.persona_key, body)
+
+    if not owner_id:
+        # No DM target configured — say it was received (the log captured it)
+        await update.message.reply_text(s.feedback_thanks)
+        return
+
     try:
         await context.bot.send_message(chat_id=int(owner_id), text=forwarded)
         await update.message.reply_text(s.feedback_thanks)
-        logger.info("feedback forwarded from anon=%s len=%d", profile.anon_user_id, len(body))
-    except Exception:
-        logger.exception("Failed to forward feedback")
-        await update.message.reply_text(s.feedback_error)
+    except Exception as exc:
+        logger.exception("Failed to forward feedback to owner_id=%s err=%s",
+                         owner_id, exc)
+        # Still confirm to user — log captured it
+        await update.message.reply_text(s.feedback_thanks)
 
 
 # -----------------------------
@@ -364,6 +376,34 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             s.interest_prompt,
             reply_markup=_interest_keyboard(lang, set(profile.interest_tags)),
         )
+        return
+
+    if data.startswith("deeper:"):
+        choice = data.split(":", 1)[1]
+        lang = profile.language
+        s = t(lang)
+        if choice == "no":
+            await query.message.reply_text(s.short_disclaimer)
+            return
+        # choice == ticker symbol — run live LLM with full unbounded prompt
+        ticker = choice.upper()
+        await context.bot.send_chat_action(
+            chat_id=query.message.chat_id, action=ChatAction.TYPING,
+        )
+        persona = get_persona(profile.persona_key)
+        try:
+            snapshot = deps.stock_service.get_snapshot(ticker)
+            reply = await deps.persona_engine.generate(
+                persona=persona, snapshot=snapshot, language=lang,
+                interests=[_localize_tag(tag, lang) for tag in profile.interest_tags] + profile.watchlist_tickers,
+            )
+            header = f"[{persona.name(lang)} · {ticker} · 전문 분석]" if lang == "ko" else f"[{persona.name(lang)} · {ticker} · deep]"
+            await query.message.reply_text(f"{header}\n\n{_strip_md(reply)}\n\n{s.short_disclaimer}")
+        except StockServiceError:
+            await query.message.reply_text(s.ticker_not_found.format(q=ticker))
+        except Exception:
+            logger.exception("Deeper analysis failed ticker=%s", ticker)
+            await query.message.reply_text(s.error_llm)
         return
 
     if data.startswith("forget:"):
@@ -489,6 +529,40 @@ async def _ingest_interest_text(
     await update.message.reply_text(s.free_query_invite)
 
 
+_NL_KEYWORDS = (
+    "추천", "비교", "비슷한", "포트폴리오", "어떤 주식", "뭐가 좋",
+    "recommend", "compare", "similar", "portfolio", "what stock", "which stock",
+    "おすすめ", "比較", "ポートフォリオ",
+    "推荐", "比较", "投资组合",
+)
+
+
+def _classify_intent(text: str) -> str:
+    """Return 'natural_language' for non-ticker asks, 'ticker' otherwise."""
+    lowered = text.lower()
+    for kw in _NL_KEYWORDS:
+        if kw in lowered:
+            return "natural_language"
+    # Long sentence or sentence-final markers → likely natural language
+    if len(text) > 25 or text.endswith(("?", "?", "요", "까")):
+        return "natural_language"
+    return "ticker"
+
+
+def _strip_md(text: str) -> str:
+    """Strip Markdown emphasis we'd otherwise have to parse-mode-escape.
+
+    Telegram default plain-text mode renders **bold** literally. Removing the
+    asterisks is simpler and safer than switching to MarkdownV2 (which would
+    require escaping every dot, dash, parenthesis the LLM produces).
+    """
+    import re
+    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)  # **bold**
+    text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"\1", text)  # *italic*
+    text = re.sub(r"__(.+?)__", r"\1", text)
+    return text
+
+
 async def _handle_ticker_query(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
@@ -499,6 +573,13 @@ async def _handle_ticker_query(
     lang = profile.language
     s = t(lang)
     persona = get_persona(profile.persona_key)
+
+    # ────────────────────────────────────────────────────────────────
+    # Intent classifier — natural-language queries we don't yet support
+    # ────────────────────────────────────────────────────────────────
+    if _classify_intent(text) == "natural_language":
+        await update.message.reply_text(s.intent_unrecognized)
+        return
 
     # Resolve to canonical ticker once for cache lookups (e.g. "테슬라" → "TSLA").
     ticker_key = deps.stock_service._lookup.resolve(text).upper() if text else ""
@@ -513,7 +594,8 @@ async def _handle_ticker_query(
         if cached is not None:
             logger.info("prewarm.cache_hit ticker=%s persona=%s lang=%s",
                         ticker_key, persona.key, lang)
-            await update.message.reply_text(cached)
+            await update.message.reply_text(_strip_md(cached))
+            await _offer_deeper(update, context, ticker_key, persona, lang)
             return
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
@@ -530,8 +612,9 @@ async def _handle_ticker_query(
     if snapshot is None:
         try:
             snapshot = deps.stock_service.get_snapshot(text)
-        except StockServiceError as exc:
-            await update.message.reply_text(str(exc))
+        except StockServiceError:
+            # Localize the not-found error
+            await update.message.reply_text(s.ticker_not_found.format(q=text))
             return
         except Exception:
             logger.exception("Stock lookup failed for input=%r", text)
@@ -554,7 +637,19 @@ async def _handle_ticker_query(
         return
 
     header = f"[{persona.name(lang)} · {snapshot.ticker}]"
-    await update.message.reply_text(f"{header}\n\n{reply}")
+    await update.message.reply_text(f"{header}\n\n{_strip_md(reply)}")
+    await _offer_deeper(update, context, snapshot.ticker, persona, lang)
+
+
+async def _offer_deeper(update, context, ticker: str, persona, lang: str) -> None:
+    """After short response, offer a deeper persona analysis with a disclaimer."""
+    s = t(lang)
+    keyboard = InlineKeyboardMarkup([[
+        InlineKeyboardButton(s.deeper_analysis_yes, callback_data=f"deeper:{ticker}"),
+        InlineKeyboardButton(s.deeper_analysis_no,  callback_data="deeper:no"),
+    ]])
+    body = f"{s.deeper_analysis_offer.format(persona=persona.name(lang))}\n\n{s.risk_notice}"
+    await update.message.reply_text(body, reply_markup=keyboard)
 
 
 async def _try_prewarmed_commentary(ticker: str, persona_key: str, language: str) -> str | None:

@@ -57,6 +57,13 @@ class _Bundle:
     feedback_usage: str
     feedback_thanks: str
     feedback_error: str
+    ticker_not_found: str
+    intent_unrecognized: str
+    deeper_analysis_offer: str
+    deeper_analysis_yes: str
+    deeper_analysis_no: str
+    short_disclaimer: str
+    risk_notice: str
 
 
 _KO = _Bundle(
@@ -128,6 +135,16 @@ _KO = _Bundle(
     feedback_usage="피드백을 함께 보내주세요.\n예시: /feedback 응답이 너무 길어요 / 피드백 좋네요!",
     feedback_thanks="감사합니다. 의견이 운영자에게 전달되었습니다. 🙏",
     feedback_error="죄송합니다. 의견 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    ticker_not_found="'{q}' 종목을 찾지 못했어요. 정확한 티커(예: AAPL) 또는 회사명(예: 애플)을 보내주세요.",
+    intent_unrecognized="어떤 종목이나 ETF가 궁금하신가요? 예: NVDA, 테슬라, QQQ\n‘추천/비교/포트폴리오’ 같은 자연어 요청은 곧 지원될 예정입니다.",
+    deeper_analysis_offer="더 전문적인 {persona} 페르소나의 의견이 필요하신가요?\n\n⏱ 예 선택 시 5초 이상 소요됩니다.",
+    deeper_analysis_yes="✅ 예, 받기",
+    deeper_analysis_no="아니요, 괜찮아요",
+    short_disclaimer="ℹ 본 응답은 투자 자문이 아닙니다.",
+    risk_notice=(
+        "⚠ 이 서비스는 주식 매매를 권장하지 않으며, 실제 투자는 전문가의 상담이 필요합니다.\n"
+        "AI는 환각 및 오류가 있을 수 있으며, 모든 투자 판단의 책임은 본인에게 있습니다."
+    ),
 )
 
 _EN = _Bundle(
@@ -199,6 +216,16 @@ _EN = _Bundle(
     feedback_usage="Please include your feedback in the same message.\nExample: /feedback The replies are too long",
     feedback_thanks="Thanks! Your feedback was forwarded to the operator. 🙏",
     feedback_error="Sorry, we couldn't deliver your feedback right now. Please try again shortly.",
+    ticker_not_found="I couldn't find '{q}'. Please send a valid ticker (e.g. AAPL) or company name (e.g. Apple).",
+    intent_unrecognized="Which stock or ETF would you like to discuss? e.g. NVDA, Tesla, QQQ\nNatural-language asks like 'recommend / compare / portfolio' are coming soon.",
+    deeper_analysis_offer="Want a deeper take from the {persona} persona?\n\n⏱ Yes takes 5+ seconds.",
+    deeper_analysis_yes="✅ Yes, please",
+    deeper_analysis_no="No thanks",
+    short_disclaimer="ℹ Not investment advice.",
+    risk_notice=(
+        "⚠ This service does not recommend buying or selling. Real investment decisions need professional advice.\n"
+        "AI may hallucinate or err. You alone bear responsibility for your investment outcomes."
+    ),
 )
 
 _JA = _Bundle(
@@ -270,6 +297,16 @@ _JA = _Bundle(
     feedback_usage="フィードバックを同じメッセージに含めてください。\n例: /feedback 応答が長すぎます",
     feedback_thanks="ありがとうございます。ご意見を運営者に転送しました。 🙏",
     feedback_error="申し訳ありません。フィードバックを送信できませんでした。しばらくしてから再度お試しください。",
+    ticker_not_found="'{q}' を見つけられませんでした。正しいティッカー(例: AAPL)または銘柄名(例: アップル)を送信してください。",
+    intent_unrecognized="どの銘柄やETFを分析しましょうか? 例: NVDA, テスラ, QQQ\n「推薦/比較/ポートフォリオ」など自然言語は近日対応予定です。",
+    deeper_analysis_offer="{persona} ペルソナのより専門的な見解が必要ですか?\n\n⏱ はいを選ぶと5秒以上かかります。",
+    deeper_analysis_yes="✅ はい、お願いします",
+    deeper_analysis_no="いいえ、結構です",
+    short_disclaimer="ℹ 本回答は投資助言ではありません。",
+    risk_notice=(
+        "⚠ 本サービスは株式の売買を推奨しません。実際の投資判断には専門家への相談が必要です。\n"
+        "AIには誤りや幻覚が含まれる可能性があり、投資の責任はすべてご自身にあります。"
+    ),
 )
 
 _ZH = _Bundle(
@@ -341,6 +378,16 @@ _ZH = _Bundle(
     feedback_usage="请将反馈与命令一起发送。\n示例: /feedback 回复太长了",
     feedback_thanks="感谢!您的反馈已转发给运营者。🙏",
     feedback_error="抱歉,反馈发送失败。请稍后再试。",
+    ticker_not_found="未找到 '{q}'。请发送正确的代码(例如 AAPL)或公司名(例如 苹果)。",
+    intent_unrecognized="您想分析哪只股票或ETF? 例如:NVDA、特斯拉、QQQ\n'推荐/比较/投资组合' 等自然语言查询将很快支持。",
+    deeper_analysis_offer="是否需要 {persona} 人设的更深入分析?\n\n⏱ 选择「是」需要5秒以上。",
+    deeper_analysis_yes="✅ 是,请分析",
+    deeper_analysis_no="不用了",
+    short_disclaimer="ℹ 本回复不构成投资建议。",
+    risk_notice=(
+        "⚠ 本服务不推荐买卖股票,实际投资决策请咨询专业人士。\n"
+        "AI 可能出错或产生幻觉,所有投资后果由您本人承担。"
+    ),
 )
 
 _BUNDLES: dict[str, _Bundle] = {"ko": _KO, "en": _EN, "ja": _JA, "zh": _ZH}
