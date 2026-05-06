@@ -169,11 +169,20 @@ async def run_aggregation(storage_account_name: str, credential=None) -> None:
         events_7d = await _read_logs_in_window(svc, 24 * 7)
         agg_7d = _aggregate(events_7d, "7d")
 
+        from azure.storage.blob import ContentSettings
+        # 30분 browser cache + public CDN cache. Aggregator runs every 15min,
+        # so 30min is safe (clients see at most 30min stale data).
+        content_settings = ContentSettings(
+            content_type="application/json",
+            cache_control="public, max-age=1800",
+        )
         for name, agg in (("24h.json", agg_24h), ("7d.json", agg_7d)):
             blob = svc.get_blob_client(DASHBOARD_CONTAINER, name)
             payload = json.dumps(agg, ensure_ascii=False, indent=2).encode("utf-8")
             try:
-                await blob.upload_blob(payload, overwrite=True, content_type="application/json")
+                await blob.upload_blob(
+                    payload, overwrite=True, content_settings=content_settings,
+                )
             except Exception:
                 logger.exception("dashboard upload failed for %s", name)
 

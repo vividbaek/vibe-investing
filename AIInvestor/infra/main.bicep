@@ -38,7 +38,8 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   kind: 'StorageV2'
   properties: {
     minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: false
+    // dashboard/ 컨테이너만 public-read 로 노출 (anonymized stats)
+    allowBlobPublicAccess: true
     supportsHttpsTrafficOnly: true
   }
 }
@@ -48,17 +49,41 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
   name: 'default'
   properties: {
     deleteRetentionPolicy: { enabled: true, days: 7 }
+    cors: {
+      corsRules: [
+        {
+          allowedOrigins: [
+            '*'
+          ]
+          allowedMethods: [ 'GET', 'HEAD', 'OPTIONS' ]
+          allowedHeaders: [ '*' ]
+          exposedHeaders: [ '*' ]
+          maxAgeInSeconds: 3600
+        }
+      ]
+    }
   }
 }
 
-var containerNames = ['users', 'reports', 'logs', 'analysis', 'deployment', 'prewarm', 'dashboard']
-resource containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [for name in containerNames: {
+var privateContainerNames = ['users', 'reports', 'logs', 'analysis', 'deployment', 'prewarm']
+resource privateContainers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [for name in privateContainerNames: {
   parent: blobService
   name: name
   properties: {
     publicAccess: 'None'
   }
 }]
+
+// dashboard/ holds anonymized aggregated JSON consumed by the public Static
+// Web App. publicAccess: Blob = anyone can GET individual blobs but cannot
+// list the container.
+resource dashboardContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: 'dashboard'
+  properties: {
+    publicAccess: 'Blob'
+  }
+}
 
 // Lifecycle policy — logs/ 90d, analysis/ 365d
 resource lifecycle 'Microsoft.Storage/storageAccounts/managementPolicies@2023-05-01' = {
@@ -320,6 +345,20 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
 }
 
 // -----------------------------------------------------------------
+// Static Web Apps Free — landing + dashboard, global edge, $0/mo
+// -----------------------------------------------------------------
+resource staticWeb 'Microsoft.Web/staticSites@2024-04-01' = {
+  name: 'swa-${prefix}'
+  location: 'eastasia'   // SWA Free SKU available regions: eastasia closest
+  sku: { name: 'Free', tier: 'Free' }
+  properties: {
+    allowConfigFileUpdates: true
+    provider: 'Custom'   // deployed by GitHub Actions, not GitHub-integrated
+    enterpriseGradeCdnStatus: 'Disabled'
+  }
+}
+
+// -----------------------------------------------------------------
 // Outputs
 // -----------------------------------------------------------------
 output functionAppName string = funcApp.name
@@ -330,3 +369,5 @@ output appInsightsName string = appi.name
 // Bicep linter resolves chained safe-access (.?) without warning.
 // When enableFrontDoor=false, frontDoorEndpoint itself is null → output becomes ''.
 output frontDoorEndpointHost string = frontDoorEndpoint.?properties.?hostName ?? ''
+output staticWebAppName string = staticWeb.name
+output staticWebAppHost string = staticWeb.properties.defaultHostname

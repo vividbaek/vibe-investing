@@ -112,3 +112,34 @@ jobs:
             -d "drop_pending_updates=true"
           echo ""
           curl -fsS "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/getWebhookInfo"
+
+      - name: Inject dashboard key hash into static_web/dashboard.html
+        run: |
+          if [ -n "${{ secrets.DASHBOARD_ACCESS_KEY }}" ]; then
+            HASH=$(printf '%s' "${{ secrets.DASHBOARD_ACCESS_KEY }}" | sha256sum | cut -d' ' -f1)
+            sed -i "s|__KEY_HASH__|$HASH|g" static_web/dashboard.html
+            echo "✓ injected hash (length=${#HASH})"
+          else
+            echo "DASHBOARD_ACCESS_KEY not set; dashboard.html will keep placeholder hash (page will lock)"
+          fi
+          # Substitute storage account name into the static page (for blob fetch URL)
+          sed -i "s|staiinvestorprod|${STORAGEACCOUNT}|g" static_web/dashboard.html
+          sed -i "s|func-aiinvestor-prod|${FUNCTIONAPPNAME}|g" static_web/dashboard.html
+
+      - name: Get Static Web App deployment token
+        id: swa_token
+        run: |
+          TOKEN=$(az staticwebapp secrets list --name "$STATICWEBAPPNAME" --resource-group "$RG" --query properties.apiKey -o tsv)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Deploy static web content
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.swa_token.outputs.token }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: AIInvestor/static_web
+          api_location: ""
+          output_location: ""
+          skip_app_build: true

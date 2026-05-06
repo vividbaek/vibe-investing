@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Investor — Operations Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         max-width: 1100px; margin: 24px auto; padding: 0 24px; color: #222; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .gen { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card { border: 1px solid #e2e2e2; border-radius: 8px; padding: 16px;
+          background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .card h3 { margin: 0 0 12px 0; font-size: 14px; color: #555; }
+  .big-number { font-size: 28px; font-weight: 700; color: #1976d2; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+  th { background: #fafafa; color: #666; font-weight: 600; }
+  .download { margin-top: 24px; }
+  .download a { background: #1976d2; color: white; padding: 8px 14px; border-radius: 4px;
+                text-decoration: none; margin-right: 8px; font-size: 13px; }
+  canvas { max-height: 220px; }
+  #lock-screen { text-align: center; padding: 80px 20px; color: #888; font-size: 14px; }
+  #lock-screen a { color: #1976d2; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div id="lock-screen" style="display:none">
+  <h2>증권당 운영자 대시보드</h2>
+  <p>접근 키가 필요합니다.</p>
+  <p><a href="/">← 메인 페이지로</a></p>
+</div>
+
+<div id="dashboard-content" style="display:none">
+  <h1>AI Investor — Operations Dashboard</h1>
+  <div class="gen" id="gen-info">Loading…</div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>📊 응답 분류 (24h)</h3>
+      <canvas id="tierChart"></canvas>
+    </div>
+    <div class="card">
+      <h3>⏱ p50 응답시간 (ms, 24h)</h3>
+      <canvas id="latencyChart"></canvas>
+    </div>
+    <div class="card">
+      <h3>🌐 언어 분포 (24h)</h3>
+      <canvas id="langChart"></canvas>
+    </div>
+    <div class="card">
+      <h3>👤 페르소나 분포 (24h)</h3>
+      <canvas id="personaChart"></canvas>
+    </div>
+    <div class="card" style="grid-column: span 2;">
+      <h3>🔝 Top 20 ticker (24h)</h3>
+      <table id="topTickers"><thead><tr><th>#</th><th>Ticker</th><th>Hits</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card" style="grid-column: span 2;">
+      <h3>💸 LLM 토큰 사용량 (24h)</h3>
+      <div>입력: <span class="big-number" id="llmIn">—</span> 토큰
+           &nbsp;&nbsp;&nbsp; 출력: <span class="big-number" id="llmOut">—</span> 토큰</div>
+    </div>
+  </div>
+
+  <div class="download">
+    <a id="csv-24h" href="#">📥 CSV (24h)</a>
+    <a id="csv-7d" href="#">📥 CSV (7d)</a>
+  </div>
+</div>
+
+<script>
+// Build-time-injected SHA-256 hash of the operator key.
+const KEY_HASH = "__KEY_HASH__";
+
+// Storage account for fetching pre-aggregated dashboard JSON.
+// 'dashboard' container is public-read; data is anonymized stats only.
+const BLOB_BASE = "https://staiinvestorprod.blob.core.windows.net/dashboard";
+
+// Function App URL for CSV export (still server-rendered, key checked there too).
+const FUNC_BASE = "https://func-aiinvestor-prod.azurewebsites.net/api";
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function gateOrRender() {
+  const params = new URLSearchParams(location.search);
+  const key = params.get('key') || '';
+  if (!key) {
+    document.getElementById('lock-screen').style.display = 'block';
+    return;
+  }
+  const provided = await sha256Hex(key);
+  if (provided !== KEY_HASH) {
+    document.getElementById('lock-screen').style.display = 'block';
+    return;
+  }
+  document.getElementById('dashboard-content').style.display = 'block';
+  await loadStats(key);
+}
+
+async function loadStats(key) {
+  let stats24, stats7;
+  try {
+    const r24 = await fetch(`${BLOB_BASE}/24h.json`, { mode: 'cors' });
+    stats24 = r24.ok ? await r24.json() : {};
+  } catch (e) { stats24 = {}; }
+  try {
+    const r7 = await fetch(`${BLOB_BASE}/7d.json`, { mode: 'cors' });
+    stats7 = r7.ok ? await r7.json() : {};
+  } catch (e) { stats7 = {}; }
+
+  document.getElementById('gen-info').textContent =
+    `24h total: ${stats24.total || 0} · 7d total: ${stats7.total || 0} · 갱신: ${stats24.generated_at || '—'}`;
+
+  document.getElementById('csv-24h').href = `${FUNC_BASE}/dashboard_export?key=${encodeURIComponent(key)}&window=24h`;
+  document.getElementById('csv-7d').href = `${FUNC_BASE}/dashboard_export?key=${encodeURIComponent(key)}&window=7d`;
+
+  const palette = ['#1976d2', '#388e3c', '#f57c00', '#7b1fa2', '#c62828', '#0097a7', '#5d4037'];
+
+  function pieFromObj(canvasId, obj) {
+    const labels = Object.keys(obj || {});
+    const data = labels.map(k => obj[k]);
+    new Chart(document.getElementById(canvasId), {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: palette }] },
+      options: { plugins: { legend: { position: 'right', labels: { font: { size: 11 } } } } }
+    });
+  }
+  function barFromObj(canvasId, obj, label) {
+    const labels = Object.keys(obj || {});
+    const data = labels.map(k => obj[k]);
+    new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: { labels, datasets: [{ data, label, backgroundColor: '#1976d2' }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  pieFromObj('tierChart', stats24.tier_counts);
+  barFromObj('latencyChart', stats24.p50_by_tier, 'p50 ms');
+  pieFromObj('langChart', stats24.language_dist);
+  pieFromObj('personaChart', stats24.persona_dist);
+
+  const tbody = document.querySelector('#topTickers tbody');
+  (stats24.top_tickers || []).forEach(([t, n], i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i + 1}</td><td>${t}</td><td>${n}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('llmIn').textContent = (stats24.llm_total_in || 0).toLocaleString();
+  document.getElementById('llmOut').textContent = (stats24.llm_total_out || 0).toLocaleString();
+}
+
+gateOrRender();
+</script>
+</body>
+</html>

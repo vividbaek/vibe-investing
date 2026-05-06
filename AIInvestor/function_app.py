@@ -315,23 +315,9 @@ def _check_dashboard_key(req: func.HttpRequest) -> bool:
     return provided == expected
 
 
-@app.route(route="dashboard", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
-async def dashboard(req: func.HttpRequest) -> func.HttpResponse:
-    await _bootstrap()
-    from services.dashboard_html import landing_page, dashboard_page
-
-    if not _check_dashboard_key(req):
-        return func.HttpResponse(landing_page(), mimetype="text/html", status_code=200)
-
-    from services.dashboard_aggregator import fetch_dashboard_json
-    if not _config or not _config.storage_account_name:
-        return func.HttpResponse(landing_page(), mimetype="text/html", status_code=200)
-
-    stats_24h = await fetch_dashboard_json(_config.storage_account_name, "24h")
-    stats_7d = await fetch_dashboard_json(_config.storage_account_name, "7d")
-    key_param = req.params.get("key", "")
-    html = dashboard_page(stats_24h, stats_7d, key_param)
-    return func.HttpResponse(html, mimetype="text/html", status_code=200)
+# (HTML dashboard moved to Static Web App — see static_web/. Function App
+# now only serves the CSV export endpoint, since CSV streaming benefits
+# from server-side blob iteration.)
 
 
 @app.route(route="dashboard_export", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
