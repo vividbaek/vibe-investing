@@ -213,10 +213,19 @@ async def adjust_for_penalty(
 # ──────────────────────────────────────────────────────────
 
 async def _read(repo, user_key: str) -> UserProfile:
-    if hasattr(repo, "_lock") and not callable(getattr(repo.get, "__await__", None)):
-        # SQLite repo — sync `get`
-        return repo.get(user_key)
-    return await repo.get(user_key) if hasattr(repo, "get") else repo.get_or_create(user_key, "en", "buffett")
+    """Read a profile from any repo. Works with sync (SQLite) and async (Blob).
+
+    Detect-by-result pattern: call the method, then check if it returned a
+    coroutine. The earlier `inspect.iscoroutinefunction(repo.get)` check
+    fails because bound methods don't expose __await__ — only the COROUTINE
+    that's the *result* of calling them does.
+    """
+    res = repo.get(user_key) if hasattr(repo, "get") else repo.get_or_create(
+        user_key, "en", "buffett"
+    )
+    if hasattr(res, "__await__"):
+        return await res
+    return res
 
 
 async def _update(repo, user_key: str, **fields) -> UserProfile:
