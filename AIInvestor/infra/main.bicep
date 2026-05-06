@@ -239,8 +239,8 @@ resource roleKvDeployer 'Microsoft.Authorization/roleAssignments@2022-04-01' = i
 // Azure Front Door Standard — global edge cache for prewarm/ blobs
 // (Classic Microsoft CDN is retired for new deployments.)
 // -----------------------------------------------------------------
-@description('Set to false to skip Front Door (saves ~$35/mo base cost)')
-param enableFrontDoor bool = true
+@description('Front Door (Azure CDN) — disabled by default. Forbidden on Free Trial/Student. Enable when on Pay-As-You-Go and global edge actually matters (~$35/mo).')
+param enableFrontDoor bool = false
 
 var frontDoorName = 'fd-${prefix}'
 var frontDoorEndpointName = 'edge-${prefix}'
@@ -325,4 +325,6 @@ output functionAppHost string = funcApp.properties.defaultHostName
 output storageAccount string = storage.name
 output keyVaultName string = keyVault.name
 output appInsightsName string = appi.name
-output frontDoorEndpointHost string = enableFrontDoor ? frontDoorEndpoint.properties.?hostName ?? '' : ''
+// Bicep linter resolves chained safe-access (.?) without warning.
+// When enableFrontDoor=false, frontDoorEndpoint itself is null → output becomes ''.
+output frontDoorEndpointHost string = frontDoorEndpoint.?properties.?hostName ?? ''
