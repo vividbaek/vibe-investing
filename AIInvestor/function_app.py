@@ -1036,7 +1036,7 @@ async def gamification_persona_analyze(req: func.HttpRequest) -> func.HttpRespon
     from services.persona_engine import get_persona
     persona = get_persona(profile.persona_key)
     try:
-        snapshot = await asyncio.to_thread(_stock_service.snapshot, ticker)
+        snapshot = await asyncio.to_thread(_stock_service.get_snapshot, ticker)
         commentary = await _persona_engine.generate(
             persona=persona, snapshot=snapshot, language=profile.language,
             interests=profile.interest_tags or None,
@@ -1108,7 +1108,7 @@ async def gamification_persona_analyze_advanced(req: func.HttpRequest) -> func.H
 
     # Snapshot the requested ticker
     try:
-        snapshot = await asyncio.to_thread(_stock_service.snapshot, ticker)
+        snapshot = await asyncio.to_thread(_stock_service.get_snapshot, ticker)
     except Exception as e:
         logger.exception("advanced snapshot failed for %s", ticker)
         return func.HttpResponse(json.dumps({"error": "fetch_failed", "detail": str(e)}),
@@ -1124,7 +1124,7 @@ async def gamification_persona_analyze_advanced(req: func.HttpRequest) -> func.H
     rival_snap = None
     if rival_entry is not None:
         try:
-            rival_snap = await asyncio.to_thread(_stock_service.snapshot, rival_entry.ticker)
+            rival_snap = await asyncio.to_thread(_stock_service.get_snapshot, rival_entry.ticker)
         except Exception:
             logger.warning("rival snapshot failed for %s", rival_entry.ticker)
 
