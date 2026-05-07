@@ -185,6 +185,50 @@ async def submit_welcome_prediction(
     }
 
 
+async def get_active_welcome_event(
+    storage_account_name: str,
+    user_key: str,
+    *,
+    credential=None,
+) -> WelcomeEvent | None:
+    """Return the user's currently active (or recently completed) welcome event.
+
+    'Active' means status ∈ {open, predicted} AND target_at hasn't passed yet,
+    OR it has passed and is settled (we still return for 1 hour after settle so
+    the user sees the result).
+    """
+    user_short = user_key.replace("tg:", "")
+    creds = credential or DefaultAzureCredential()
+    try:
+        async with BlobServiceClient(
+            account_url=f"https://{storage_account_name}.blob.core.windows.net",
+            credential=creds,
+        ) as svc:
+            container = svc.get_container_client(CONTAINER)
+            prefix = f"welcome_mini/{user_short}/"
+            try:
+                async for blob in container.list_blobs(name_starts_with=prefix):
+                    client = container.get_blob_client(blob.name)
+                    stream = await client.download_blob()
+                    evt = WelcomeEvent(**json.loads(await stream.readall()))
+                    # Show if still open/predicted, OR resolved within last 1h
+                    if evt.status in ("open", "predicted"):
+                        return evt
+                    if evt.status == "resolved" and evt.resolved_at:
+                        try:
+                            rdt = datetime.fromisoformat(evt.resolved_at.replace("Z", "+00:00"))
+                            if (datetime.now(timezone.utc) - rdt) < timedelta(hours=1):
+                                return evt
+                        except (ValueError, AttributeError):
+                            pass
+            except ResourceNotFoundError:
+                pass
+            return None
+    finally:
+        if credential is None and hasattr(creds, "close"):
+            await creds.close()
+
+
 async def settle_pending_welcome_events(
     storage_account_name: str,
     *,

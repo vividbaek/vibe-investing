@@ -712,6 +712,116 @@ def _next_invite_reward(current: int) -> str:
     return rewards.get(nxt, "")
 
 
+@app.route(route="gamification/welcome_event/status", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def gamification_welcome_event_status(req: func.HttpRequest) -> func.HttpResponse:
+    """§T2E-N — Return the user's active (or recently resolved) welcome event."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS)
+    if not _config or not _config.storage_account_name:
+        return func.HttpResponse(json.dumps({"active": False}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS)
+
+    from services.welcome_event import get_active_welcome_event
+    evt = await get_active_welcome_event(_config.storage_account_name, user_key)
+    if evt is None:
+        return func.HttpResponse(
+            json.dumps({"active": False}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+    payload = {
+        "active": True,
+        "event_id": evt.event_id,
+        "started_btc_price": evt.started_btc_price,
+        "started_at": evt.started_at,
+        "target_at": evt.target_at,
+        "status": evt.status,                   # open | predicted | resolved
+        "user_prediction": evt.user_prediction,
+        "actual_price": evt.actual_price,
+        "correct": evt.correct,
+        "tolerance_pct": 0.3,
+        "reward_correct": 500,
+        "reward_participation": 50,
+    }
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=5"  # very short — countdown is live
+    return func.HttpResponse(
+        json.dumps(payload, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers,
+    )
+
+
+@app.route(route="gamification/prediction_history", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def gamification_prediction_history(req: func.HttpRequest) -> func.HttpResponse:
+    """§T2E-B — Return the user's recent prediction submissions across all markets.
+    Used by Mini App Predict tab to show history + accuracy. Limited to last 14 days
+    × 3 markets to keep response small."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS)
+    if not _config or not _config.storage_account_name:
+        return func.HttpResponse(json.dumps({"items": []}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS)
+
+    from azure.identity.aio import DefaultAzureCredential
+    from azure.storage.blob.aio import BlobServiceClient
+    from datetime import timedelta as _td
+
+    user_short = user_key.replace("tg:", "")
+    items: list[dict] = []
+    creds = DefaultAzureCredential()
+    try:
+        async with BlobServiceClient(
+            account_url=f"https://{_config.storage_account_name}.blob.core.windows.net",
+            credential=creds,
+        ) as svc:
+            container = svc.get_container_client("predictions")
+            prefix = f"{user_short}/"
+            cutoff = datetime.now(timezone.utc) - _td(days=14)
+            async for blob in container.list_blobs(name_starts_with=prefix):
+                if blob.last_modified and blob.last_modified < cutoff:
+                    continue
+                try:
+                    client = container.get_blob_client(blob.name)
+                    stream = await client.download_blob()
+                    body = await stream.readall()
+                    pred = json.loads(body)
+                except Exception:
+                    continue
+                items.append({
+                    "market": pred.get("market"),
+                    "window_id": pred.get("window_id"),
+                    "direction": pred.get("direction"),
+                    "predicted_price": pred.get("predicted_price"),
+                    "submitted_at": pred.get("submitted_at"),
+                    "resolved": pred.get("resolved", False),
+                    "actual_direction": pred.get("actual_direction"),
+                    "actual_price": pred.get("actual_price"),
+                    "correct": pred.get("correct", False),
+                })
+    except Exception:
+        logger.exception("prediction history read failed")
+    finally:
+        await creds.close()
+
+    items.sort(key=lambda x: x.get("submitted_at", ""), reverse=True)
+    items = items[:30]   # cap
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=15"
+    return func.HttpResponse(
+        json.dumps({"items": items}, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers,
+    )
+
+
 @app.route(route="gamification/welcome_event/predict", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST", "OPTIONS"])
 async def gamification_welcome_event_predict(req: func.HttpRequest) -> func.HttpResponse:
     """§T2E-N — Submit BTC price guess for the welcome mini-event."""
