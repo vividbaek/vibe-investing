@@ -1190,6 +1190,146 @@ async def gamification_attend(req: func.HttpRequest) -> func.HttpResponse:
 
 
 # ---------------------------------------------------------------------
+# §SAJU — Four Pillars (Saju) reading + element-matched stock recommendations
+# ---------------------------------------------------------------------
+
+@app.route(route="gamification/saju/profile", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST", "OPTIONS"])
+async def saju_save_profile(req: func.HttpRequest) -> func.HttpResponse:
+    """Persist user's birth date + hour. Body: {birth_date: 'YYYY-MM-DD', birth_hour: 0-23 | null}."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS_POST)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    try:
+        body = req.get_json()
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "invalid_json"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    birth_date = (body or {}).get("birth_date", "").strip()
+    birth_hour_raw = (body or {}).get("birth_hour")
+    birth_hour: int | None = None
+    if birth_hour_raw is not None and birth_hour_raw != "":
+        try:
+            birth_hour = int(birth_hour_raw)
+            if not (0 <= birth_hour <= 23):
+                raise ValueError
+        except (TypeError, ValueError):
+            return func.HttpResponse(
+                json.dumps({"error": "invalid_birth_hour"}),
+                status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    from services.saju_service import save_birth_data
+    try:
+        await save_birth_data(_profile_repo, user_key,
+                              birth_date=birth_date, birth_hour=birth_hour)
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "invalid_birth_date"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    return func.HttpResponse(json.dumps({"success": True}),
+        status_code=200, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+
+@app.route(route="gamification/saju/today", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def saju_today(req: func.HttpRequest) -> func.HttpResponse:
+    """Today's Saju reading + 5 stock picks (1 free, 4 locked unless free trial / unlocked)."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS)
+
+    from services.saju_service import (
+        build_today_payload, has_birth_data, mark_first_use,
+        reset_unlocks_if_new_day,
+    )
+
+    try:
+        profile = await _profile_repo.get_or_create(
+            user_key=user_key, default_language="ko", default_persona="buffett",
+        )
+    except AttributeError:
+        profile = _profile_repo.get_or_create(
+            user_key=user_key, default_language="ko", default_persona="buffett")
+
+    if not has_birth_data(profile):
+        return func.HttpResponse(
+            json.dumps({"available": False, "reason": "birth_data_missing"}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+
+    profile = await reset_unlocks_if_new_day(_profile_repo, user_key, profile)
+    profile = await mark_first_use(_profile_repo, user_key, profile)
+
+    payload = build_today_payload(profile, user_key)
+    payload["available"] = True
+
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=60"
+    return func.HttpResponse(
+        json.dumps(payload, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers,
+    )
+
+
+@app.route(route="gamification/saju/unlock", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST", "OPTIONS"])
+async def saju_unlock(req: func.HttpRequest) -> func.HttpResponse:
+    """Spend points to unlock one of today's locked recommendations.
+    Body: {ticker: 'NVDA'}."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS_POST)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    try:
+        body = req.get_json()
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "invalid_json"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    ticker = (body or {}).get("ticker", "").strip().upper()
+    if not ticker:
+        return func.HttpResponse(json.dumps({"error": "missing_ticker"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    from services.saju_service import has_birth_data, unlock_ticker
+
+    try:
+        profile = await _profile_repo.get_or_create(
+            user_key=user_key, default_language="ko", default_persona="buffett",
+        )
+    except AttributeError:
+        profile = _profile_repo.get_or_create(
+            user_key=user_key, default_language="ko", default_persona="buffett")
+
+    if not has_birth_data(profile):
+        return func.HttpResponse(json.dumps({"error": "birth_data_missing"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    ok, reason, updated = await unlock_ticker(
+        _profile_repo, user_key, profile, ticker, usage_logger=_usage_logger,
+    )
+    payload = {"success": ok, "reason": reason}
+    if updated is not None:
+        payload["points_balance"] = updated.points_balance
+    status = 200 if ok else 402 if reason == "insufficient_points" else 400
+    return func.HttpResponse(
+        json.dumps(payload, ensure_ascii=False),
+        status_code=status, mimetype="application/json", headers=_CORS_HEADERS_POST,
+    )
+
+
+# ---------------------------------------------------------------------
 # 7) Public ticker price feed — /api/data/{ticker}
 #     3-tier cache: memory → Blob → yfinance origin
 # ---------------------------------------------------------------------

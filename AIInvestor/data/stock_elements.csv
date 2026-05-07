@@ -1,0 +1,303 @@
+ticker,name,sector,industry,business_summary,brand_color,primary_element,secondary_element,source
+# ── 화 (Fire): software, AI/cloud, EV, gaming, oil, ads ──
+MSFT,Microsoft,Information Technology,Infrastructure Software,Cloud and productivity software platform,#00A4EF,fire,water,manual
+AAPL,Apple,Information Technology,Consumer Electronics,Devices software services ecosystem,#A2AAAD,fire,metal,manual
+GOOGL,Alphabet,Communication Services,Internet Content,Search advertising YouTube cloud,#4285F4,water,fire,manual
+GOOG,Alphabet (C),Communication Services,Internet Content,Search advertising YouTube cloud,#4285F4,water,fire,manual
+META,Meta Platforms,Communication Services,Social Media,Social platforms and advertising,#1877F2,water,fire,manual
+ORCL,Oracle,Information Technology,Application Software,Enterprise database and cloud,#F80000,fire,,manual
+CRM,Salesforce,Information Technology,Application Software,Customer relationship management cloud,#00A1E0,fire,water,manual
+ADBE,Adobe,Information Technology,Application Software,Creative and document software,#FF0000,fire,,manual
+NOW,ServiceNow,Information Technology,Application Software,IT service management cloud,#62D84E,fire,wood,manual
+SNOW,Snowflake,Information Technology,Application Software,Cloud data warehouse platform,#29B5E8,fire,water,manual
+PLTR,Palantir,Information Technology,Application Software,Government and enterprise data analytics,#000000,fire,water,manual
+TSLA,Tesla,Consumer Discretionary,Auto Manufacturers,Electric vehicles and energy storage,#CC0000,fire,,manual
+RIVN,Rivian Automotive,Consumer Discretionary,Auto Manufacturers,Electric truck SUV maker,#F1B237,fire,earth,manual
+LCID,Lucid Group,Consumer Discretionary,Auto Manufacturers,Luxury electric vehicles,#0066B2,fire,water,manual
+F,Ford Motor,Consumer Discretionary,Auto Manufacturers,Automobile manufacturing,#003478,fire,water,manual
+GM,General Motors,Consumer Discretionary,Auto Manufacturers,Automobile manufacturing,#005DAA,fire,water,manual
+XOM,Exxon Mobil,Energy,Integrated Oil,Integrated oil and gas exploration refining,#FF2E2E,fire,,manual
+CVX,Chevron,Energy,Integrated Oil,Integrated oil and gas major,#0E5BA3,fire,water,manual
+COP,ConocoPhillips,Energy,Oil Exploration,Independent oil and gas E&P,#E8232C,fire,,manual
+SLB,Schlumberger,Energy,Oil Services,Oilfield services equipment,#0066CC,fire,water,manual
+OXY,Occidental Petroleum,Energy,Oil Exploration,Oil and gas exploration production,#E10A1F,fire,,manual
+EOG,EOG Resources,Energy,Oil Exploration,Independent oil and gas producer,#E20074,fire,,manual
+MPC,Marathon Petroleum,Energy,Oil Refining,Refining transportation marketing,#0033A0,fire,water,manual
+PSX,Phillips 66,Energy,Oil Refining,Refining marketing midstream,#FFB81C,fire,earth,manual
+VLO,Valero Energy,Energy,Oil Refining,Petroleum refining ethanol,#003E7E,fire,water,manual
+NEE,NextEra Energy,Utilities,Electric Utilities,Electric utility renewables,#0033A0,fire,water,manual
+DUK,Duke Energy,Utilities,Electric Utilities,Electric utility US Southeast,#003366,fire,water,manual
+SO,Southern Company,Utilities,Electric Utilities,Electric utility Southeast US,#0072CE,fire,water,manual
+AEP,American Electric Power,Utilities,Electric Utilities,Electric utility multi-state,#005DAA,fire,water,manual
+EXC,Exelon,Utilities,Electric Utilities,Electric utility US,#1A4781,fire,water,manual
+SRE,Sempra Energy,Utilities,Multi-Utility,Electric and gas utility,#E22335,fire,,manual
+TTD,Trade Desk,Communication Services,Advertising,Programmatic advertising platform,#338ACA,fire,water,manual
+DV,DoubleVerify,Communication Services,Advertising,Digital ad verification,#1F2A44,fire,water,manual
+RBLX,Roblox,Communication Services,Video Games,Online gaming metaverse platform,#E2231A,fire,,manual
+EA,Electronic Arts,Communication Services,Video Games,Video game publisher,#FF4747,fire,,manual
+TTWO,Take-Two Interactive,Communication Services,Video Games,Video game publisher GTA,#000000,fire,water,manual
+NFLX,Netflix,Communication Services,Entertainment,Streaming entertainment service,#E50914,water,fire,manual
+DIS,Walt Disney,Communication Services,Entertainment,Diversified entertainment,#113CCF,water,fire,manual
+SPOT,Spotify,Communication Services,Streaming,Audio streaming subscription,#1DB954,wood,water,manual
+WBD,Warner Bros Discovery,Communication Services,Entertainment,Media studios streaming,#0064A4,water,fire,manual
+PARA,Paramount,Communication Services,Entertainment,Media networks streaming,#0066CC,water,fire,manual
+ROKU,Roku,Communication Services,Entertainment,TV streaming platform,#6F1AB1,water,fire,manual
+# ── 금 (Metal): semis, finance, defense, machinery ──
+NVDA,NVIDIA,Information Technology,Semiconductors,GPUs AI accelerators,#76B900,metal,wood,manual
+AMD,Advanced Micro Devices,Information Technology,Semiconductors,CPUs GPUs,#ED1C24,metal,fire,manual
+INTC,Intel,Information Technology,Semiconductors,CPUs and foundry,#0071C5,metal,water,manual
+AVGO,Broadcom,Information Technology,Semiconductors,Semiconductor and infrastructure software,#CC092F,metal,fire,manual
+QCOM,Qualcomm,Information Technology,Semiconductors,Wireless chipsets,#3253DC,metal,water,manual
+TSM,Taiwan Semi,Information Technology,Semiconductors,Foundry leader,#CC0000,metal,fire,manual
+MU,Micron,Information Technology,Semiconductors,Memory DRAM NAND,#0066B3,metal,water,manual
+AMAT,Applied Materials,Information Technology,Semi Equipment,Semiconductor equipment,#0072CE,metal,water,manual
+LRCX,Lam Research,Information Technology,Semi Equipment,Semiconductor equipment,#0046AD,metal,water,manual
+KLAC,KLA Corp,Information Technology,Semi Equipment,Semiconductor process control,#003986,metal,water,manual
+ASML,ASML,Information Technology,Semi Equipment,Lithography systems,#0067B1,metal,water,manual
+ARM,Arm Holdings,Information Technology,Semiconductors,CPU IP licensing,#00C1DE,metal,water,manual
+MRVL,Marvell Technology,Information Technology,Semiconductors,Data infrastructure semis,#0033A0,metal,water,manual
+ON,ON Semiconductor,Information Technology,Semiconductors,Power and signal semis,#00A0E0,metal,water,manual
+TXN,Texas Instruments,Information Technology,Semiconductors,Analog and embedded chips,#CC0000,metal,fire,manual
+ADI,Analog Devices,Information Technology,Semiconductors,Analog chips,#003876,metal,water,manual
+JPM,JPMorgan Chase,Financial Services,Bank,Universal bank,#1A4480,metal,water,manual
+BAC,Bank of America,Financial Services,Bank,Consumer commercial bank,#012169,metal,water,manual
+WFC,Wells Fargo,Financial Services,Bank,Diversified bank,#D71E28,metal,fire,manual
+C,Citigroup,Financial Services,Bank,Global universal bank,#005EB8,metal,water,manual
+GS,Goldman Sachs,Financial Services,Capital Markets,Investment bank,#7399C6,metal,water,manual
+MS,Morgan Stanley,Financial Services,Capital Markets,Investment bank wealth,#0070BB,metal,water,manual
+BLK,BlackRock,Financial Services,Asset Management,Asset management ETFs,#000000,metal,water,manual
+SCHW,Charles Schwab,Financial Services,Capital Markets,Brokerage banking,#00A0DF,metal,water,manual
+AXP,American Express,Financial Services,Credit Service,Card payments network,#016FD0,metal,water,manual
+V,Visa,Financial Services,Payment,Card payment network,#1A1F71,metal,water,manual
+MA,Mastercard,Financial Services,Payment,Card payment network,#EB001B,metal,fire,manual
+PYPL,PayPal,Financial Services,Payment,Digital payments,#003087,metal,water,manual
+COIN,Coinbase,Financial Services,Capital Markets,Crypto exchange brokerage,#0052FF,metal,water,manual
+HOOD,Robinhood,Financial Services,Capital Markets,Retail brokerage app,#00C805,metal,wood,manual
+BRK.B,Berkshire Hathaway,Financial Services,Insurance,Diversified holding insurance,#1F1F1F,metal,water,manual
+PGR,Progressive,Financial Services,Insurance,P&C insurance,#0033A0,metal,water,manual
+TRV,Travelers,Financial Services,Insurance,Property casualty insurance,#C8102E,metal,fire,manual
+AIG,American International,Financial Services,Insurance,Diversified insurance,#003BB3,metal,water,manual
+LMT,Lockheed Martin,Industrials,Aerospace Defense,Defense systems aerospace,#003366,metal,water,manual
+RTX,RTX Corporation,Industrials,Aerospace Defense,Defense and aerospace,#D52B1E,metal,fire,manual
+NOC,Northrop Grumman,Industrials,Aerospace Defense,Defense systems,#003594,metal,water,manual
+GD,General Dynamics,Industrials,Aerospace Defense,Defense aerospace marine,#1F1F1F,metal,water,manual
+BA,Boeing,Industrials,Aerospace Defense,Aircraft defense space,#0033A0,metal,water,manual
+HII,Huntington Ingalls,Industrials,Aerospace Defense,Defense shipbuilder,#0033A0,metal,water,manual
+LHX,L3Harris Tech,Industrials,Aerospace Defense,Defense electronics communications,#005CB9,metal,water,manual
+TXT,Textron,Industrials,Aerospace Defense,Aircraft defense industrial,#000000,metal,water,manual
+CAT,Caterpillar,Industrials,Machinery,Heavy machinery construction,#FFCD11,metal,earth,manual
+DE,Deere,Industrials,Machinery,Agricultural construction equipment,#367C2B,metal,wood,manual
+ETN,Eaton,Industrials,Machinery,Power management,#0072CE,metal,water,manual
+PH,Parker Hannifin,Industrials,Machinery,Motion and control technologies,#0033A0,metal,water,manual
+EMR,Emerson Electric,Industrials,Machinery,Automation industrial,#1F4E79,metal,water,manual
+CMI,Cummins,Industrials,Machinery,Engines power generation,#CC0000,metal,fire,manual
+HON,Honeywell,Industrials,Conglomerate,Aerospace automation tech,#CC0000,metal,fire,manual
+GE,GE Aerospace,Industrials,Aerospace Defense,Aircraft engines aviation,#005EB8,metal,water,manual
+GEV,GE Vernova,Industrials,Power Equipment,Power generation grid,#0033A0,metal,water,manual
+NEM,Newmont,Materials,Gold Mining,Gold mining,#FFC72C,metal,earth,manual
+GOLD,Barrick Gold,Materials,Gold Mining,Gold copper mining,#B89D5E,metal,earth,manual
+FCX,Freeport-McMoRan,Materials,Copper Mining,Copper gold mining,#FF6900,metal,fire,manual
+# ── 수 (Water): internet, telecom, media, beverage, shipping ──
+T,AT&T,Communication Services,Telecom,Wireless and broadband telecom,#00A8E0,water,,manual
+VZ,Verizon,Communication Services,Telecom,Wireless and broadband,#CD040B,water,fire,manual
+TMUS,T-Mobile US,Communication Services,Wireless,Wireless carrier,#E20074,water,fire,manual
+CMCSA,Comcast,Communication Services,Telecom,Cable broadband media,#000000,water,,manual
+CHTR,Charter Communications,Communication Services,Telecom,Cable broadband,#0066CC,water,,manual
+DASH,DoorDash,Consumer Discretionary,Internet Retail,Local food delivery marketplace,#FF3008,water,fire,manual
+UBER,Uber Technologies,Industrials,Internet Services,Mobility delivery freight,#000000,water,fire,manual
+LYFT,Lyft,Industrials,Internet Services,Ridesharing,#FF00BF,water,fire,manual
+EBAY,eBay,Consumer Discretionary,Internet Retail,Online marketplace,#E53238,water,fire,manual
+ETSY,Etsy,Consumer Discretionary,Internet Retail,Handmade marketplace,#F1641E,water,fire,manual
+SHOP,Shopify,Consumer Discretionary,Internet Retail,E-commerce platform,#7AB55C,wood,water,manual
+PINS,Pinterest,Communication Services,Internet Content,Visual discovery platform,#E60023,water,fire,manual
+SNAP,Snap,Communication Services,Social Media,Camera platform Snapchat,#FFFC00,water,earth,manual
+RDDT,Reddit,Communication Services,Social Media,Online community platform,#FF4500,water,fire,manual
+KO,Coca-Cola,Consumer Staples,Beverages,Non-alcoholic beverages,#F40009,water,fire,manual
+PEP,PepsiCo,Consumer Staples,Beverages,Beverages and snacks,#004B93,water,fire,manual
+MNST,Monster Beverage,Consumer Staples,Beverages,Energy drinks,#00A651,water,wood,manual
+KDP,Keurig Dr Pepper,Consumer Staples,Beverages,Coffee soft drinks,#A6192E,water,fire,manual
+STZ,Constellation Brands,Consumer Staples,Beverages,Beer wine spirits,#1F2A44,water,,manual
+BUD,Anheuser-Busch InBev,Consumer Staples,Beverages,Beer global,#A6192E,water,fire,manual
+TAP,Molson Coors,Consumer Staples,Beverages,Beer brewing,#A6192E,water,fire,manual
+FDX,FedEx,Industrials,Logistics,Express logistics freight,#4D148C,water,,manual
+UPS,UPS,Industrials,Logistics,Package delivery logistics,#351C15,water,earth,manual
+DAL,Delta Air Lines,Industrials,Airline,Major US airline,#9B1B30,water,fire,manual
+UAL,United Airlines,Industrials,Airline,Major US airline,#005DAA,water,,manual
+AAL,American Airlines,Industrials,Airline,Major US airline,#0078D2,water,,manual
+LUV,Southwest Airlines,Industrials,Airline,Low-cost airline,#F9B612,water,earth,manual
+KMI,Kinder Morgan,Energy,Oil Gas Midstream,Pipelines storage,#A6192E,water,fire,manual
+ENB,Enbridge,Energy,Oil Gas Midstream,Pipelines energy infrastructure,#F89728,water,fire,manual
+ET,Energy Transfer,Energy,Oil Gas Midstream,Pipelines NGL,#0033A0,water,,manual
+WMB,Williams Companies,Energy,Oil Gas Midstream,Natural gas pipelines,#E2231A,water,fire,manual
+OKE,ONEOK,Energy,Oil Gas Midstream,Natural gas liquids pipelines,#0033A0,water,,manual
+AMZN,Amazon,Consumer Discretionary,Internet Retail,E-commerce AWS cloud,#FF9900,water,fire,manual
+# ── 목 (Wood): biotech, pharma, healthcare, agri ──
+JNJ,Johnson & Johnson,Health Care,Pharmaceutical,Pharma medical devices,#D71E28,wood,fire,manual
+PFE,Pfizer,Health Care,Pharmaceutical,Pharma vaccines,#0093D0,wood,water,manual
+LLY,Eli Lilly,Health Care,Pharmaceutical,Diabetes obesity oncology pharma,#D52B1E,wood,fire,manual
+MRK,Merck,Health Care,Pharmaceutical,Pharma vaccines,#00857C,wood,water,manual
+ABBV,AbbVie,Health Care,Pharmaceutical,Immunology oncology pharma,#061D45,wood,water,manual
+BMY,Bristol-Myers Squibb,Health Care,Pharmaceutical,Pharma immuno-oncology,#BE2BBB,wood,fire,manual
+NVO,Novo Nordisk,Health Care,Pharmaceutical,Diabetes obesity insulin,#001965,wood,water,manual
+AZN,AstraZeneca,Health Care,Pharmaceutical,Oncology rare disease pharma,#830051,wood,fire,manual
+GSK,GSK,Health Care,Pharmaceutical,Pharma vaccines,#F36633,wood,fire,manual
+SNY,Sanofi,Health Care,Pharmaceutical,Pharma vaccines,#7A00E6,wood,fire,manual
+TAK,Takeda,Health Care,Pharmaceutical,Global pharma,#A50034,wood,fire,manual
+AMGN,Amgen,Health Care,Biotechnology,Biotech innovator,#0063BE,wood,water,manual
+GILD,Gilead Sciences,Health Care,Biotechnology,HIV oncology biotech,#003478,wood,water,manual
+REGN,Regeneron,Health Care,Biotechnology,Biotech eye oncology,#0066CC,wood,water,manual
+VRTX,Vertex Pharmaceuticals,Health Care,Biotechnology,CF biotech,#08315C,wood,water,manual
+BIIB,Biogen,Health Care,Biotechnology,Neurology biotech,#171E23,wood,water,manual
+ILMN,Illumina,Health Care,Biotechnology,Genome sequencing,#1A4280,wood,water,manual
+MRNA,Moderna,Health Care,Biotechnology,mRNA vaccines therapies,#D52B1E,wood,fire,manual
+BNTX,BioNTech,Health Care,Biotechnology,mRNA biotech vaccines,#012169,wood,water,manual
+INCY,Incyte,Health Care,Biotechnology,Oncology biotech,#0033A0,wood,water,manual
+SGEN,Seagen,Health Care,Biotechnology,Oncology biotech,#0033A0,wood,water,manual
+ISRG,Intuitive Surgical,Health Care,Medical Devices,Surgical robotics,#005EB8,wood,water,manual
+MDT,Medtronic,Health Care,Medical Devices,Medical devices,#000F9F,wood,water,manual
+SYK,Stryker,Health Care,Medical Devices,Orthopedic surgical devices,#FFB81C,wood,earth,manual
+BSX,Boston Scientific,Health Care,Medical Devices,Medical devices,#003594,wood,water,manual
+ABT,Abbott Laboratories,Health Care,Medical Devices,Diagnostics medical devices,#008FCD,wood,water,manual
+DXCM,Dexcom,Health Care,Medical Devices,Continuous glucose monitors,#005EB8,wood,water,manual
+EW,Edwards Lifesciences,Health Care,Medical Devices,Heart valves,#003594,wood,water,manual
+IDXX,IDEXX Laboratories,Health Care,Medical Diagnostics,Veterinary diagnostics,#005CB9,wood,water,manual
+IQV,IQVIA,Health Care,Health Information Services,Clinical research data,#0033A0,wood,water,manual
+UNH,UnitedHealth Group,Health Care,Healthcare Plans,Health insurance Optum,#002677,wood,water,manual
+CI,Cigna,Health Care,Healthcare Plans,Health insurance Evernorth,#127B5D,wood,water,manual
+CVS,CVS Health,Health Care,Healthcare Plans,Pharmacy retail Aetna,#CC0000,wood,fire,manual
+HUM,Humana,Health Care,Healthcare Plans,Medicare Advantage insurer,#71B23B,wood,,manual
+ELV,Elevance Health,Health Care,Healthcare Plans,Health insurance Anthem,#00A6E2,wood,water,manual
+MCK,McKesson,Health Care,Drug Distribution,Pharma distribution,#FF6633,wood,fire,manual
+COR,Cencora,Health Care,Drug Distribution,Pharma distribution,#FFC72C,wood,earth,manual
+HCA,HCA Healthcare,Health Care,Hospital,Hospital network,#005EB8,wood,water,manual
+THC,Tenet Healthcare,Health Care,Hospital,Hospital network,#003594,wood,water,manual
+ZTS,Zoetis,Health Care,Pharmaceutical,Animal health,#FF7F00,wood,fire,manual
+ADM,Archer-Daniels-Midland,Consumer Staples,Farm Products,Agricultural processing,#FFC72C,wood,earth,manual
+BG,Bunge,Consumer Staples,Farm Products,Oilseeds grains processing,#FFC72C,wood,earth,manual
+CTVA,Corteva,Materials,Agricultural Inputs,Seed crop protection,#7AB55C,wood,,manual
+WY,Weyerhaeuser,Real Estate,Forestry REIT,Timber and wood products,#327848,wood,earth,manual
+# ── 토 (Earth): REIT, retail, food/staples, construction ──
+PLD,Prologis,Real Estate,Industrial REIT,Logistics real estate,#0E48C7,earth,water,manual
+AMT,American Tower,Real Estate,Specialty REIT,Wireless tower REIT,#005CB9,earth,water,manual
+EQIX,Equinix,Real Estate,Specialty REIT,Data center REIT,#ED1C2E,earth,fire,manual
+CCI,Crown Castle,Real Estate,Specialty REIT,Tower REIT fiber,#00386F,earth,water,manual
+DLR,Digital Realty,Real Estate,Specialty REIT,Data center REIT,#003594,earth,water,manual
+SPG,Simon Property,Real Estate,Retail REIT,Mall REIT,#1F2A44,earth,water,manual
+O,Realty Income,Real Estate,Retail REIT,Net-lease retail REIT,#0072CE,earth,water,manual
+PSA,Public Storage,Real Estate,Specialty REIT,Self-storage REIT,#FFA300,earth,fire,manual
+EQR,Equity Residential,Real Estate,Residential REIT,Apartment REIT,#003594,earth,water,manual
+AVB,AvalonBay,Real Estate,Residential REIT,Apartment REIT,#0033A0,earth,water,manual
+WELL,Welltower,Real Estate,Healthcare REIT,Healthcare real estate,#003594,earth,water,manual
+EXR,Extra Space Storage,Real Estate,Specialty REIT,Self-storage REIT,#1F4E79,earth,water,manual
+ARE,Alexandria Real Estate,Real Estate,Office REIT,Life science office REIT,#003594,earth,water,manual
+WMT,Walmart,Consumer Staples,Discount Stores,Discount retail,#0071CE,earth,water,manual
+COST,Costco,Consumer Staples,Discount Stores,Membership warehouse,#E31837,earth,fire,manual
+TGT,Target,Consumer Staples,Discount Stores,Discount retail,#CC0000,earth,fire,manual
+KR,Kroger,Consumer Staples,Grocery,Grocery retail,#004B87,earth,water,manual
+DG,Dollar General,Consumer Staples,Discount Stores,Small-box discount retail,#FFD100,earth,,manual
+DLTR,Dollar Tree,Consumer Staples,Discount Stores,Discount retail,#00833F,earth,wood,manual
+PG,Procter & Gamble,Consumer Staples,Household Products,Consumer products,#003DA5,earth,water,manual
+KMB,Kimberly-Clark,Consumer Staples,Household Products,Tissue personal care,#E31837,earth,fire,manual
+CL,Colgate-Palmolive,Consumer Staples,Household Products,Oral care personal care,#CC0000,earth,fire,manual
+EL,Estée Lauder,Consumer Staples,Personal Products,Prestige beauty,#000000,earth,water,manual
+CHD,Church & Dwight,Consumer Staples,Household Products,Consumer brands,#005DAA,earth,water,manual
+CLX,Clorox,Consumer Staples,Household Products,Cleaning consumer products,#08599C,earth,water,manual
+GIS,General Mills,Consumer Staples,Packaged Food,Packaged foods,#0066B2,earth,water,manual
+K,Kellanova,Consumer Staples,Packaged Food,Packaged foods cereal,#D52B1E,earth,fire,manual
+HSY,Hershey,Consumer Staples,Confectioners,Chocolate confectionery,#7B3F00,earth,,manual
+MDLZ,Mondelez,Consumer Staples,Packaged Food,Snacks confectionery,#A05CB8,earth,fire,manual
+MKC,McCormick,Consumer Staples,Packaged Food,Spices flavors,#CC0000,earth,fire,manual
+SYY,Sysco,Consumer Staples,Food Distribution,Food distribution,#00509E,earth,water,manual
+TSN,Tyson Foods,Consumer Staples,Packaged Food,Meat protein,#005EB8,earth,water,manual
+HRL,Hormel Foods,Consumer Staples,Packaged Food,Packaged meats,#005EB8,earth,water,manual
+KHC,Kraft Heinz,Consumer Staples,Packaged Food,Packaged foods,#A6192E,earth,fire,manual
+MCD,McDonald's,Consumer Discretionary,Restaurant,Quick-service burger chain,#FFC72C,earth,fire,manual
+SBUX,Starbucks,Consumer Discretionary,Restaurant,Specialty coffee chain,#006241,earth,wood,manual
+CMG,Chipotle,Consumer Discretionary,Restaurant,Fast-casual Mexican,#A81612,earth,fire,manual
+YUM,Yum! Brands,Consumer Discretionary,Restaurant,KFC Pizza Hut Taco Bell,#FFFFFF,earth,metal,manual
+DPZ,Domino's Pizza,Consumer Discretionary,Restaurant,Pizza chain,#0078AE,earth,water,manual
+QSR,Restaurant Brands,Consumer Discretionary,Restaurant,Burger King Tim Hortons,#A81612,earth,fire,manual
+HD,Home Depot,Consumer Discretionary,Home Improvement,Home improvement retail,#F96302,earth,fire,manual
+LOW,Lowe's,Consumer Discretionary,Home Improvement,Home improvement retail,#004990,earth,water,manual
+NKE,Nike,Consumer Discretionary,Footwear,Athletic footwear apparel,#000000,earth,water,manual
+LULU,Lululemon,Consumer Discretionary,Apparel,Athletic apparel,#A6192E,earth,fire,manual
+TJX,TJX Companies,Consumer Discretionary,Apparel Retail,Off-price retail,#A6192E,earth,fire,manual
+ROST,Ross Stores,Consumer Discretionary,Apparel Retail,Off-price apparel retail,#003594,earth,water,manual
+BBY,Best Buy,Consumer Discretionary,Specialty Retail,Consumer electronics retail,#0046BE,earth,water,manual
+ULTA,Ulta Beauty,Consumer Discretionary,Specialty Retail,Beauty retail,#000000,earth,water,manual
+ORLY,O'Reilly Automotive,Consumer Discretionary,Auto Parts Retail,Auto parts retail,#00833F,earth,wood,manual
+AZO,AutoZone,Consumer Discretionary,Auto Parts Retail,Auto parts retail,#F26722,earth,fire,manual
+MO,Altria,Consumer Staples,Tobacco,Tobacco Marlboro,#003366,earth,water,manual
+PM,Philip Morris Intl,Consumer Staples,Tobacco,Tobacco international,#A6192E,earth,fire,manual
+DHR,Danaher,Health Care,Diagnostics,Diagnostics life sciences,#005EB8,earth,water,manual
+TMO,Thermo Fisher,Health Care,Diagnostics,Life sciences diagnostics,#0F66B5,earth,water,manual
+LIN,Linde,Materials,Specialty Chemicals,Industrial gases,#0033A0,earth,water,manual
+APD,Air Products,Materials,Specialty Chemicals,Industrial gases,#005EB8,earth,water,manual
+SHW,Sherwin-Williams,Materials,Specialty Chemicals,Paint coatings,#A6192E,earth,fire,manual
+ECL,Ecolab,Materials,Specialty Chemicals,Cleaning sanitation,#003594,earth,water,manual
+DD,DuPont de Nemours,Materials,Specialty Chemicals,Specialty chemicals,#A6192E,earth,fire,manual
+DOW,Dow,Materials,Chemicals,Diversified chemicals,#E10027,earth,fire,manual
+LYB,LyondellBasell,Materials,Chemicals,Plastics chemicals,#005EB8,earth,water,manual
+PPG,PPG Industries,Materials,Specialty Chemicals,Coatings paint,#003594,earth,water,manual
+ALB,Albemarle,Materials,Specialty Chemicals,Lithium specialty chemicals,#7AB55C,earth,wood,manual
+NUE,Nucor,Materials,Steel,Steel manufacturing,#005EB8,earth,water,manual
+STLD,Steel Dynamics,Materials,Steel,Steel manufacturing,#003594,earth,water,manual
+X,United States Steel,Materials,Steel,Steel manufacturing,#A6192E,earth,fire,manual
+MLM,Martin Marietta,Materials,Building Materials,Aggregates cement,#FFB81C,earth,fire,manual
+VMC,Vulcan Materials,Materials,Building Materials,Aggregates,#003594,earth,water,manual
+EXP,Eagle Materials,Materials,Building Materials,Cement gypsum,#A6192E,earth,fire,manual
+DHI,DR Horton,Consumer Discretionary,Homebuilders,Homebuilder largest US,#003594,earth,water,manual
+LEN,Lennar,Consumer Discretionary,Homebuilders,Homebuilder,#003594,earth,water,manual
+NVR,NVR Inc,Consumer Discretionary,Homebuilders,Homebuilder,#003594,earth,water,manual
+PHM,PulteGroup,Consumer Discretionary,Homebuilders,Homebuilder,#A6192E,earth,fire,manual
+TOL,Toll Brothers,Consumer Discretionary,Homebuilders,Luxury homebuilder,#003594,earth,water,manual
+WM,Waste Management,Industrials,Waste Management,Waste collection recycling,#FFB81C,earth,fire,manual
+RSG,Republic Services,Industrials,Waste Management,Waste management,#00A651,earth,wood,manual
+CSX,CSX,Industrials,Railroads,Eastern US railroad,#003594,earth,water,manual
+NSC,Norfolk Southern,Industrials,Railroads,Eastern US railroad,#003594,earth,water,manual
+UNP,Union Pacific,Industrials,Railroads,Western US railroad,#FFB81C,earth,fire,manual
+MMM,3M,Industrials,Conglomerate,Diversified industrial,#FF0000,metal,fire,manual
+ITW,Illinois Tool Works,Industrials,Machinery,Diversified machinery,#A6192E,metal,fire,manual
+ROK,Rockwell Automation,Industrials,Machinery,Industrial automation,#FF0000,metal,fire,manual
+DOV,Dover Corp,Industrials,Machinery,Diversified industrial,#0033A0,metal,water,manual
+PCAR,Paccar,Industrials,Auto Manufacturers,Heavy trucks,#FFB81C,fire,earth,manual
+# ── More Tech / NASDAQ heavy names ──
+CSCO,Cisco Systems,Information Technology,Communications Equipment,Networking equipment,#1BA0D7,fire,water,manual
+ANET,Arista Networks,Information Technology,Communications Equipment,Cloud networking,#0066CC,fire,water,manual
+JNPR,Juniper Networks,Information Technology,Communications Equipment,Networking equipment,#84BD00,fire,wood,manual
+NET,Cloudflare,Information Technology,Application Software,Edge cloud security,#F38020,fire,,manual
+DDOG,Datadog,Information Technology,Application Software,Observability cloud monitoring,#632CA6,fire,water,manual
+MDB,MongoDB,Information Technology,Application Software,Document database,#13AA52,fire,wood,manual
+ZS,Zscaler,Information Technology,Application Software,Cloud security,#0067B5,fire,water,manual
+CRWD,CrowdStrike,Information Technology,Application Software,Endpoint security,#FA0F00,fire,,manual
+PANW,Palo Alto Networks,Information Technology,Application Software,Cybersecurity,#FA582D,fire,,manual
+FTNT,Fortinet,Information Technology,Application Software,Cybersecurity,#DA291C,fire,,manual
+WDAY,Workday,Information Technology,Application Software,HR finance cloud,#005CB9,fire,water,manual
+INTU,Intuit,Information Technology,Application Software,Tax accounting software,#0077C5,fire,water,manual
+TEAM,Atlassian,Information Technology,Application Software,Developer collab tools,#0052CC,fire,water,manual
+ZM,Zoom Communications,Information Technology,Application Software,Video conferencing,#2D8CFF,fire,water,manual
+DOCU,DocuSign,Information Technology,Application Software,E-signature workflow,#FFCC22,fire,earth,manual
+HUBS,HubSpot,Information Technology,Application Software,Marketing CRM,#FF7A59,fire,,manual
+TWLO,Twilio,Information Technology,Application Software,Communications API,#F22F46,fire,,manual
+OKTA,Okta,Information Technology,Application Software,Identity cloud,#007DC1,fire,water,manual
+ABNB,Airbnb,Consumer Discretionary,Internet Retail,Travel accommodation marketplace,#FF5A5F,water,fire,manual
+BABA,Alibaba,Consumer Discretionary,Internet Retail,Chinese e-commerce cloud,#FF6A00,water,fire,manual
+JD,JD.com,Consumer Discretionary,Internet Retail,Chinese e-commerce,#E1251B,water,fire,manual
+PDD,PDD Holdings,Consumer Discretionary,Internet Retail,Pinduoduo Temu,#E02E24,water,fire,manual
+NIO,NIO,Consumer Discretionary,Auto Manufacturers,Chinese EV,#00BFFF,fire,water,manual
+XPEV,XPeng,Consumer Discretionary,Auto Manufacturers,Chinese EV,#00C4F4,fire,water,manual
+LI,Li Auto,Consumer Discretionary,Auto Manufacturers,Chinese EV,#A6192E,fire,,manual
+SE,Sea Limited,Communication Services,Internet Content,SE Asia Shopee Garena,#F4622A,water,fire,manual
+MELI,MercadoLibre,Consumer Discretionary,Internet Retail,LatAm e-commerce,#FFE600,water,earth,manual
+GLBE,Global-E Online,Information Technology,Application Software,Cross-border e-commerce SaaS,#5856D6,fire,water,manual
+ASTS,AST SpaceMobile,Communication Services,Telecom,Satellite cellular broadband,#000000,water,fire,manual
+RKLB,Rocket Lab,Industrials,Aerospace Defense,Small launch space systems,#000000,metal,water,manual
+SMCI,Super Micro Computer,Information Technology,Computer Hardware,Server systems,#003594,metal,fire,manual
+DELL,Dell Technologies,Information Technology,Computer Hardware,PCs servers storage,#007DB8,metal,water,manual
+HPE,Hewlett Packard Enterprise,Information Technology,Computer Hardware,Enterprise IT,#01A982,fire,wood,manual
+HPQ,HP Inc,Information Technology,Computer Hardware,PCs printers,#0096D6,fire,water,manual
+IBM,IBM,Information Technology,IT Services,Hybrid cloud AI consulting,#1F70C1,fire,water,manual
+ACN,Accenture,Information Technology,IT Services,IT consulting,#A100FF,fire,,manual
+INFY,Infosys,Information Technology,IT Services,IT services,#007CC5,fire,water,manual
+TCS,Tata Consultancy,Information Technology,IT Services,IT services,#1F70C1,fire,water,manual
+WIT,Wipro,Information Technology,IT Services,IT services,#341F65,fire,water,manual

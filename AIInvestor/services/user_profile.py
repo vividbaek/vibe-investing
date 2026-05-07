@@ -65,6 +65,12 @@ class UserProfile:
     invite_landings_count: int = 0      # how many ref_ link clicks this user generated
     invite_validated_count: int = 0     # invitees who passed first-mission gate
     invite_zombie_count: int = 0        # 7-day no-activity invitees
+    # §SAJU — Four Pillars (Saju) profile + recommendation unlocks
+    saju_birth_date: str = ""           # ISO yyyy-mm-dd (KST)
+    saju_birth_hour: int = -1           # 0–23 KST, -1 = unknown
+    saju_first_used_at: str = ""        # ISO date of first /saju/ use (for 5-day free)
+    saju_unlocked_today: list[str] = field(default_factory=list)  # tickers unlocked today
+    saju_unlocked_date_kst: str = ""    # KST date when unlocks were last reset
 
 
 class UserProfileRepo:
@@ -103,6 +109,11 @@ class UserProfileRepo:
             invite_landings_count INTEGER NOT NULL DEFAULT 0,
             invite_validated_count INTEGER NOT NULL DEFAULT 0,
             invite_zombie_count INTEGER NOT NULL DEFAULT 0,
+            saju_birth_date     TEXT NOT NULL DEFAULT '',
+            saju_birth_hour     INTEGER NOT NULL DEFAULT -1,
+            saju_first_used_at  TEXT NOT NULL DEFAULT '',
+            saju_unlocked_today TEXT NOT NULL DEFAULT '[]',
+            saju_unlocked_date_kst TEXT NOT NULL DEFAULT '',
             created_at          TEXT NOT NULL,
             updated_at          TEXT NOT NULL
         );
@@ -136,6 +147,12 @@ class UserProfileRepo:
         "ALTER TABLE users ADD COLUMN invite_landings_count INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE users ADD COLUMN invite_validated_count INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE users ADD COLUMN invite_zombie_count INTEGER NOT NULL DEFAULT 0",
+        # §SAJU migrations
+        "ALTER TABLE users ADD COLUMN saju_birth_date TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE users ADD COLUMN saju_birth_hour INTEGER NOT NULL DEFAULT -1",
+        "ALTER TABLE users ADD COLUMN saju_first_used_at TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE users ADD COLUMN saju_unlocked_today TEXT NOT NULL DEFAULT '[]'",
+        "ALTER TABLE users ADD COLUMN saju_unlocked_date_kst TEXT NOT NULL DEFAULT ''",
     )
 
     def __init__(self, db_path: str | Path, salt: str) -> None:
@@ -182,7 +199,8 @@ class UserProfileRepo:
 
         coerced: dict[str, object] = {}
         for k, v in fields.items():
-            if k in {"interest_tags", "watchlist_tickers", "recent_tickers"} and isinstance(v, list):
+            if k in {"interest_tags", "watchlist_tickers", "recent_tickers",
+                     "saju_unlocked_today"} and isinstance(v, list):
                 coerced[k] = json.dumps(v, ensure_ascii=False)
             elif k == "sector_count" and isinstance(v, dict):
                 coerced[k] = json.dumps(v, ensure_ascii=False)
@@ -254,4 +272,9 @@ def _row_to_profile(row: sqlite3.Row) -> UserProfile:
         invite_landings_count=_g("invite_landings_count", 0),
         invite_validated_count=_g("invite_validated_count", 0),
         invite_zombie_count=_g("invite_zombie_count", 0),
+        saju_birth_date=_g("saju_birth_date", ""),
+        saju_birth_hour=_g("saju_birth_hour", -1),
+        saju_first_used_at=_g("saju_first_used_at", ""),
+        saju_unlocked_today=json.loads(_g("saju_unlocked_today", "[]") or "[]"),
+        saju_unlocked_date_kst=_g("saju_unlocked_date_kst", ""),
     )
