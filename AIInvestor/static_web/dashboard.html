@@ -67,6 +67,8 @@ h1 { font-weight:700; font-size:1.6rem; }
 .error-box { background:#3a1f1f; border-left:4px solid var(--bad);
              padding:14px 18px; border-radius:8px; color:#ffb4b4; }
 canvas { max-height: 240px; }
+.stat-card { background:var(--card); border:1px solid var(--border); }
+.stat-num { font-size:1.55rem; font-weight:700; color:var(--accent); margin-top:4px; }
 </style>
 </head>
 <body>
@@ -299,8 +301,92 @@ canvas { max-height: 240px; }
     </div></div>
   </div>
 
+  <!-- Prediction-market dashboard — points & holders -->
+  <h2 class="section-title">🎯 예측 시장 통계</h2>
+  <div class="row g-3 mb-3" id="pm-stat-grid">
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">참여자 총수</div>
+        <div class="stat-num" id="pm-participants">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">참여 포인트 누적</div>
+        <div class="stat-num" id="pm-participation">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">총 유저 포인트 (lifetime)</div>
+        <div class="stat-num" id="pm-lifetime">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">현재 유저 보유 포인트</div>
+        <div class="stat-num" id="pm-balance">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">오늘 지급 (KST)</div>
+        <div class="stat-num" id="pm-today-grant" style="color:var(--good);">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">오늘 소멸 (KST)</div>
+        <div class="stat-num" id="pm-today-burn" style="color:var(--bad);">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">총 지급 누적</div>
+        <div class="stat-num" id="pm-grant-total" style="color:var(--good);">—</div>
+      </div></div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card stat-card"><div class="card-body p-3">
+        <div class="muted small">총 소멸 누적</div>
+        <div class="stat-num" id="pm-burn-total" style="color:var(--bad);">—</div>
+      </div></div>
+    </div>
+  </div>
+  <p class="muted small mb-3">
+    ⓘ 5분 캐시 · <a href="#" id="pm-refresh">강제 새로고침</a>
+    · 90일 윈도우의 NDJSON + 모든 사용자 프로필 스캔
+    · <span id="pm-as-of">—</span>
+  </p>
+
+  <!-- Top 99 holders -->
+  <h2 class="section-title">🏆 포인트 보유 등수 (Top 99)</h2>
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>전체 <span id="pm-holders-count">—</span> 명 중 상위 99명</span>
+      <a id="pm-holders-csv-dl" class="btn btn-sm btn-warning">📥 100위 이하 + 전체 CSV</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="text-end">순위</th>
+            <th>식별자 (anon)</th>
+            <th>표시 이름</th>
+            <th class="text-end">현재 보유</th>
+            <th class="text-end">누적</th>
+            <th>티어</th>
+          </tr>
+        </thead>
+        <tbody id="pm-holders-body">
+          <tr><td colspan="6" class="muted text-center">로딩 중…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Azure month-to-date spend -->
-  <h2 class="section-title">☁️ Azure 과금 (이번 달 누적)</h2>
+  <h2 class="section-title mt-4">☁️ Azure 과금 (이번 달 누적)</h2>
   <div class="card">
     <div class="card-body">
       <div id="billing-summary" class="muted">로딩 중…</div>
@@ -400,8 +486,83 @@ async function loadAll() {
   await loadDates(1);
   await loadBalance();
   await loadBilling();
+  await loadPMStats();
+  await loadPMHolders();
   wireDownloadButtons();
 }
+
+async function loadPMStats(force) {
+  try {
+    const url = `${FUNC_BASE}/dashboard_pm_stats?key=${encodeURIComponent(KEY)}${force ? "&force=1" : ""}`;
+    const r = await fetch(url, { mode: "cors" });
+    if (!r.ok) {
+      document.getElementById("pm-participants").textContent = "—";
+      return;
+    }
+    const d = await r.json();
+    const set = (id, v) => { document.getElementById(id).textContent = fmtNum(v || 0); };
+    set("pm-participants",   d.participants_total);
+    set("pm-participation",  d.participation_points_total);
+    set("pm-lifetime",       d.user_points_total_lifetime);
+    set("pm-balance",        d.user_points_balance_total);
+    set("pm-today-grant",    d.today_granted_points);
+    set("pm-today-burn",     d.today_burned_points);
+    set("pm-grant-total",    d.granted_points_total);
+    set("pm-burn-total",     d.burned_points_total);
+    const asOf = (d.as_of_kst || "").replace("T", " ").substring(0, 16);
+    document.getElementById("pm-as-of").textContent = `갱신 ${asOf} · 사용자 ${fmtNum(d.user_count || 0)}명`;
+  } catch (e) {
+    console.error("loadPMStats failed", e);
+  }
+}
+
+async function loadPMHolders() {
+  try {
+    const r = await fetch(`${FUNC_BASE}/dashboard_pm_holders?key=${encodeURIComponent(KEY)}&limit=99`,
+                          { mode: "cors" });
+    if (!r.ok) {
+      document.getElementById("pm-holders-body").innerHTML =
+        `<tr><td colspan="6" class="muted text-center">로딩 실패 (HTTP ${r.status})</td></tr>`;
+      return;
+    }
+    const d = await r.json();
+    document.getElementById("pm-holders-count").textContent = fmtNum(d.total || 0);
+    document.getElementById("pm-holders-csv-dl").href =
+      `${FUNC_BASE}/dashboard_pm_holders_csv?key=${encodeURIComponent(KEY)}`;
+    document.getElementById("pm-holders-csv-dl").target = "_blank";
+    const rows = d.holders || [];
+    if (!rows.length) {
+      document.getElementById("pm-holders-body").innerHTML =
+        '<tr><td colspan="6" class="muted text-center">데이터 없음</td></tr>';
+      return;
+    }
+    const tierColor = { bronze:"#cd7f32", silver:"#c0c0c0", gold:"#f7931a",
+                        platinum:"#74b9ff", diamond:"#fd79a8" };
+    document.getElementById("pm-holders-body").innerHTML = rows.map(h => {
+      const medal = h.rank === 1 ? "🥇" : h.rank === 2 ? "🥈" : h.rank === 3 ? "🥉" : "";
+      const tc = tierColor[h.tier] || "#aaa";
+      return `<tr>
+        <td class="text-end"><strong>${medal}${h.rank}</strong></td>
+        <td><code>${escapeHtml(h.anon_short)}</code></td>
+        <td>${escapeHtml(h.display_name || "")}</td>
+        <td class="text-end" style="color:var(--accent); font-weight:700;">${fmtNum(h.balance)}</td>
+        <td class="text-end muted">${fmtNum(h.cumulative)}</td>
+        <td><span style="color:${tc};">${escapeHtml(h.tier)} ${h.tier_stage}</span></td>
+      </tr>`;
+    }).join("");
+  } catch (e) {
+    console.error("loadPMHolders failed", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const r = document.getElementById("pm-refresh");
+  if (r) r.addEventListener("click", e => {
+    e.preventDefault();
+    loadPMStats(true);
+    loadPMHolders();
+  });
+});
 
 function wireDownloadButtons() {
   const k = encodeURIComponent(KEY);

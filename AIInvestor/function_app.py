@@ -2479,6 +2479,108 @@ async def dashboard_dates(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
+@app.route(route="dashboard_pm_stats", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def dashboard_pm_stats(req: func.HttpRequest) -> func.HttpResponse:
+    """Prediction-market 9 metrics + total user count.
+    Cached 5 min in-process. ?force=1 bypasses cache.
+    Counts:
+      participants_total, participation_points_total, user_points_total_lifetime,
+      today_granted_points, today_burned_points, burned_points_total,
+      granted_points_total, user_points_balance_total, user_count
+    """
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    if not _check_dashboard_key(req):
+        return func.HttpResponse("Forbidden", status_code=403)
+    if not _config or not _config.storage_account_name:
+        return func.HttpResponse("Not configured", status_code=500)
+
+    from dataclasses import asdict
+    from services.prediction_market_stats import compute_stats
+    force = (req.params.get("force") or "").strip() in ("1", "true", "yes")
+    try:
+        snap = await compute_stats(_config.storage_account_name, force=force)
+    except Exception as e:
+        logger.exception("dashboard_pm_stats failed")
+        return func.HttpResponse(json.dumps({"error": str(e)}),
+            status_code=500, mimetype="application/json", headers=_CORS_HEADERS)
+
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=120"
+    return func.HttpResponse(json.dumps(asdict(snap), ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers)
+
+
+@app.route(route="dashboard_pm_holders", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def dashboard_pm_holders(req: func.HttpRequest) -> func.HttpResponse:
+    """Top point holders, paginated. Default returns ranks 1..99.
+    Query: ?key=...&limit=99&offset=0&force=1"""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    if not _check_dashboard_key(req):
+        return func.HttpResponse("Forbidden", status_code=403)
+    if not _config or not _config.storage_account_name:
+        return func.HttpResponse("Not configured", status_code=500)
+
+    from dataclasses import asdict
+    from services.prediction_market_stats import get_holders
+    try:
+        limit = max(1, min(500, int(req.params.get("limit") or 99)))
+        offset = max(0, int(req.params.get("offset") or 0))
+    except ValueError:
+        return func.HttpResponse("Bad limit/offset", status_code=400)
+    force = (req.params.get("force") or "").strip() in ("1", "true", "yes")
+
+    try:
+        rows = await get_holders(_config.storage_account_name, force=force)
+    except Exception as e:
+        logger.exception("dashboard_pm_holders failed")
+        return func.HttpResponse(json.dumps({"error": str(e)}),
+            status_code=500, mimetype="application/json", headers=_CORS_HEADERS)
+
+    page = rows[offset: offset + limit]
+    payload = {
+        "total": len(rows),
+        "limit": limit,
+        "offset": offset,
+        "holders": [asdict(r) for r in page],
+    }
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=120"
+    return func.HttpResponse(json.dumps(payload, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers)
+
+
+@app.route(route="dashboard_pm_holders_csv", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
+async def dashboard_pm_holders_csv(req: func.HttpRequest) -> func.HttpResponse:
+    """Full ranking as CSV download. Query: ?key=..."""
+    await _bootstrap()
+    if not _check_dashboard_key(req):
+        return func.HttpResponse("Forbidden", status_code=403)
+    if not _config or not _config.storage_account_name:
+        return func.HttpResponse("Not configured", status_code=500)
+
+    from services.prediction_market_stats import get_holders, holders_to_csv
+    try:
+        rows = await get_holders(_config.storage_account_name)
+    except Exception as e:
+        logger.exception("dashboard_pm_holders_csv failed")
+        return func.HttpResponse(f"error: {e}", status_code=500)
+
+    body = holders_to_csv(rows)
+    from datetime import datetime, timezone, timedelta
+    today = (datetime.now(timezone.utc) + timedelta(hours=9)).date().isoformat()
+    return func.HttpResponse(
+        body, mimetype="text/csv", status_code=200,
+        headers={
+            "Content-Disposition": f'attachment; filename="pm_holders_{today}.csv"',
+            "Cache-Control": "private, max-age=300",
+        },
+    )
+
+
 @app.route(route="dashboard_billing", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
 async def dashboard_billing(req: func.HttpRequest) -> func.HttpResponse:
     """Admin-only Azure month-to-date spend (cached 30 min).
