@@ -1,0 +1,11 @@
+rank,ticker,company_name_kr,sector_kr,ai_layer,current_price_usd,market_cap_b,ai_revenue_exposure_pct,revenue_growth_yoy_pct,fcf_margin_pct,roic_pct,score_ai_exposure,score_capital_efficiency,score_valuation,score_momentum,total_score,target_return_12m_pct,stop_loss_pct,key_thesis_kr,risk_factor_kr
+1,NVDA,엔비디아,반도체-GPU,Layer 1,145.0,3550,90,68,52,75,34,28,15,18,95,24,-15,Blackwell/Rubin GPU 사이클 + 데이터센터 매출 80% 비중 + CUDA 생태계 독점,중국 수출 규제 강화 / Hyperscaler 자체 ASIC 점유율 확대
+2,TSM,TSMC,반도체-파운드리,Layer 1,215.0,1100,50,40,38,28,32,28,17,15,92,21,-13,3nm/2nm 파운드리 독점 + 애리조나 Fab 가동 + AI 매출 비중 50% 돌파,지정학 리스크(대만) / Capex 부담 증가
+3,MSFT,마이크로소프트,소프트웨어-클라우드,Layer 2,445.0,3300,35,16,32,28,33,27,16,15,91,16,-13,Azure AI 매출 +60% YoY + Copilot 침투율 가속 + OpenAI 지분가치,AI Capex ROI 검증 압박 / 반독점 규제
+4,AVGO,브로드컴,반도체-네트워크/ASIC,Layer 1,235.0,1090,60,45,48,32,32,27,15,16,90,19,-14,VMware 통합 시너지 + 자체 ASIC TAM 확장 + 네트워크 칩 독점,사이클 변동성 / 멀티플 부담
+5,META,메타플랫폼,인터넷-광고AI,Layer 2,620.0,1580,40,22,38,30,31,27,16,15,89,17,-13,자체 데이터센터 + Llama 오픈소스 + 광고 AI 매출 가속,Capex 급증으로 FCF 마진 하락 우려 / 규제
+6,GOOGL,알파벳,인터넷-클라우드,Layer 2,185.0,2280,30,15,28,25,30,26,18,14,88,15,-13,GCP +35% YoY + TPU 자체 칩 우위 + Gemini 통합 가속,검색 시장 점유율 위협 / 반독점 소송
+7,ASML,ASML홀딩,반도체-EUV장비,Layer 1,720.0,290,45,18,30,22,30,25,17,15,87,15,-12,EUV/High-NA 독점 + High-NA 도입 가속 + 한국·대만 발주,중국 매출 규제 / Capex 사이클 변동성
+8,VRT,베르티브홀딩스,산업재-DC전력,Layer 3,115.0,44,70,28,16,18,31,28,15,12,86,22,-15,데이터센터 전력/냉각 1위 + 액침 냉각 점유율 확대 + AI 백로그 +50%,경쟁 심화(슈나이더) / 자재비 변동
+9,ANET,아리스타네트웍스,통신-DC네트워크,Layer 3,115.0,145,65,18,40,30,30,27,14,13,84,17,-13,800G 이더넷 스위치 1위 + Meta/MS 주요 고객 + AI 클러스터 네트워크,주요 고객 집중도 / 화이트박스 경쟁
+10,PLTR,팔란티어,소프트웨어-AI플랫폼,Layer 4,95.0,210,80,30,38,18,32,22,12,12,78,20,-18,AIP(인공지능플랫폼) 채택 가속 + 정부+상용 듀얼 매출 + 매출 가속도 ↑,밸류에이션 부담(PEG 3.5+) / 변동성 극심

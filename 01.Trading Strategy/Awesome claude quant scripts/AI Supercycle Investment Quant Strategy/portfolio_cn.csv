@@ -1,0 +1,11 @@
+rank,ticker,company_name_cn,sector_cn,ai_layer,current_price_usd,market_cap_b,ai_revenue_exposure_pct,revenue_growth_yoy_pct,fcf_margin_pct,roic_pct,score_ai_exposure,score_capital_efficiency,score_valuation,score_momentum,total_score,target_return_12m_pct,stop_loss_pct,key_thesis_cn,risk_factor_cn
+1,NVDA,英伟达,半导体-GPU,Layer 1,145.0,3550,90,68,52,75,34,28,15,18,95,24,-15,Blackwell/Rubin GPU 周期 + 数据中心营收占比 80% + CUDA 生态护城河,中国出口管制加强 / 超大规模云厂商自研 ASIC 份额扩大
+2,TSM,台积电,半导体-晶圆代工,Layer 1,215.0,1100,50,40,38,28,32,28,17,15,92,21,-13,3nm/2nm 晶圆代工垄断 + 亚利桑那 Fab 量产 + AI 营收占比突破 50%,地缘政治风险（台海）/ 资本支出压力上升
+3,MSFT,微软,软件-云计算,Layer 2,445.0,3300,35,16,32,28,33,27,16,15,91,16,-13,Azure AI 营收 +60% YoY + Copilot 渗透率加速 + OpenAI 股权价值,AI 资本支出 ROI 检验压力 / 反垄断监管
+4,AVGO,博通,半导体-网络/ASIC,Layer 1,235.0,1090,60,45,48,32,32,27,15,16,90,19,-14,VMware 整合协同 + 自研 ASIC TAM 扩张 + 网络芯片垄断,周期波动 / 估值压缩风险
+5,META,Meta 平台,互联网-广告 AI,Layer 2,620.0,1580,40,22,38,30,31,27,16,15,89,17,-13,自建数据中心 + Llama 开源 + 广告 AI 营收加速,资本支出激增压制 FCF 利润率 / 监管
+6,GOOGL,谷歌母公司,互联网-云计算,Layer 2,185.0,2280,30,15,28,25,30,26,18,14,88,15,-13,GCP +35% YoY + TPU 自研芯片优势 + Gemini 整合加速,搜索市场份额受威胁 / 反垄断诉讼
+7,ASML,阿斯麦,半导体-EUV 设备,Layer 1,720.0,290,45,18,30,22,30,25,17,15,87,15,-12,EUV/High-NA 垄断 + High-NA 导入加速 + 韩台订单,中国营收限制 / 资本支出周期波动
+8,VRT,维谛技术,工业-数据中心电力,Layer 3,115.0,44,70,28,16,18,31,28,15,12,86,22,-15,数据中心电力/散热第一 + 浸没冷却份额扩大 + AI 订单储备 +50%,竞争加剧（施耐德）/ 材料成本波动
+9,ANET,Arista 网络,通信-数据中心网络,Layer 3,115.0,145,65,18,40,30,30,27,14,13,84,17,-13,800G 以太网交换机第一 + Meta/MSFT 主要客户 + AI 集群网络,客户集中度风险 / 白盒竞争
+10,PLTR,Palantir,软件-AI 平台,Layer 4,95.0,210,80,30,38,18,32,22,12,12,78,20,-18,AIP（人工智能平台）采纳加速 + 政府+商业双轮营收 + 营收加速度 ↑,估值压力（PEG 3.5+）/ 极端波动
