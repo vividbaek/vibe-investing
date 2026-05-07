@@ -12,10 +12,13 @@
 :root { --bg:#151521; --card:#2a2a3c; --accent:#f7931a;
         --buffett:#74b9ff; --dalio:#a29bfe; --wood:#fd79a8;
         --good:#4caf50; --bad:#e57373; --border:#3a3a4a; }
-html, body { height:100%; }
+html, body { min-height:100%; }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
        background:var(--bg); color:#e8e8e8; margin:0; padding:0;
-       padding-bottom:64px; /* tab bar height */ }
+       /* tab bar (64px) + iOS home indicator safe-area + 16px breathing room.
+          Without env() the bottom of the page hides behind the tab bar
+          on iPhones with home indicator (~34px). */
+       padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 16px); }
 .topbar { padding:14px 18px; display:flex; justify-content:space-between; align-items:center;
           border-bottom:1px solid var(--border); }
 .user-info { display:flex; align-items:center; gap:8px; font-size:14px; }
@@ -41,7 +44,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
                padding:7px 14px; font-weight:700; font-size:13px; }
 .btn-mission:disabled { background:#555; color:#888; }
 .tab-bar { position:fixed; bottom:0; left:0; right:0; background:var(--card);
-           border-top:1px solid var(--border); display:flex; height:64px; }
+           border-top:1px solid var(--border); display:flex; height:64px;
+           /* Extend the bar's safe-area painted area downward so on iPhones
+              the tab background covers the home indicator, but the tappable
+              icons stay above it. */
+           padding-bottom: env(safe-area-inset-bottom, 0px);
+           box-sizing: content-box; }
 .tab { flex:1; display:flex; flex-direction:column; align-items:center;
        justify-content:center; color:#aaa; text-decoration:none;
        font-size:11px; gap:3px; }
