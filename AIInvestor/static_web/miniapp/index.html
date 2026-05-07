@@ -72,6 +72,18 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 
 <!-- ─────────────── HOME ─────────────── -->
 <section class="section" id="tab-home">
+  <!-- §A5 시황 card — only visible if a recent slot report exists -->
+  <div id="today-market-card" style="display:none;">
+    <div class="section-title" data-i18n="today_market">📊 오늘의 시황</div>
+    <div class="card" style="border-left:4px solid var(--buffett);">
+      <div class="title" id="tm-slot-label" style="font-size:13px;">—</div>
+      <div class="meta" id="tm-preview" style="margin-top:6px; line-height:1.5;">로딩 중…</div>
+      <div style="margin-top:10px;">
+        <button class="btn-mission" id="tm-expand-btn" data-i18n="see_full">전체 보기</button>
+      </div>
+    </div>
+  </div>
+
   <div class="section-title" data-i18n="todays_missions">오늘의 미션</div>
 
   <div class="card">
@@ -342,15 +354,48 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   </div>
 </section>
 
-<!-- ─────────────── PERSONA placeholder ─────────────── -->
+<!-- ─────────────── PERSONA (full) ─────────────── -->
 <section class="section" id="tab-persona" style="display:none;">
-  <div class="section-title">페르소나</div>
-  <div class="card">
-    <div class="title">텔레그램 봇으로 이동</div>
-    <div class="meta">
-      <code>/persona</code> 명령으로 워렌 버핏 / 레이 달리오 / 캐시 우드 중 선택.<br>
-      <code>/lang</code> 으로 언어 변경 (ko / en / ja / zh).
+  <div class="section-title" data-i18n="persona_section">페르소나</div>
+  <p class="meta" style="margin-bottom:8px;" data-i18n="persona_help">투자 멘토 페르소나를 선택하세요. 시황·종목 분석이 선택한 멘토의 시각으로 제공됩니다.</p>
+
+  <div class="card persona-card" data-persona="buffett" style="border-left:4px solid var(--buffett); cursor:pointer;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div class="title" style="color:var(--buffett);">🎩 Warren Buffett</div>
+        <div class="meta">장기 가치 · Long-term value · 長期価値 · 长期价值</div>
+        <div class="meta" style="margin-top:4px;">해자(moat) · 내재가치 · owner earnings 기반 시각</div>
+      </div>
+      <span class="persona-active-badge" id="badge-buffett" style="display:none; color:var(--good);">✓</span>
     </div>
+  </div>
+
+  <div class="card persona-card" data-persona="dalio" style="border-left:4px solid var(--dalio); cursor:pointer;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div class="title" style="color:var(--dalio);">📐 Ray Dalio</div>
+        <div class="meta">매크로 · Macro · マクロ · 宏观</div>
+        <div class="meta" style="margin-top:4px;">신용 사이클 · 금리 · 인플레 · 지정학 통합</div>
+      </div>
+      <span class="persona-active-badge" id="badge-dalio" style="display:none; color:var(--good);">✓</span>
+    </div>
+  </div>
+
+  <div class="card persona-card" data-persona="wood" style="border-left:4px solid var(--wood); cursor:pointer;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div class="title" style="color:var(--wood);">🚀 Cathie Wood</div>
+        <div class="meta">혁신 성장 · Innovation · 革新 · 创新</div>
+        <div class="meta" style="margin-top:4px;">AI / 로봇 / 유전학 / 블록체인 5년 잠재 성장</div>
+      </div>
+      <span class="persona-active-badge" id="badge-wood" style="display:none; color:var(--good);">✓</span>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:18px;" data-i18n="language_section">언어</div>
+  <div class="card meta">
+    텔레그램 봇 <code>/lang</code> 명령으로 언어 변경 (ko / en / ja / zh).
+    미니앱은 자동 따라옵니다.
   </div>
 </section>
 
@@ -388,7 +433,11 @@ let _lang = "ko";
 const I18N = {
   ko: {
     home: "홈", predict: "예측", invite: "초대", rank: "랭킹", persona: "페르소나",
+    today_market: "📊 오늘의 시황",
+    see_full: "전체 보기",
     todays_missions: "오늘의 미션",
+    persona_help: "투자 멘토 페르소나를 선택하세요. 시황·종목 분석이 선택한 멘토의 시각으로 제공됩니다.",
+    language_section: "언어",
     attend_title: "📅 출석 체크",
     attend_meta:  "하루 한 번 출석하면 +10 P, 연속 출석 시 보너스 +5 P/일 (최대 +50)",
     attend_btn:   "출석 체크하기",
@@ -442,7 +491,11 @@ const I18N = {
   },
   en: {
     home: "Home", predict: "Predict", invite: "Invite", rank: "Rank", persona: "Persona",
+    today_market: "📊 Today's market",
+    see_full: "View full",
     todays_missions: "Today's missions",
+    persona_help: "Choose your investor mentor persona. Market & ticker analysis will be framed through that mentor's lens.",
+    language_section: "Language",
     attend_title: "📅 Daily check-in",
     attend_meta:  "+10 P once a day. Streak bonus +5 P/day (cap +50).",
     attend_btn:   "Check in",
@@ -496,7 +549,11 @@ const I18N = {
   },
   ja: {
     home: "ホーム", predict: "予測", invite: "招待", rank: "ランク", persona: "ペルソナ",
+    today_market: "📊 本日の市況",
+    see_full: "全文を見る",
     todays_missions: "本日のミッション",
+    persona_help: "投資メンター・ペルソナを選択。市況・銘柄分析がそのメンターの視点で提供されます。",
+    language_section: "言語",
     attend_title: "📅 出席チェック",
     attend_meta: "1日1回 +10 P、連続で+5 P/日(最大+50)",
     attend_btn: "出席する",
@@ -550,7 +607,11 @@ const I18N = {
   },
   zh: {
     home: "主页", predict: "预测", invite: "邀请", rank: "排行", persona: "角色",
+    today_market: "📊 今日市况",
+    see_full: "查看全文",
     todays_missions: "今日任务",
+    persona_help: "选择投资导师角色。市况和股票分析将以该导师视角呈现。",
+    language_section: "语言",
     attend_title: "📅 签到",
     attend_meta: "每日 +10 P,连续奖励 +5 P/日(上限 +50)",
     attend_btn: "签到",
@@ -804,6 +865,82 @@ document.getElementById("btc-submit").addEventListener("click", async () => {
     notify(msg);
   }
 });
+
+// ─────────────── §A5 Today's market (slot report) ───────────────
+
+let _todayMarket = null;
+
+async function loadTodayMarket() {
+  try {
+    const r = await api("/today_market");
+    if (!r.available) {
+      document.getElementById("today-market-card").style.display = "none";
+      return;
+    }
+    _todayMarket = r;
+    const card = document.getElementById("today-market-card");
+    card.style.display = "block";
+    const labelEl = document.getElementById("tm-slot-label");
+    const slotName = _lang === "ko" ? r.slot_name_kr : r.slot_name_en;
+    labelEl.textContent = `${slotName} · KST ${r.kst_time}`;
+
+    // Show the first ~120 chars as preview
+    const lines = (r.rendered_text || "").split("\n").filter(Boolean);
+    // Skip the title line, take 2-3 content lines
+    const preview = lines.slice(1, 4).join(" · ").substring(0, 200) + "…";
+    document.getElementById("tm-preview").textContent = preview;
+  } catch (e) {
+    console.error("today market fetch failed", e);
+    document.getElementById("today-market-card").style.display = "none";
+  }
+}
+
+document.getElementById("tm-expand-btn").addEventListener("click", () => {
+  if (!_todayMarket) return;
+  // Open the full report in a Telegram popup (or fall back to alert)
+  if (tg?.showPopup) {
+    tg.showPopup({
+      title: _lang === "ko" ? "오늘의 시황" : "Today's market",
+      message: _todayMarket.rendered_text.substring(0, 4000),
+      buttons: [{ type: "ok" }],
+    });
+  } else {
+    notify(_todayMarket.rendered_text);
+  }
+});
+
+
+// ─────────────── §A4 Persona swap ───────────────
+
+async function setActivePersonaBadge(currentPersona) {
+  ["buffett", "dalio", "wood"].forEach(p => {
+    const badge = document.getElementById(`badge-${p}`);
+    if (badge) badge.style.display = p === currentPersona ? "inline" : "none";
+  });
+}
+
+document.querySelectorAll(".persona-card").forEach(card => {
+  card.addEventListener("click", async () => {
+    const p = card.dataset.persona;
+    if (!p) return;
+    try {
+      await api("/persona", {
+        method: "POST",
+        body: JSON.stringify({ persona_key: p }),
+      });
+      tg?.HapticFeedback?.notificationOccurred("success");
+      setActivePersonaBadge(p);
+      const labels = { buffett: "Warren Buffett", dalio: "Ray Dalio", wood: "Cathie Wood" };
+      notify(`✓ ${labels[p]}`);
+      // Reload today_market with new persona
+      _todayMarket = null;
+      loadTodayMarket();
+    } catch (e) {
+      notify("Persona swap failed: " + e.message);
+    }
+  });
+});
+
 
 // ─────────────── §T2E-O Brag cards ───────────────
 
@@ -1244,7 +1381,24 @@ document.querySelectorAll(".tab").forEach(t => {
       syncBtcPriceToPredictTab();
     }
     if (target === "rank") loadBragCards();
+    if (target === "persona") {
+      // Refresh active badge from latest profile
+      api("/profile").then(p => setActivePersonaBadge(p.persona_key)).catch(() => {});
+    }
   });
+});
+
+// §A6 BTC auto-refresh — every 3 minutes + when tab becomes visible
+setInterval(() => {
+  if (document.visibilityState === "visible") fetchBtcCurrent();
+}, 180_000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    fetchBtcCurrent();
+    // Also refresh welcome event countdown if active
+    if (_welcomeEvent && _welcomeEvent.status !== "resolved") loadWelcomeEvent();
+  }
 });
 
 // Init — parallel fetch reduces perceived load time
@@ -1260,6 +1414,7 @@ if (!initData) {
     fetchBtcCurrent(),
     loadInvitePack(),   // warm cache so invite tab opens instant
     loadWelcomeEvent(), // detect active event so predict tab is ready
+    loadTodayMarket(),  // §A5 — surface latest slot report on Home
   ]);
 }
 </script>

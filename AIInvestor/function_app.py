@@ -856,6 +856,84 @@ async def share_card_proxy(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
+@app.route(route="gamification/today_market", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def gamification_today_market(req: func.HttpRequest) -> func.HttpResponse:
+    """§A5 — Latest 6-slot market report for Mini App Home card.
+    Returns the most recent slot's rendered text + the slot label so the
+    Mini App can show a one-line teaser + "더 보기" button."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS)
+    if not _config or not _config.storage_account_name:
+        return func.HttpResponse(json.dumps({"available": False}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS)
+
+    # User's profile to know persona + language
+    profile_call = _profile_repo.get_or_create(user_key=user_key, default_language="ko", default_persona="buffett")
+    profile = await profile_call if hasattr(profile_call, "__await__") else profile_call
+
+    from services.slot_report import fetch_latest_slot_report, SLOTS_BY_ID
+    result = await fetch_latest_slot_report(
+        _config.storage_account_name, profile.persona_key, profile.language,
+    )
+    if result is None:
+        return func.HttpResponse(json.dumps({"available": False}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS)
+    slot_id, rendered_text = result
+    slot = SLOTS_BY_ID.get(slot_id)
+    payload = {
+        "available": True,
+        "slot_id": slot_id,
+        "slot_name_kr": slot.name_kr if slot else slot_id,
+        "slot_name_en": slot.name_en if slot else slot_id,
+        "kst_time": slot.kst_time if slot else "",
+        "rendered_text": rendered_text,
+        "persona": profile.persona_key,
+        "language": profile.language,
+    }
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=120"  # 2 min — slot updates every few hours
+    return func.HttpResponse(
+        json.dumps(payload, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers,
+    )
+
+
+@app.route(route="gamification/persona", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST", "OPTIONS"])
+async def gamification_set_persona(req: func.HttpRequest) -> func.HttpResponse:
+    """§A4 — Switch the user's persona from the Mini App.
+    Body: {"persona_key": "buffett" | "dalio" | "wood"}
+    """
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS)
+    try:
+        body = req.get_json()
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "bad json"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS)
+
+    persona_key = (body.get("persona_key") or "").strip().lower()
+    if persona_key not in ("buffett", "dalio", "wood"):
+        return func.HttpResponse(json.dumps({"error": "invalid persona"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS)
+
+    update_res = _profile_repo.update(user_key, persona_key=persona_key)
+    profile = await update_res if hasattr(update_res, "__await__") else update_res
+    return func.HttpResponse(
+        json.dumps({"success": True, "persona_key": profile.persona_key}, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=_CORS_HEADERS,
+    )
+
+
 @app.route(route="gamification/welcome_event/status", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
 async def gamification_welcome_event_status(req: func.HttpRequest) -> func.HttpResponse:
     """§T2E-N — Return the user's active (or recently resolved) welcome event."""
