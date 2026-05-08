@@ -494,11 +494,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     </div>
   </div>
 
-  <!-- ── Persona-aware analysis (Korean favorites + search + advanced gate) ── -->
-  <div id="persona-analysis-block" style="display:none; margin-top:18px;">
+  <!-- ── Persona-aware analysis (always visible — discoverability) ── -->
+  <div id="persona-analysis-block" style="margin-top:18px;">
     <div class="section-title">📊 페르소나 분석</div>
     <p class="meta" style="margin-bottom:8px;" id="persona-analysis-help">
-      종목을 골라 선택한 페르소나의 시각으로 분석을 받아보세요.
+      위에서 페르소나를 고르면 그 시각으로 종목을 분석받습니다.
+      기본은 워런 버핏(장기 가치). 아래 종목을 눌러보세요.
     </p>
 
     <div class="card">
@@ -661,11 +662,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 <!-- ─────────────── TAB BAR ─────────────── -->
 <nav class="tab-bar">
   <a href="#" class="tab active" data-tab="home"><i class="fa-solid fa-house"></i><span data-i18n="home">홈</span></a>
-  <a href="#" class="tab" data-tab="predict"><i class="fa-solid fa-chart-line"></i><span data-i18n="predict">예측</span></a>
+  <a href="#" class="tab" data-tab="persona"><i class="fa-solid fa-user-tie"></i><span data-i18n="persona">페르소나</span></a>
   <a href="#" class="tab" data-tab="saju"><i class="fa-solid fa-yin-yang"></i><span>사주</span></a>
   <a href="#" class="tab" data-tab="invite"><i class="fa-solid fa-user-plus"></i><span data-i18n="invite">초대</span></a>
   <a href="#" class="tab" data-tab="rank"><i class="fa-solid fa-trophy"></i><span data-i18n="rank">랭킹</span></a>
-  <a href="#" class="tab" data-tab="persona"><i class="fa-solid fa-user-tie"></i><span data-i18n="persona">페르소나</span></a>
+  <a href="#" class="tab" data-tab="predict"><i class="fa-solid fa-chart-line"></i><span data-i18n="predict">예측</span></a>
 </nav>
 
 <script>
@@ -1191,10 +1192,9 @@ document.querySelectorAll(".persona-card").forEach(card => {
       // Reload today_market with new persona
       _todayMarket = null;
       loadTodayMarket();
-      // Reveal persona-analysis block + load presets if not loaded
-      document.getElementById("persona-analysis-block").style.display = "block";
+      // Persona-analysis block is now always visible — just ensure presets
+      // are loaded (idempotent) and re-run last analysis with new persona.
       if (!_personaPresets) await loadPersonaPresets();
-      // If a previous ticker was analyzed, re-run with the new persona
       if (_parLastTicker) runPersonaAnalysis(_parLastTicker);
     } catch (e) {
       notify("Persona swap failed: " + e.message);
@@ -2371,7 +2371,17 @@ function _switchToTab(target) {
   if (target === "rank") loadBragCards();
   if (target === "saju") loadSaju();
   if (target === "persona") {
-    api("/profile").then(p => setActivePersonaBadge(p.persona_key)).catch(() => {});
+    // Refresh active badge from saved persona, then auto-load preset
+    // tickers so the analysis section is immediately interactive (no
+    // "click a persona first" gate).
+    api("/profile").then(p => {
+      _personaCurrent = p.persona_key || "buffett";
+      setActivePersonaBadge(_personaCurrent);
+    }).catch(() => {
+      _personaCurrent = "buffett";
+      setActivePersonaBadge("buffett");
+    });
+    if (!_personaPresets) loadPersonaPresets();
   }
   window.scrollTo(0, 0);
 }
