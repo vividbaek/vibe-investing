@@ -1717,6 +1717,221 @@ async def saju_unlock(req: func.HttpRequest) -> func.HttpResponse:
 
 
 # ---------------------------------------------------------------------
+# §FORTUNE — work-priority §3: deterministic daily fortune (1 free + 2 locked)
+#   Sits parallel to §SAJU above. Saju uses 五行 → 5 picks (analytical depth);
+#   Fortune uses seed × risk-tier → 3 picks (decisive daily choice + paywall).
+# ---------------------------------------------------------------------
+
+@app.route(route="profile/onboard", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST", "OPTIONS"])
+async def profile_onboard(req: func.HttpRequest) -> func.HttpResponse:
+    """§3 Step 3 — Save birth date+hour after legal-eligibility checks.
+
+    Body: {anon, birth_date: 'YYYYMMDD', birth_time: 'HHMM'|'9999',
+           agree_terms, agree_age_19, agree_not_us}
+    Validates: ≥19yo, all 3 agree_* flags = true, valid date format.
+    """
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS_POST)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    try:
+        body = req.get_json() or {}
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "invalid_json"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    bd_compact = (body.get("birth_date") or "").strip()
+    bt_compact = (body.get("birth_time") or "").strip()
+    agree_terms = bool(body.get("agree_terms"))
+    agree_age = bool(body.get("agree_age_19"))
+    agree_not_us = bool(body.get("agree_not_us"))
+
+    # Format: YYYYMMDD → YYYY-MM-DD; HHMM → hour int (or -1 for 9999)
+    import re
+    if not re.match(r"^\d{8}$", bd_compact):
+        return func.HttpResponse(json.dumps({"error": "invalid_birth_date_format"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+    bd_iso = f"{bd_compact[:4]}-{bd_compact[4:6]}-{bd_compact[6:8]}"
+
+    if bt_compact == "9999":
+        birth_hour: int | None = None
+    elif re.match(r"^\d{4}$", bt_compact):
+        try:
+            h = int(bt_compact[:2])
+            if not (0 <= h <= 23):
+                raise ValueError
+            birth_hour = h
+        except ValueError:
+            return func.HttpResponse(json.dumps({"error": "invalid_birth_time_format"}),
+                status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+    else:
+        return func.HttpResponse(json.dumps({"error": "invalid_birth_time_format"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    if not (agree_terms and agree_age and agree_not_us):
+        return func.HttpResponse(json.dumps({"error": "must_accept_all_agreements"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    from services.fortune_service import is_age_19_or_older
+    if not is_age_19_or_older(bd_iso):
+        return func.HttpResponse(json.dumps({"error": "under_age_19"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    from services.saju_service import save_birth_data
+    try:
+        await save_birth_data(_profile_repo, user_key,
+                              birth_date=bd_iso, birth_hour=birth_hour)
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "invalid_birth_date"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    return func.HttpResponse(
+        json.dumps({"ok": True, "birth_date": bd_iso}, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=_CORS_HEADERS_POST,
+    )
+
+
+@app.route(route="fortune/today", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "OPTIONS"])
+async def fortune_today(req: func.HttpRequest) -> func.HttpResponse:
+    """§3 Step 3 — today's fortune: 1 free + 2 locked (with masking)."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS)
+
+    try:
+        profile = await _profile_repo.get_or_create(
+            user_key=user_key,
+            default_language=_detect_lang_from_init_data(req),
+            default_persona="buffett",
+        )
+    except AttributeError:
+        profile = _profile_repo.get_or_create(
+            user_key=user_key, default_language="ko", default_persona="buffett")
+
+    if not profile.saju_birth_date:
+        return func.HttpResponse(
+            json.dumps({"available": False, "reason": "birth_data_missing"}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+
+    from services.fortune_service import (
+        UNLOCK_COST_POINTS, is_already_unlocked_today, select_for_user,
+    )
+    result = select_for_user(profile)
+    if result is None:
+        return func.HttpResponse(
+            json.dumps({"available": False, "reason": "internal"}),
+            status_code=200, mimetype="application/json", headers=_CORS_HEADERS,
+        )
+
+    # Mask locked tickers unless user has unlocked them today
+    locked_payload = []
+    for p in result["locked"]:
+        unlocked = is_already_unlocked_today(profile, p["ticker"])
+        locked_payload.append({
+            "ticker": p["ticker"] if unlocked else "***",
+            "risk": p["risk"],
+            "unlocked": unlocked,
+            "unlock_cost_points": 0 if unlocked else UNLOCK_COST_POINTS,
+        })
+
+    payload = {
+        "available": True,
+        "lucky_number": result["lucky_number"],
+        "fortune_seed": result["fortune_seed"],
+        "free": {**result["free"], "unlocked": True},
+        "locked": locked_payload,
+    }
+    headers = dict(_CORS_HEADERS)
+    headers["Cache-Control"] = "private, max-age=60"
+    return func.HttpResponse(json.dumps(payload, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=headers)
+
+
+@app.route(route="fortune/unlock", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST", "OPTIONS"])
+async def fortune_unlock(req: func.HttpRequest) -> func.HttpResponse:
+    """§3 Step 3 — unlock a locked ticker via points/donation/invite channel."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_CORS_HEADERS_POST)
+    await _bootstrap()
+    user_key = await _verify_telegram_init_data_get_userkey(req)
+    if not user_key:
+        return func.HttpResponse(json.dumps({"error": "unauthorized"}),
+            status_code=401, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    try:
+        body = req.get_json() or {}
+    except ValueError:
+        return func.HttpResponse(json.dumps({"error": "invalid_json"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    target_risk = (body.get("target_risk") or "").strip().lower()
+    channel = (body.get("channel") or "points").strip().lower()
+    if target_risk not in ("low", "medium", "high"):
+        return func.HttpResponse(json.dumps({"error": "invalid_target_risk"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+    if channel not in ("points", "donation", "invite"):
+        return func.HttpResponse(json.dumps({"error": "invalid_channel"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    try:
+        profile = await _profile_repo.get_or_create(
+            user_key=user_key,
+            default_language=_detect_lang_from_init_data(req),
+            default_persona="buffett",
+        )
+    except AttributeError:
+        profile = _profile_repo.get_or_create(
+            user_key=user_key, default_language="ko", default_persona="buffett")
+
+    from services.fortune_service import (
+        UNLOCK_COST_POINTS, select_for_user, unlock_via_points,
+    )
+    result = select_for_user(profile)
+    if result is None:
+        return func.HttpResponse(json.dumps({"error": "birth_data_missing"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    target = next((p for p in result["locked"] if p["risk"] == target_risk), None)
+    if target is None:
+        return func.HttpResponse(json.dumps({"error": "target_not_locked"}),
+            status_code=400, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+    # Channels other than 'points' fold into existing flows:
+    #   donation  → expects user to already have donated (point credit handles it)
+    #   invite    → expects ≥1 verified referral (admin to validate)
+    # MVP: only 'points' is fully wired; donation/invite return 501 for now
+    # so the UI surface is stable but discourages these paths until §7.
+    if channel != "points":
+        return func.HttpResponse(
+            json.dumps({"error": "channel_not_wired_yet", "channel": channel,
+                       "hint": "use channel='points' or wait for §7"}),
+            status_code=501, mimetype="application/json", headers=_CORS_HEADERS_POST,
+        )
+
+    ok, reason, updated = await unlock_via_points(
+        _profile_repo, profile, target["ticker"], usage_logger=_usage_logger,
+    )
+    payload = {"success": ok, "reason": reason, "ticker": target["ticker"]}
+    if updated is not None:
+        payload["points_balance"] = updated.points_balance
+    if not ok and reason == "insufficient_points":
+        payload["cost_points"] = UNLOCK_COST_POINTS
+        return func.HttpResponse(json.dumps(payload, ensure_ascii=False),
+            status_code=402, mimetype="application/json", headers=_CORS_HEADERS_POST)
+    return func.HttpResponse(json.dumps(payload, ensure_ascii=False),
+        status_code=200, mimetype="application/json", headers=_CORS_HEADERS_POST)
+
+
+# ---------------------------------------------------------------------
 # §MATCHUP — hourly mover-pair predictions (stock↔stock, coin↔coin, mixed)
 # ---------------------------------------------------------------------
 

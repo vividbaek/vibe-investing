@@ -1,0 +1,18 @@
+{
+  "_comment": "Hand-curated 3-tier risk pool for fortune-match. Replace with yfinance.beta dynamic fetch when ticker_data_cache supports it. Each tier ≥10 entries — fortune_match.build_risk_pool requires ≥5.",
+  "low": [
+    "JNJ", "PG", "KO", "WMT", "MCD", "PEP", "VZ", "T", "MO", "CL",
+    "KMB", "GIS", "K", "HSY", "MDLZ", "MSFT", "AAPL", "BRK.B", "JPM", "BAC",
+    "VOO", "SPY", "DIA"
+  ],
+  "medium": [
+    "GOOGL", "GOOG", "AMZN", "META", "ORCL", "ADBE", "CRM", "NFLX",
+    "NKE", "DIS", "HD", "LOW", "MA", "V", "AXP", "GS", "MS",
+    "QQQ", "XLK", "VTI", "AVGO", "TXN", "QCOM"
+  ],
+  "high": [
+    "TSLA", "NVDA", "AMD", "PLTR", "COIN", "SHOP", "UBER",
+    "RBLX", "RIVN", "LCID", "MRVL", "ARM", "MARA", "RIOT",
+    "TQQQ", "SOXL", "TSLL", "ARKK", "ARKG", "IONQ", "RKLB", "SMCI"
+  ]
+}
