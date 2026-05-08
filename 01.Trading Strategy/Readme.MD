@@ -1,142 +1,146 @@
 # 01. Trading Strategy
 
-vibe-investing 레포의 트레이딩 전략 인덱스입니다.
+vibe-investing 레포의 트레이딩 전략 라이브러리입니다. 백테스트 데이터, Python 봇, 칼럼, 다국어 퀀트 프롬프트가 함께 위치합니다.
 
 → [메인 README로 돌아가기](https://github.com/gameworkerkim/vibe-investing/blob/main/README.md)
 
 ---
 
-## 시작 전 반드시 읽을 것
+## 폴더 구성
 
-> **LLM은 엑셀이지, 정답을 알려주는 오라클(신탁)이 아니다.**
+이 폴더는 4개의 하위 자산으로 구성되어 있습니다.
 
-본 폴더의 모든 LLM 기반 트레이딩 전략은 *사용자의 지식 수준만큼만 작동*하는 도구입니다. 같은 LLM이라도 한국어, 영어, 중국어 입력에 따라 결과가 다르며, 학습 cutoff 이후의 실시간 시장 변화는 인지하지 못합니다.
-
-본 인덱스에 들어가기 전, *Cross-Lingual LLM 검증 연구*와 *MSFT 11/11 사례 칼럼*을 먼저 읽으시면 모든 전략을 더 비판적으로 활용할 수 있습니다.
-
-* [LLM 합의 vs 시장 현실 — 마이크로소프트 사례 칼럼 (PDF v2)](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts/Dividend%20growth%20prompt/Column_LLM_Consensus_vs_Reality_MSFT_Case_v2.pdf)
-* [같은 칼럼 (Markdown)](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts/Dividend%20growth%20prompt/Column%20llm%20consensus%20vs%20reality%20msft%20case.md)
-* [Cross-Lingual LLM Accuracy Paper v5 (학술 논문 릴리즈 예정 )]
-
----
-
-## 구성
-
-이 폴더는 네 가지 카테고리의 트레이딩 전략과 분석 자료를 담고 있습니다.
-
-| 폴더 | 종류 | 설명 |
+| 폴더 | 핵심 자산 | 형식 |
 | --- | --- | --- |
-| [AI-hedge-fund/](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/AI-hedge-fund) | **분석 리포트 (NEW)** | **virattt/ai-hedge-fund 오픈소스 헤지펀드 프레임워크 분석 + 페르소나 AI 평가** |
-| [Awesome claude quant scripts/](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts) | 스크립트 모음 | Claude 기반 4종 트레이딩 전략 + Sample 템플릿 + Cross-Lingual LLM 검증 연구 |
-| [Luxury investment strategy/](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/Luxury%20investment%20strategy) | 단일 전략 + 칼럼 | 명품 섹터 3단계 포트폴리오 + 225건 백테스트 |
-| [Investment Strategy Based on Bitcoin and Nasdaq Coupling/](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/Investment%20Strategy%20Based%20on%20Bitcoin%20and%20Nasdaq%20Coupling) | 단일 전략 + 봇 | BTC-QQQ 6 regime 트레이딩 + 547줄 Python 봇 |
+| [Awesome claude quant scripts](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts) | Claude 기반 재현 가능한 퀀트 스크립트 라이브러리 (Dividend, Pharma KR/EN/CN, AI Supercycle) | 스크립트 + 칼럼 + 학술 + 다국어 |
+| [Investment Strategy Based on Bitcoin and Nasdaq Coupling](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Investment%20Strategy%20Based%20on%20Bitcoin%20and%20Nasdaq%20Coupling) | BTC-QQQ 커플링 분석 + 547줄 Python 봇 + 6 regime 분류 | 칼럼 + Python 봇 + CSV 4종 |
+| [Luxury investment strategy](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Luxury%20investment%20strategy) | LVMH/Hermès/Kering 명품 섹터 6년 데이터 + 3단계 포트폴리오 | 칼럼 + CSV 4종 + 백테스트 225건 |
+| [AI-hedge-fund](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/AI-hedge-fund) | virattt/ai-hedge-fund 멀티 페르소나 분석 + GuruAgents 학술 결과 | 분석 보고서 |
 
 ---
 
-## AI-hedge-fund (NEW)
+## 주요 자산
 
-> 워런 버핏 + 찰리 멍거 + 캐시 우드가 같은 종목을 두고 토론한다면?
+### Awesome Claude Quant Scripts — 가장 활발히 업데이트 중
 
-[virattt/ai-hedge-fund](https://github.com/virattt/ai-hedge-fund) (GitHub 51,700+ stars, 9,000+ forks) 오픈소스 프로젝트의 **개념 분석 리포트**입니다. 14명의 전설적 투자자 페르소나(벤 그레이엄, 워런 버핏, 찰리 멍거, 빌 애크먼, 캐시 우드, 필립 피셔, 스탠리 드러켄밀러 등)와 6개 전문 분석 에이전트(Valuation, Technicals, Fundamentals, Sentiment, Risk Manager, Portfolio Manager)가 협업하는 **멀티 에이전트 헤지펀드 시뮬레이션** 프레임워크를 분석합니다.
+[전체 문서 보기](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts)
 
-핵심 내용:
+이 레포에서 가장 활발하게 업데이트되는 폴더입니다. Claude 기반 *재현 가능한 퀀트 프롬프트 + 결과물 + 학술 검증*이 함께 위치합니다.
 
-* **다중 에이전트 협업 구조** — 각 에이전트가 독립적으로 BUY / SELL / HOLD 신호를 생성하고, Portfolio Manager가 최종 결정 통합
-* **LLM 제공자 다양화** — OpenAI, Anthropic, Groq, DeepSeek, 로컬 Ollama 모두 지원
-* **백테스팅 모듈** — 과거 데이터로 전략 성과 시뮬레이션
-* **에이전트 추론 시각화** — `--show-reasoning` 플래그로 의사결정 과정 투명화
-* **LangGraph 기반 오케스트레이션** — 복잡한 멀티 에이전트 상태 관리
+3개 하위 폴더:
 
-페르소나 AI의 실제 성과 — *학술 검증*:
+- **Dividend growth prompt** — 배당 성장주 universe 프롬프트 + Cross-Lingual LLM 학술 검증 (SSRN IN REVIEW) + MSFT 사례 칼럼 v2 (6개 LLM 11/11 매수 합의 → 5월 -7% 하락)
+- **Pharma growth prompt** — 미국 제약 LONG 7 + SHORT 3 (FDA Orange Book + ClinicalTrials.gov NCT 1차 출처 강제) — 한국어 / 영어 / 중국어 동시 제공
+- **AI Supercycle Investment Quant Strategy** — AI 인프라 사이클의 시점적 정량 전략
 
-* GuruAgents 논문(arXiv:2510.01664)에서 Buffett 페르소나가 NASDAQ-100 백테스트(2023 Q4 ~ 2025 Q2)에서 **CAGR 42.2%**로 벤치마크 약 25%를 압도
-* 다른 페르소나는 *varied* — 시장 regime에 의존적
+이 폴더의 차별점:
 
-→ [폴더 README](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/AI-hedge-fund/Readme.md) 참조
+- 단일 LLM 답변 의존이 아닌 *다국어 검증 + 1차 출처 강제* 의 재현 가능한 프롬프트 패턴
+- 칼럼·학술 working paper·CSV 데이터·다국어 프롬프트가 *같은 폴더에* 함께 존재 → 사용자가 fork 하여 본인 universe에 즉시 적용 가능
+- 메타 메시지 *\"LLM은 엑셀이지 정답을 알려주는 오라클이 아니다\"* 의 시스템 차원 implementation
 
->  **본 프로젝트는 교육·연구 목적이며 실거래용이 아닙니다.** 가장 가치 있는 사용법은 *"내가 검토 중인 종목을 4-5명 페르소나에게 동시 분석시켜 충돌 지점을 찾는 것"* — Buffett은 valuation으로 반대, Wood는 innovation으로 찬성하는 토론이 단일 LLM 답보다 풍부한 판단 자료를 만듭니다.
+### Nasdaq-BTC Coupling Bot — 547줄 Python 트레이딩 신호 생성기
 
----
+[전체 문서 보기](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Investment%20Strategy%20Based%20on%20Bitcoin%20and%20Nasdaq%20Coupling)
 
-## Awesome claude quant scripts
-
-Claude를 활용해 만든 트레이딩 전략 스크립트 모음입니다. 4종의 전략과 1개의 Sample 템플릿, 그리고 *Cross-Lingual LLM Accuracy 학술 연구*가 포함되어 있습니다.
-
-→ [폴더 README](https://github.com/gameworkerkim/vibe-investing/blob/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts/Readme.MD) 참조
-
-수록 전략:
-
-* AI supply chain bayesian analysis — AI 공급망 위험을 베이지안 추론으로 분석
-* DAT quant strategy — DAT (Digital Asset Treasury) 기업 정량 전략
-* Declining Stock Quant Script Using LLM — LLM 기반 하락주 분석 스크립트
-* Long-Term Dividend Investing — 장기 배당 투자 스크립트
-* **Dividend growth prompt** — 4 LLM × 3 언어 = 11개 결과물 검증 연구 + MSFT 사례 칼럼 (PDF v2)
-
-핵심 발견 (Dividend growth prompt 연구):
-
-* 11개 LLM 모두가 MSFT를 universal pick으로 추천했지만, 어떤 LLM도 OpenAI 의존도 45%, Calendar 2026 capex $190B, circular financing 같은 시점 의존적 위험을 인지하지 못함
-* 같은 날 어닝 우위를 보인 GOOG는 0/11로 추천 누락 (프롬프트 criteria 하네스 효과)
-* Cross-Lingual asymmetry 평균 Jaccard 0.297 — 동일 LLM도 언어별로 다른 결과 생성
-
----
-
-## Luxury investment strategy
-
-> 단일 종목 집중은 실패합니다. GLUX ETF 적립식이 답일 수 있습니다.
-
-LVMH, Hermès, Kering, Richemont, Ferrari 등 13개 명품 기업·ETF의 2020-2026 데이터를 분석한 전략입니다. 225건의 백테스트로 적립식 / Buy-the-Dip / 중국 쇼크 역발상 3가지 전략을 비교합니다.
-
-핵심 발견:
-
-* 2020-2026 누적 복리: Ferrari +389%, Hermès +311%, Kering -42%
-* 2024년 단년 수치: Kering -39.4%, Burberry -30%, LVMH -13%
-* 단일 종목 집중 백테스트 모두 음수 수익률
-
-본 전략에는 칼럼, 4종 CSV 데이터셋, 저/중/고 위험 3단계 포트폴리오가 포함됩니다.
-
----
-
-## Investment Strategy Based on Bitcoin and Nasdaq Coupling
-
+> Those who know the regime, know the trade.
 > Regime을 아는 자가 거래를 안다.
 
-2020-2026년 BTC-QQQ 30일 rolling correlation을 26개 분기로 분석하고, 6 regime별 트레이딩 전략을 도출했습니다. Python 봇으로 실시간 신호 생성까지 end-to-end 구현되어 있습니다.
+BTC-QQQ 30일 rolling correlation 실시간 추적 + 6 regime 자동 분류 + Telegram/Slack 알림까지 엔드투엔드 파이프라인. Binance + Alpaca WebSocket 연동.
+
+547 lines, 10 classes, 18 functions. 실행 모드 4종 (once / paper / backtest / live).
+
+핵심 발견 (2020-2026 BTC-QQQ 데이터):
+
+- 6년 평균 30일 rolling correlation: +0.335
+- 2025년 평균 상관계수: 0.52 (2024년 0.23의 2배)
+- 2026년 2월 regime swing: 2주 만에 -0.68 → +0.72
+- 2026년 4월 현재: -0.20 (10년 중 최저, 역사적 BTC 반등 시그널)
+- Medium regime (+0.30~+0.60) 에서 Nasdaq이 BTC를 15~60분 선행
+- 비대칭 커플링: BTC는 나스닥 상승 무시, 하락은 따라감
+
+Regime별 파라미터:
+
+| Regime | Signal | Position | Stop Loss | Target | 신뢰도 | 빈도 |
+| --- | --- | --- | --- | --- | --- | --- |
+| NEGATIVE (<-0.50) | STRONG_LONG_BTC | +15% | -15% | +25% | 85% | 15% |
+| DECOUPLING (-0.10~-0.49) | ACCUMULATE_BTC | +8% | -10% | +15% | 65% | 15% |
+| LOW (-0.10~+0.30) | NEUTRAL | 0% | — | — | 40% | 25% |
+| MEDIUM (+0.30~+0.60) | FOLLOW_NASDAQ | +10% | -8% | +12% | 70% | 54% |
+| STRONG (+0.60~+0.80) | RISK_OFF | -5% | -5% | +5% | 75% | 15% |
+| EXTREME (+0.80~+1.0) | CRISIS_MODE | -20% | -3% | +3% | 90% | 5% |
+
+알려진 한계: 상관관계는 과거 통계, regime 전환 지연 (30일 window), flash crash 취약, 유동성 가정 위반 가능, API 안정성 의존, 한국 거주자 자동매매는 외환거래법 / 자본시장법 검토 필수.
+
+### Luxury Investment Strategy — 명품 섹터 6년 실증 분석
+
+[전체 문서 보기](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Luxury%20investment%20strategy)
+
+> A Birkin bag is forever. An LVMH share is not.
+> 버킨 백은 영원하다. LVMH 주식은 그렇지 않다.
+
+중국 경기 침체와 부동산 위기로 촉발된 2024-2025 명품 섹터 역사적 조정 실증 분석. LVMH, Hermès, Kering, Richemont, Ferrari 등 세계 주요 명품 기업 13개 (기업 11 + ETF 2) 의 2020-2026 전 구간 데이터 + 225건의 백테스트 + 저/중/고 위험 3단계 포트폴리오.
 
 핵심 발견:
 
-* 2026년 4월 기준 상관계수 -0.20 (10년 중 최저)
-* Medium regime에서 Nasdaq이 BTC를 15-60분 선행
-* 2026년 2월 -0.68 → +0.72로 2주 만의 swing 사례
+- 2020-2026 누적 복리: Ferrari +389%, Hermès +311%, Richemont +167%, LVMH +32%, Kering -42%
+- 2024년 단년: Kering -39.4%, Burberry -30%, LVMH -13%, Moncler -7.8%
+- 3가지 전략 백테스트 (LVMH 단일 종목): DCA -10.87%, Buy-the-Dip -11.11%, 중국 쇼크 역발상 -7.96%
+- GLUX ETF 적립식이면 약 +30~40% 추정 (단일 종목 집중의 위험성 입증)
 
-본 전략에는 칼럼, 4종 CSV 데이터셋, 547줄 Python 트레이딩 봇이 포함됩니다.
+부속 데이터 4종:
+
+- `luxury_companies_etfs_2026.csv` — 13개 투자 대상 상세
+- `luxury_performance_2020_2026.csv` — 13 반기별 수익률
+- `luxury_backtest_3strategies.csv` — 225건 백테스트 상세 로그
+- `luxury_portfolio_by_risk.csv` — 19개 자산 할당안 (저/중/고 위험)
+
+### AI-hedge-fund 페르소나 분석
+
+[전체 문서 보기](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/AI-hedge-fund)
+
+virattt/ai-hedge-fund 레포의 멀티 페르소나 구조와 GuruAgents 학술 결과 (CAGR 42.2%) 를 한국 투자자 관점에서 분석한 working report. AI 페르소나 도구의 *작동 원리와 한계*를 정리.
+
+이 분석은 칼럼 8번 (LLM 합의 vs 시장 현실 MSFT v2) 와 학술 자료 A (Cross-Lingual LLM Accuracy v5) 의 *왜 multi-agent 페르소나가 시장을 못 이기는가* 의 메커니즘 분석에 사용됩니다.
 
 ---
 
-## 본 폴더의 4가지 트랙 — 어떤 것부터 봐야 할까
+## 권장 진입 경로
 
-| 관심 영역 | 추천 시작점 |
-| --- | --- |
-| **AI 멀티 에이전트 / 페르소나 투자** | AI-hedge-fund 분석 리포트 → ai-hedge-fund 오픈소스 직접 실험 |
-| **LLM 프롬프트 퀀트 / 배당주** | Awesome claude quant scripts → Dividend growth prompt 칼럼 먼저 읽기 |
-| **명품 섹터 / 적립식 ETF** | Luxury investment strategy 칼럼 + GLUX ETF 분석 |
-| **크립토-주식 상관관계 / regime 트레이딩** | Bitcoin-Nasdaq Coupling 칼럼 + Python 봇 |
+### 재현 가능한 퀀트 프롬프트를 본인 전략에 적용하고 싶은 분
+
+→ [Awesome claude quant scripts](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Awesome%20claude%20quant%20scripts) 폴더 README 부터.
+
+특히 Pharma 프롬프트는 *섹터/시장 교체만으로* 본인 universe에 즉시 적용 가능합니다 (KR / EN / CN 동시 제공).
+
+### 실시간 트레이딩 신호를 보고 싶은 분
+
+→ [Coupling Bot](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Investment%20Strategy%20Based%20on%20Bitcoin%20and%20Nasdaq%20Coupling) 의 `python nasdaq_btc_coupling_bot.py --mode once` 로 현재 BTC-Nasdaq regime 즉시 확인.
+
+### 명품·럭셔리 섹터에 관심 있는 분
+
+→ [Luxury investment strategy](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/Luxury%20investment%20strategy) 의 칼럼 + CSV 4종.
+
+### AI 페르소나 도구의 작동 원리를 이해하고 싶은 분
+
+→ [AI-hedge-fund 분석](https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy/AI-hedge-fund) + 칼럼 8번 (LLM 합의 vs 시장 현실) + 학술 자료 A (Cross-Lingual LLM Accuracy v5) 3개를 함께 읽기.
 
 ---
 
-## 사용 시 권장 순서
+## 알려진 한계 (공통)
 
-1. **선행 학습** — 상단 박스의 *MSFT 사례 칼럼*과 *Cross-Lingual LLM 논문*을 먼저 읽고 LLM의 4가지 구조적 한계 인지
-2. 본인의 관심 시장 확인 (AI 헤지펀드 / 주식 / 명품 / 크립토-주식 커플링)
-3. 해당 폴더의 README와 칼럼 먼저 읽기
-4. 스크립트 또는 봇 실행 전 "알려진 한계" 섹션 반드시 확인
-5. CSV 데이터로 재현·검증
-6. **Cross-LLM + 다국어 + 실시간 어닝으로 검증**
-7. 페이퍼 트레이딩으로 검증 후 실거래 고려
+이 폴더의 모든 자산에 적용되는 공통 한계입니다.
+
+- 백테스트 결과는 백테스트상 이상적 시나리오 — 실거래에서 slippage, commission, 세금, 파이프라인 지연으로 실제 수익률 낮아짐
+- 시장 regime 의존성 — 2024-2026 AI 랠리에서 검증된 결과가 다른 regime (약세장, 섹터 로테이션) 에서도 동일하게 작동한다는 보장은 없음
+- LLM 비용 — 일부 도구는 Opus 기준 월 $200~400
+- 한국 거주자 외환거래법 / 자본시장법 검토 필수
+- AI 페르소나는 실제 투자 거장의 의견이 아닌 LLM의 narrative 시뮬레이션
+
+각 자산별 추가 한계는 해당 폴더 README 또는 칼럼 본문 참조.
 
 ---
 
 ## Disclaimer
 
-각 전략은 연구·교육 목적입니다. 백테스트 결과는 이상적 시나리오 기반이며 실거래 수익률과 다릅니다. *AI-hedge-fund와 GuruAgents의 페르소나 AI 백테스트 결과(Buffett CAGR 42.2%) 등 학술/오픈소스 백테스트도 마찬가지로 시장 regime에 의존적이며 미래 수익을 보장하지 않습니다.*
-
-자세한 내용은 [메인 README의 Disclaimer](https://github.com/gameworkerkim/vibe-investing/blob/main/README.md#disclaimer) 참조.
+모든 자산은 연구·교육 목적입니다. 시장 구조 분석은 통계적·학술적 논평이며 특정 주체를 지목하지 않습니다. 자세한 내용은 [메인 README의 Disclaimer](https://github.com/gameworkerkim/vibe-investing/blob/main/README.md#disclaimer) 참조.
