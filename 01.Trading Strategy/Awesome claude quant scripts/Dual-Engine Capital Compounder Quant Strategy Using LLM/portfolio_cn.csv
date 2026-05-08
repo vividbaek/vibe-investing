@@ -1,0 +1,11 @@
+rank,ticker,company_name_cn,sector,sub_segment_cn,current_price_usd,market_cap_b,dividend_yield_pct,buyback_yield_pct,tcry_pct,div_5y_cagr_pct,payout_ratio_pct,roe_or_roic_pct,key_multiple,multiple_value,score_earnings_quality,score_dividend_growth,score_valuation,score_cycle_defense,total_score,target_return_12m_pct,stop_loss_pct,key_thesis_cn,risk_factor_cn
+1,V,Visa,Financial,卡组织,360.0,720,0.65,4.05,4.7,16.5,22,30,Forward P/E,28,32,28,17,13,90,15,-13,全球支付网络双寡头垄断 + 营业利润率 65% + 6% 综合资本回报率,反垄断诉讼 / 稳定币支付渗透
+2,JPM,摩根大通,Financial,大型银行,245.0,710,2.05,4.45,6.5,12.0,28,17,P/TBV,2.4,30,27,16,15,88,11,-13,全球资产 $4T 第一 + 一级资本 14%+ + 年度回购 $350 亿,衰退导致违约率上升 / 监管收紧
+3,HD,家得宝,Retail,家居装修,415.0,415,2.17,4.05,6.2,12.0,55,42,EV/EBITDA,18,30,26,17,14,87,12,-14,家居装修市场第一 + ROIC 40%+ + 制造业回流受益 + 连续 14 年涨息,住房周期放缓 / Lowe 竞争
+4,BLK,贝莱德,Financial,资产管理,1090.0,165,1.90,2.90,4.8,11.8,49,15,Forward P/E,22,29,27,16,14,86,12,-13,AUM $11.5T+ 第一 + iShares + Aladdin 多层营收 + IBIT 比特币 ETF 成功,市场 beta 敞口 / 被动化费率压缩
+5,TJX,TJX 公司,Retail,折扣零售,130.0,145,1.15,3.55,4.7,10.5,33,55,EV/EBITDA,16,29,28,15,14,86,15,-13,折扣零售第一 + ROIC 55% + 连续 28 年涨息 + 通胀对冲品类,库存周转放缓 / 供应链压力
+6,AXP,美国运通,Financial,高端卡,310.0,225,1.05,4.05,5.1,10.0,22,32,Forward P/E,19,29,26,16,14,85,13,-13,高净值客户忠诚度 + Membership Rewards 锁定 + 连续 13 年涨息,衰退期旅行消费冲击 / Z 世代流失
+7,MCD,麦当劳,Retail,快餐 QSR,310.0,225,2.28,3.10,5.4,7.0,55,30,EV/EBITDA,16,28,25,16,14,83,10,-13,全球 4 万+ 加盟店 + 连续 28 年涨息 + 工资通胀对冲,Shake Shack 等竞争 / 素食趋势
+8,CB,安达保险,Financial,财产保险,295.0,118,1.25,2.75,4.0,5.2,28,18,P/TBV,1.5,28,24,17,13,82,11,-13,商业保险第一 + 连续 31 年涨息 + 保费上涨周期,自然灾害频率上升 / 再保险费率上涨
+9,WMT,沃尔玛,Retail,大型零售,95.0,765,0.87,2.05,2.9,5.5,38,21,EV/EBITDA,16,28,22,16,18,84,10,-12,全球第一零售商 + Walmart+ 会员加速 + 广告营收增长 +60%,电商利润率压缩 / 工资成本上升
+10,TGT,塔吉特,Retail,折扣零售,155.0,72,2.89,3.65,6.5,12.0,52,28,EV/EBITDA,11,26,28,18,8,80,12,-15,连续 54 年涨息（红利之王）+ 自有品牌利润率优势 + 电商增长 60%,库存执行失误反复 / 失窃损失加剧

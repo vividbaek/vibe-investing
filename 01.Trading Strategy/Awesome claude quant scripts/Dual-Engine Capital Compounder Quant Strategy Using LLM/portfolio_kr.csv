@@ -1,0 +1,11 @@
+rank,ticker,company_name_kr,sector,sub_segment_kr,current_price_usd,market_cap_b,dividend_yield_pct,buyback_yield_pct,tcry_pct,div_5y_cagr_pct,payout_ratio_pct,roe_or_roic_pct,key_multiple,multiple_value,score_earnings_quality,score_dividend_growth,score_valuation,score_cycle_defense,total_score,target_return_12m_pct,stop_loss_pct,key_thesis_kr,risk_factor_kr
+1,V,비자,Financial,카드네트워크,360.0,720,0.65,4.05,4.7,16.5,22,30,Forward P/E,28,32,28,17,13,90,15,-13,글로벌 결제 네트워크 톡독점 + 영업이익률 65% + 자사주매입 비중 환원율 6%대,반독점 소송 / 스테이블코인 결제 침투
+2,JPM,JP모건체이스,Financial,메가뱅크,245.0,710,2.05,4.45,6.5,12.0,28,17,P/TBV,2.4,30,27,16,15,88,11,-13,자산 $4T 글로벌 1위 + Tier 1 자본 14%+ + 자사주 $35B 환원,경기침체 시 NCO 급증 / 규제 강화
+3,HD,홈디포,Retail,홈개량,415.0,415,2.17,4.05,6.2,12.0,55,42,EV/EBITDA,18,30,26,17,14,87,12,-14,홈개량 시장 점유율 1위 + ROIC 40%+ + 리쇼어링 수혜 + 14년 연속 배당 인상,주택 사이클 둔화 / Lowe 경쟁
+4,BLK,블랙록,Financial,자산관리,1090.0,165,1.90,2.90,4.8,11.8,49,15,Forward P/E,22,29,27,16,14,86,12,-13,AUM $11.5T+ 1위 + iShares + Aladdin 다층 매출 + IBIT 비트코인 ETF 성공,시장 베타 노출 / 패시브 수수료 압박
+5,TJX,TJX코퍼레이션,Retail,오프프라이스,130.0,145,1.15,3.55,4.7,10.5,33,55,EV/EBITDA,16,29,28,15,14,86,15,-13,오프프라이스 1위 + ROIC 55% + 28년 연속 배당 인상 + 인플레 헤지 카테고리,재고 회전 둔화 / 공급망 압박
+6,AXP,아메리칸익스프레스,Financial,프리미엄카드,310.0,225,1.05,4.05,5.1,10.0,22,32,Forward P/E,19,29,26,16,14,85,13,-13,프리미엄 고객 충성도 + Membership Rewards 락인 + 13년 연속 배당 인상,경기침체 시 트래블 결제 충격 / Z세대 이탈
+7,MCD,맥도널드,Retail,QSR,310.0,225,2.28,3.10,5.4,7.0,55,30,EV/EBITDA,16,28,25,16,14,83,10,-13,글로벌 매장 4만+ 프랜차이즈 + 28년 연속 배당 인상 + 임금 인플레 헤지,셰이크쉑 등 경쟁 / 비건 트렌드
+8,CB,처브,Financial,재산보험,295.0,118,1.25,2.75,4.0,5.2,28,18,P/TBV,1.5,28,24,17,13,82,11,-13,상업보험 1위 + 31년 연속 배당 인상 + 보험료 인상 사이클,자연재해 빈도 증가 / 재보험료 상승
+9,WMT,월마트,Retail,대형리테일,95.0,765,0.87,2.05,2.9,5.5,38,21,EV/EBITDA,16,28,22,16,18,84,10,-12,글로벌 1위 리테일러 + Walmart+ 멤버십 가속 + 광고매출 60%+ 성장,e-commerce 마진 압박 / 임금 비용 상승
+10,TGT,타겟,Retail,할인리테일,155.0,72,2.89,3.65,6.5,12.0,52,28,EV/EBITDA,11,26,28,18,8,80,12,-15,54년 연속 배당 인상 (Dividend King) + 자체 브랜드 마진 우위 + e-comm 60% 성장,재고 부적정으로 마진 압박 반복 / 도난 손실 증가
