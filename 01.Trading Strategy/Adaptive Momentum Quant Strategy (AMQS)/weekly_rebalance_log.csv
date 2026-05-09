@@ -1,0 +1,122 @@
+rebalance_date,regime_label,n_holdings,holdings,amqs_nav,weekly_ret_pct,qqq_nav,qqq_weekly_ret_pct,regime_filter_active,notes
+2024-01-05,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,101111.23,1.1112,98634.16,-1.3658,RISK_ON,
+2024-01-12,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,96923.63,-4.1416,94137.87,-4.5586,RISK_ON,
+2024-01-19,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,94949.93,-2.0364,92928.05,-1.2852,RISK_ON,
+2024-01-26,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,98283.44,3.5108,97601.18,5.0288,RISK_ON,
+2024-02-02,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,104100.05,5.9182,99161.53,1.5987,RISK_ON,
+2024-02-09,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,106156.39,1.9754,100076.12,0.9223,RISK_ON,
+2024-02-16,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,105910.27,-0.2318,100444.74,0.3683,RISK_ON,
+2024-02-23,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,105678.46,-0.2189,101062.05,0.6146,RISK_ON,
+2024-03-01,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,105244.89,-0.4103,100714.52,-0.3439,RISK_ON,
+2024-03-08,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,95564.66,-9.1978,97734.59,-2.9588,RISK_ON,
+2024-03-15,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,95631.55,0.07,97961.98,0.2327,RISK_ON,
+2024-03-22,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,98779.84,3.2921,100904.07,3.0033,RISK_ON,
+2024-03-28,Q1'24: AI rally launch,10,NVDA|AVGO|MU|AMD|TSM|ASML|AMAT|LRCX|META|MSFT,99771.12,1.0035,102261.31,1.3451,RISK_ON,
+2024-04-05,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,101029.39,1.2612,101523.63,-0.7214,RISK_ON,
+2024-04-12,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,102800.32,1.7529,104743.6,3.1716,RISK_ON,
+2024-04-19,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,109554.97,6.5707,107360.02,2.4979,RISK_ON,
+2024-04-26,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,107648.39,-1.7403,106470.68,-0.8284,RISK_ON,
+2024-05-03,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,109179.1,1.4219,106436.77,-0.0319,RISK_ON,
+2024-05-10,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,107530.21,-1.5103,106490.77,0.0507,RISK_ON,
+2024-05-17,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,109239.86,1.5899,107739.28,1.1724,RISK_ON,
+2024-05-24,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,112626.18,3.0999,108867.07,1.0468,RISK_ON,
+2024-05-31,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,113896.21,1.1276,110579.25,1.5727,RISK_ON,
+2024-06-07,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,110340.16,-3.1222,109318.11,-1.1405,RISK_ON,
+2024-06-14,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,113266.32,2.6519,113435.07,3.766,RISK_ON,
+2024-06-21,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,115004.08,1.5342,117945.34,3.9761,RISK_ON,
+2024-06-28,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,113662.55,-1.1665,113996.61,-3.3479,RISK_ON,
+2024-07-05,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,116222.65,2.2524,114512.03,0.4521,RISK_ON,
+2024-07-12,Q2'24: NVDA-led continuation,10,NVDA|AVGO|ANET|MU|TSM|META|GOOGL|VRT|AMAT|MSFT,114777.84,-1.2431,116094.18,1.3816,RISK_ON,
+2024-07-19,Aug'24: yen carry unwind shock,6,BRK-B|WMT|COST|JNJ|KO|PG,107831.85,-6.0517,111205.28,-4.2112,DEFENSIVE,Stop-loss triggered; rotated to defensive basket
+2024-07-26,Aug'24: yen carry unwind shock,6,BRK-B|WMT|COST|JNJ|KO|PG,108531.26,0.6486,110294.37,-0.8191,DEFENSIVE,Stop-loss triggered; rotated to defensive basket
+2024-08-02,Aug'24: yen carry unwind shock,6,BRK-B|WMT|COST|JNJ|KO|PG,114663.9,5.6506,101919.52,-7.5932,DEFENSIVE,Stop-loss triggered; rotated to defensive basket
+2024-08-09,Aug'24: yen carry unwind shock,6,BRK-B|WMT|COST|JNJ|KO|PG,110824.7,-3.3482,98208.63,-3.641,DEFENSIVE,Stop-loss triggered; rotated to defensive basket
+2024-08-16,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,108043.01,-2.51,98382.88,0.1774,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-08-23,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,112571.43,4.1913,99573.64,1.2103,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-08-30,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,116335.18,3.3434,103828.36,4.2729,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-09-06,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,115014.84,-1.1349,104816.89,0.9521,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-09-13,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,111413.25,-3.1314,103479.64,-1.2758,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-09-20,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,111984.89,0.5131,103927.57,0.4329,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-09-27,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,119441.41,6.6585,106117.68,2.1073,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-10-04,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,123562.62,3.4504,109145.98,2.8537,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-10-11,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,126214.78,2.1464,109557.17,0.3767,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-10-18,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,125098.63,-0.8843,109491.97,-0.0595,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-10-25,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,123892.44,-0.9642,108205.14,-1.1753,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-11-01,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,127557.39,2.9582,112331.62,3.8136,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-11-08,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,125340.09,-1.7383,112193.4,-0.123,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-11-15,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,130671.87,4.2538,116058.94,3.4454,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-11-22,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,132727.4,1.573,120475.95,3.8058,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-11-29,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,135037.34,1.7404,123477.15,2.4911,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-12-06,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,137505.1,1.8275,123309.15,-0.1361,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-12-13,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,137256.59,-0.1807,122696.99,-0.4964,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-12-20,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,136200.88,-0.7691,123939.04,1.0123,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2024-12-27,Aug-Dec'24: recovery + year-end rally,10,AVGO|META|VRT|ANET|NVDA|MSFT|GOOGL|PLTR|ORCL|AAPL,134854.82,-0.9883,123652.89,-0.2309,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-01-03,Jan'25 pre-DeepSeek: AI continuation,10,NVDA|AVGO|TSM|META|VRT|ANET|MSFT|GOOGL|PLTR|ORCL,131828.67,-2.244,122449.51,-0.9732,RISK_ON,
+2025-01-10,Jan'25 pre-DeepSeek: AI continuation,10,NVDA|AVGO|TSM|META|VRT|ANET|MSFT|GOOGL|PLTR|ORCL,125577.63,-4.7418,121045.06,-1.147,RISK_ON,
+2025-01-17,Jan'25 pre-DeepSeek: AI continuation,10,NVDA|AVGO|TSM|META|VRT|ANET|MSFT|GOOGL|PLTR|ORCL,126345.22,0.6112,123153.15,1.7416,RISK_ON,
+2025-01-24,Jan'25 pre-DeepSeek: AI continuation,10,NVDA|AVGO|TSM|META|VRT|ANET|MSFT|GOOGL|PLTR|ORCL,126980.05,0.5025,125124.49,1.6007,RISK_ON,
+2025-01-31,Jan 27'25: DeepSeek shock,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,130006.98,2.3838,126134.73,0.8074,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-02-07,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,128791.73,-0.9348,120487.84,-4.4769,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-02-14,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,127735.23,-0.8203,117452.28,-2.5194,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-02-21,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,131693.6,3.0989,120362.3,2.4776,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-02-28,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,122185.41,-7.2199,116529.43,-3.1844,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-03-07,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,131168.5,7.352,117413.24,0.7584,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-03-14,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,136283.98,3.8999,118039.34,0.5332,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-03-21,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,131305.61,-3.6529,114784.83,-2.7571,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-03-28,Feb-Mar'25: tariff fears build,10,META|PLTR|VRT|GE|GEV|PWR|ETN|TGT|BRK-B|WMT,131670.03,0.2775,116803.09,1.7583,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-04-04,Apr 2'25: Liberation Day tariff shock,7,BRK-B|WMT|COST|JNJ|PG|KO|PEP,122837.63,-6.708,116764.92,-0.0327,DEFENSIVE,Stop-loss triggered; rotated to defensive basket
+2025-04-11,Apr 2'25: Liberation Day tariff shock,7,BRK-B|WMT|COST|JNJ|PG|KO|PEP,120952.87,-1.5343,115591.83,-1.0047,DEFENSIVE,Stop-loss triggered; rotated to defensive basket
+2025-04-17,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,117029.34,-3.2439,108795.55,-5.8795,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-04-25,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,116637.66,-0.3347,106213.1,-2.3737,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-05-02,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,126060.8,8.079,112024.97,5.4719,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-05-09,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,130306.56,3.368,115653.94,3.2394,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-05-16,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,134652.82,3.3354,117399.81,1.5096,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-05-23,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,129743.2,-3.6461,116317.65,-0.9218,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-05-30,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,127917.06,-1.4075,113772.05,-2.1885,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-06-06,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,131293.74,2.6397,108823.48,-4.3495,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-06-13,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,126086.55,-3.9661,106046.23,-2.5521,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-06-20,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,131768.61,4.5065,109209.01,2.9825,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-06-27,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,143386.37,8.8168,113725.0,4.1352,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-07-03,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,141226.31,-1.5065,114530.94,0.7087,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-07-11,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,146811.03,3.9545,116200.16,1.4574,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-07-18,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,146728.38,-0.0563,116808.17,0.5232,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-07-25,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,146886.98,0.1081,115364.58,-1.2359,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-08-01,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,159342.92,8.4799,120791.77,4.7044,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-08-08,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,158892.44,-0.2827,122626.53,1.5189,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-08-15,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,157157.13,-1.0921,123827.34,0.9792,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-08-22,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,160748.67,2.2853,124004.4,0.143,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-08-29,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,VRT|PWR|ETN|GEV|ANET|PLTR|META|AVGO|NVDA|AAPL,153191.82,-4.701,118586.01,-4.3695,RISK_ON,Stop-loss triggered; rotated to defensive basket
+2025-09-05,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,150899.12,-1.4966,115381.81,-2.702,RISK_ON,
+2025-09-12,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,147153.69,-2.4821,113626.36,-1.5214,RISK_ON,
+2025-09-19,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,153768.45,4.4951,117990.5,3.8408,RISK_ON,
+2025-09-26,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,164390.66,6.9079,123239.97,4.4491,RISK_ON,
+2025-10-03,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,162959.48,-0.8706,123520.55,0.2277,RISK_ON,
+2025-10-10,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,168665.25,3.5013,125551.08,1.6439,RISK_ON,
+2025-10-17,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,164256.15,-2.6141,124676.56,-0.6965,RISK_ON,
+2025-10-24,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,165880.56,0.9889,123947.63,-0.5847,RISK_ON,
+2025-10-31,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,173401.46,4.5339,127057.9,2.5093,RISK_ON,
+2025-11-07,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,182130.86,5.0342,130421.41,2.6472,RISK_ON,
+2025-11-14,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,193326.85,6.1472,135065.06,3.5605,RISK_ON,
+2025-11-21,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,193705.88,0.1961,137574.68,1.8581,RISK_ON,
+2025-11-28,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,198484.44,2.4669,139392.57,1.3214,RISK_ON,
+2025-12-05,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,193551.43,-2.4853,137276.94,-1.5178,RISK_ON,
+2025-12-12,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,178578.95,-7.7357,131596.85,-4.1377,RISK_ON,
+2025-12-19,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,174989.23,-2.0102,133491.6,1.4398,RISK_ON,
+2025-12-26,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,AVGO|PLTR|META|NVDA|VRT|GEV|MSFT|AAPL|GOOGL|ORCL,175504.04,0.2942,132787.74,-0.5273,RISK_ON,
+2026-01-02,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,176034.84,0.3024,134554.34,1.3304,RISK_ON,
+2026-01-09,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,170775.72,-2.9875,130475.15,-3.0316,RISK_ON,
+2026-01-16,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,178741.86,4.6647,133503.34,2.3209,RISK_ON,
+2026-01-23,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,181937.82,1.788,135497.18,1.4935,RISK_ON,
+2026-01-30,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,186805.2,2.6753,135625.1,0.0944,RISK_ON,
+2026-02-06,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,182418.78,-2.3481,137100.56,1.0879,RISK_ON,
+2026-02-13,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,184430.63,1.1029,136165.21,-0.6822,RISK_ON,
+2026-02-20,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,189654.89,2.8326,136806.01,0.4706,RISK_ON,
+2026-02-27,Jan-Feb'26: AI Capex sustainability debate,10,AVGO|META|PLTR|GEV|PWR|VRT|MSFT|GOOGL|AAPL|NVDA,195639.89,3.1557,136569.54,-0.1728,RISK_ON,
+2026-03-06,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,192822.11,-1.4403,139324.05,2.0169,RISK_ON,
+2026-03-13,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,197112.43,2.225,140590.16,0.9087,RISK_ON,
+2026-03-20,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,210330.67,6.7059,145844.74,3.7375,RISK_ON,
+2026-03-27,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,221229.31,5.1817,149895.83,2.7777,RISK_ON,
+2026-04-02,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,218084.46,-1.4215,149071.19,-0.5501,RISK_ON,
+2026-04-10,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,219992.83,0.8751,149065.92,-0.0035,RISK_ON,
+2026-04-17,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,216265.23,-1.6944,148977.71,-0.0592,RISK_ON,
+2026-04-24,Mar-Apr'26: earnings strength offsets concerns,10,NVDA|AVGO|META|PLTR|GEV|VRT|MSFT|GOOGL|ORCL|AAPL,213052.23,-1.4857,149229.19,0.1688,RISK_ON,

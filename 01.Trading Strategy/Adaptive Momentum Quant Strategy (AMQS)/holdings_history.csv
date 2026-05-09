@@ -1,0 +1,12 @@
+period_start,period_end,regime_label,n_holdings,AAPL,AMAT,AMD,ANET,ASML,AVGO,BRK-B,COST,ETN,GE,GEV,GOOGL,JNJ,KO,LRCX,META,MSFT,MU,NVDA,ORCL,PEP,PG,PLTR,PWR,TGT,TSM,VRT,WMT
+2024-01-02,2024-03-28,Q1'24: AI rally launch,10,0,1,1,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1,0,0
+2024-04-01,2024-07-12,Q2'24: NVDA-led continuation,10,0,1,0,1,0,1,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,0
+2024-07-15,2024-08-09,Aug'24: yen carry unwind shock,6,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1
+2024-08-12,2024-12-31,Aug-Dec'24: recovery + year-end rally,10,1,0,0,1,0,1,0,0,0,0,0,1,0,0,0,1,1,0,1,1,0,0,1,0,0,0,1,0
+2025-01-02,2025-01-24,Jan'25 pre-DeepSeek: AI continuation,10,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,1,1,0,1,1,0,0,1,0,0,1,1,0
+2025-01-27,2025-04-01,Jan 27'25: DeepSeek shock,10,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1,1,1,0,1,1
+2025-04-02,2025-04-15,Apr 2'25: Liberation Day tariff shock,7,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1
+2025-04-16,2025-08-29,"Apr-Aug'25: tariff walk-back, rotation to power/networking",10,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0,1,0,0,1,0,0,0,1,1,0,0,1,0
+2025-09-01,2025-12-31,"Sep-Dec'25: rate-cut rally, broad tech leadership",10,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,1,0,0,0,1,0
+2026-01-02,2026-02-28,Jan-Feb'26: AI Capex sustainability debate,10,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,0,1,0,0,0,1,1,0,0,1,0
+2026-03-02,2026-04-30,Mar-Apr'26: earnings strength offsets concerns,10,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,1,0,0,0,1,0
