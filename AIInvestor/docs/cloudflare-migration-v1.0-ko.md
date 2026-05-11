@@ -398,40 +398,190 @@ DAU 10k, 사용자당 50 API call, 100KB 데이터 가정:
 
 ---
 
-## 4. 두 안 비교 — 어느 쪽?
+## 3.6 ★ Plan A+ 하이브리드 — Chat API/실시간 → Workers, Batch → Azure
 
-| 평가 축 | Plan A (Proxy) | Plan B (전면) |
+> 외부 검토 의견 반영. Plan A의 "캐시 hit률" 관점에서 **"실시간 vs 배치"
+> SLA 관점**으로 재분류하면 결정이 더 명확하다.
+
+### 핵심 통찰
+
+> "사용자 경험에 직접 영향을 주는 **실시간 Chat API**는 반드시 Workers로.
+> 백그라운드 **배치 (timer cron)** 는 Azure에 남겨도 무방."
+
+Plan A (단순 프록시)의 한계: 캐시 hit률이 90%여도 **cache miss 10% (= persona
+분석 등 사용자가 직접 기다리는 호출)** 가 여전히 Azure cold start 750ms를
+탄다. 이게 가장 자주 사용자가 짜증나는 순간 — 새 종목을 분석 요청한 직후.
+
+### 분류 매트릭스 — 어떤 endpoint를 어디로?
+
+| Endpoint | 분류 | 위치 (Plan A+) | 이유 |
+|---|---|---|---|
+| `POST /telegram/webhook` | 실시간 | **Workers (grammY)** | 모든 사용자 진입점, cold 절대 안 됨 |
+| `POST /persona/analyze` | **실시간 Chat** | **Workers** | DeepSeek HTTP, 외부 fetch + 후처리만, TS 포팅 쉬움 |
+| `POST /persona/analyze_advanced` | **실시간 Chat** | **Workers** | 3 페르소나 병렬 fetch, gather() → Promise.all() |
+| `POST /matchup/predict` | 실시간 | **Workers** | UI 즉시 응답 필요 |
+| `POST /single_pred/predict` | 실시간 | **Workers** | 동일 |
+| `POST /predictions/create` | 실시간 | **Workers** | 동일 |
+| `POST /fortune/unlock` | 실시간 | **Workers** | 동일 |
+| `POST /profile/onboard` | 실시간 | **Workers** | 사용자 첫 진입 |
+| `GET /profile/check` | 실시간 | **Workers + KV** | 콜드스타트 회피 핵심 |
+| `GET /data/{ticker}` | 실시간 (캐시) | **Workers + KV** | 30s cache |
+| `GET /today_market` | 실시간 (캐시) | **Workers + KV** | 60s cache |
+| `GET /matchup/active` | 실시간 (캐시) | **Workers + KV** | 20s cache |
+| `GET /single_pred/active` | 실시간 (캐시) | **Workers + KV** | 20s cache |
+| `GET /fortune/today` | 실시간 (캐시) | **Workers + KV** | per-user 60s |
+| `GET /rankings/{kind}` | 실시간 (캐시) | **Workers + KV** | 5min cache |
+| `GET /predictions/mine` | 실시간 | **Workers (D1 read)** | 사용자별, 인덱스로 빠름 |
+| `GET /matchup/history` | 실시간 (캐시) | **Workers + KV** | 2min cache |
+| ─── 배치 / 무거운 작업 ─── | | | |
+| Timer `매시간 :00` 매치업 생성 | 배치 | **Azure (Cron)** | yfinance fetch + Blob 쓰기, 30초 가능 |
+| Timer `매시간 :00` 단일 생성 | 배치 | **Azure (Cron)** | 동일 |
+| Timer `30분` gauge 갱신 | 배치 | **Azure (Cron)** | yfinance N개 병렬, ~10초 |
+| Timer `5분` resolve | 배치 | **Azure (Cron)** | yfinance + point ledger 쓰기 |
+| Timer `5분` donate verify | 배치 | **Azure (Cron)** | TonAPI / TronGrid 폴링 |
+| Timer `KST 03:00` ranking rebuild | 배치 | **Azure (Cron)** | 전체 사용자 스캔, 1분+ |
+| Timer `KST 04:00` milestone payout | 배치 | **Azure (Cron)** | 30일 holding 정산 |
+| Timer `KST 06/08/12/15:30/21/23` 시황 | 배치 | **Azure (Cron)** | DeepSeek × 4국어 × 3 페르소나 = 12 LLM call |
+| Timer `4시간` prewarm 252 ticker × 600 commentary | 배치 | **Azure (Cron)** | 가장 무거운 LLM 워밍업 |
+| **Pillow brag card 생성** | 배치 | **Azure (도구상자)** | Pillow Python only, Workers 불가 |
+
+### 데이터 위치
+
+| 데이터 | 위치 | 이유 |
 |---|---|---|
-| 작업 기간 | 1주 | 3-4주 |
-| 위험도 | 낮음 (롤백 쉬움) | 중 (Python 재작성) |
-| 성능 개선 | 핵심 6 API만 95% 단축 | 모든 API 95% 단축 + WS |
-| 월 비용 | $0-3 (Azure 90% ↓) | $0-5 (Azure 폐기) |
-| 아시아 latency | 좋음 (cache hit 시) | 매우 좋음 (모든 경로) |
-| Real-time | 폴링 30s 유지 | WebSocket 즉시 |
-| 운영 복잡도 | 두 시스템 병행 | Cloudflare 단일 |
-| Python 자산 활용 | 100% 유지 | 0% (TypeScript 재작성) |
-| Brag card (Pillow) | 그대로 사용 | @vercel/og 재구현 필요 |
-| yfinance 의존 | 그대로 | Workers fetch + 캐시 재설계 |
+| 사용자 프로필 (D1 schema) | **D1** | SQL 인덱스, 빠른 lookup |
+| 핫 캐시 (profile_check, ticker price) | **KV** | edge 분산, TTL |
+| 매치업/단일 summary blob | **R2** | 큰 JSON, Workers/Azure 양쪽 read |
+| 자랑 카드 PNG | **R2 + Azure 둘 다** | 생성=Azure, 서빙=Workers→R2 미러 |
+| 로그 NDJSON | **R2** | append-only, Azure batch가 write |
+| 슬롯 시황 리포트 | **R2** | Azure가 생성, Workers가 read+cache |
 
-### 추천 경로
+### Workers ↔ Azure 통신 계약
 
-```
-[현재 Azure] ──1주──> [Plan A: Workers proxy] ──3주──> [Plan B: Cloudflare-only]
-                       성능 60% 개선                    100% 개선 + WS
-                       비용 90% 절감                    완전 무료 티어
-                       즉시 효과                        장기 운영 단순화
+```typescript
+// Workers → Azure (배치 트리거)
+POST https://func-aiinvestor-prod.azurewebsites.net/api/internal/cron/<name>
+Headers:
+  X-Internal-HMAC: <hmac-sha256(secret, body)>
+  X-Internal-Source: cf-worker
+Body: { trigger_name, kst_now, params }
 ```
 
-**1단계 (즉시 — 1주)**:
-- Cloudflare DNS + Pages + Workers proxy 셋업
-- 핵심 6 API edge cache 적용
-- Asia POP 자동 분산 효과로 일본/싱가포르 사용자 즉시 체감
+```typescript
+// Azure → R2 (write summary)
+PUT /matchup-summary/2026-05-11.json
+Authorization: Bearer <S3-compatible-creds>
+Body: <aggregated JSON>
+```
 
-**2단계 (검증 후 — 3주)**:
-- D1 schema 마이그레이션 (사용자 데이터 dual-write)
-- 가장 핫한 모듈부터 TypeScript 재작성 (fortune, prediction, matchup)
-- Telegram bot은 마지막에 (grammY로 재작성)
-- 한 모듈씩 Workers로 cutover → Azure 점진 폐기
+```typescript
+// Workers → R2 (read summary, then KV cache)
+const cached = await env.KV.get(`matchup_sum:${date}`);
+if (cached) return JSON.parse(cached);
+const obj = await env.R2.get(`matchup-summary/${date}.json`);
+const text = await obj.text();
+ctx.waitUntil(env.KV.put(`matchup_sum:${date}`, text, {expirationTtl: 60}));
+return JSON.parse(text);
+```
+
+### Plan A+ 작업 타임라인 (외부 의견 기반 정제)
+
+| Phase | 기간 | 작업 |
+|---|---|---|
+| **준비** | 3일 | persona_engine 모듈 분석 / TS 포팅 식별 / API 계약 정의 |
+| **Workers Chat API** | 1주 | TS 포팅 (persona_engine, 사주, 매치업, 단일) + DeepSeek streaming + Workers Secrets |
+| **Azure Cron 정리** | 3일 | HTTP 트리거 제거 (실시간만) → Timer만 잔류, Workers가 HMAC으로 internal cron 호출 |
+| **통합 테스트** | 3일 | dev 환경 e2e + Telegram 봇 cutover + 24h 모니터링 |
+| **합계** | **약 2.5주** | Plan A(1주) 와 Plan B(3-4주) 사이 |
+
+### Plan A+ 비교 우위
+
+| 평가 축 | Plan A (단순) | **Plan A+ 하이브리드** | Plan B (전면) |
+|---|---|---|---|
+| 사용자 체감 (실시간) | 캐시 hit만 빠름 | **모든 실시간 빠름** | 전부 빠름 |
+| 콜드스타트 영향 | persona_analyze 등 OK | **모두 회피** | 모두 회피 |
+| Pillow / yfinance 처리 | Azure 그대로 | **Azure 도구상자** | 재구현 필요 |
+| 작업 기간 | 1주 | **2.5주** | 3-4주 |
+| 운영 복잡도 | Azure full + Workers | **Azure batch + Workers main** | Cloudflare 단일 |
+| Azure 비용 절감 | 80% | **70%** (cron 유지) | 100% |
+| 향후 Plan B 전환 | 추가 작업 큼 | **점진 가능** | 종료 |
+
+### Plan A+ 위험과 완화
+
+- **Workers → Azure cron 호출 신뢰성**: HMAC + retry + idempotency key
+- **Workers/Azure cron 충돌**: Azure Timer만 사실상 신뢰원 (Workers는 트리거만)
+- **Pillow brag card 지연**: 자랑 카드는 비-실시간이므로 OK (생성 후 push 알림)
+- **D1 + Azure SQLite 동기화**: 사용자 데이터 dual-write 1주 후 D1 단독
+
+---
+
+## 4. 세 안 비교 — 어느 쪽?
+
+| 평가 축 | Plan A (Proxy) | **Plan A+ (하이브리드)** | Plan B (전면) |
+|---|---|---|---|
+| 작업 기간 | 1주 | **2.5주** | 3-4주 |
+| 위험도 | 낮음 (롤백 쉬움) | **낮음-중** (단계 가능) | 중 (Python 재작성) |
+| 실시간 API 개선 | 캐시 hit만 | **모든 실시간 5ms** | 모든 API 5ms |
+| 콜드스타트 영향 | 비-캐시 경로 잔존 | **완전 회피** | 완전 회피 |
+| Chat API 응답 (페르소나 분석) | Azure cold 750ms | **Workers 5ms + DeepSeek** | Workers 5ms |
+| 월 Azure 비용 | $3 (호출 90%↓) | **$3-5** (배치만) | $0 |
+| 월 Cloudflare 비용 | $0 | $0 | $0-5 |
+| 운영 복잡도 | 두 시스템 병행 | **두 시스템, 역할 분리 명확** | Cloudflare 단일 |
+| Pillow brag card | Azure (그대로) | **Azure 도구상자 (그대로)** | @vercel/og 재구현 필요 |
+| yfinance | Azure (그대로) | **Azure 배치 (그대로)** | Workers fetch + 캐시 재설계 |
+| Python 자산 활용 | 100% | **80% (실시간만 TS 포팅)** | 0% |
+
+### 추천 경로 — **Plan A+ 하이브리드로 직행** (외부 의견 채택)
+
+```
+[현재 Azure] ───2.5주───> [Plan A+ 하이브리드] ────[선택]────> [Plan B 전면]
+                          • 실시간 → Workers           • Pillow/yfinance도 TS
+                          • 배치 → Azure               • Azure 완전 폐기
+                          • 사용자 체감 100%↑          • $0/월
+                          • 비용 80%↓                  • 6개월~1년 후 검토
+```
+
+### 왜 Plan A보다 Plan A+가 더 나은가
+
+- Plan A는 **캐시 hit률 90%** 기준 비교지만, 캐시 miss 10%가 곧 **persona
+  analyze 등 사용자가 직접 기다리는 호출**이다. 정확히 가장 짜증나는 순간에
+  Azure cold 750ms를 탄다.
+- Plan A+는 **"실시간/배치" 분리** 기준이라 cache 여부와 무관하게 사용자
+  대기 경로는 모두 Workers (5ms + 외부 API). 사용자 체감 100% 개선.
+- Plan B 대비 작업 부담 50% — Pillow / yfinance처럼 어려운 부분은 Azure에
+  그대로 두고 점진 이전.
+
+### Plan A+ 실행 단계 (외부 검토 의견 + 본 문서 합본)
+
+**Phase 1 — 준비 (3일)**
+- [ ] persona_engine 모듈 분석 + TS 포팅 식별
+- [ ] Workers ↔ Azure HMAC 계약 정의 (`X-Internal-HMAC` 헤더)
+- [ ] D1 schema 초안 (users / predictions / matchups / matchup_predictions)
+- [ ] R2 bucket 설계 (share-cards, summary, logs)
+- [ ] KV namespace 설계 (profile_check, session, ticker_price, matchup_sum)
+
+**Phase 2 — Workers 실시간 구축 (1주)**
+- [ ] Cloudflare Pages: `static_web/` 배포 (1일)
+- [ ] Workers 프로젝트 셋업 + Secrets 등록 (DeepSeek key, Telegram token)
+- [ ] persona_engine TypeScript 포팅 (DeepSeek fetch + 4국어 + disclaimer append)
+- [ ] /telegram/webhook on Workers (grammY 사용) — Telegram 봇 진입점
+- [ ] /persona/analyze + /persona/analyze_advanced — DeepSeek streaming
+- [ ] /predict, /fortune/unlock, /matchup/predict, /single_pred/predict — 실시간 쓰기 경로
+- [ ] /profile/check, /data/ticker, /today_market 등 read 경로 + KV cache
+
+**Phase 3 — Azure 배치 정리 (3일)**
+- [ ] Azure Functions의 HTTP route 모두 제거 (Timer만 잔류)
+- [ ] Azure를 "internal cron + Pillow tool box"로 재포지셔닝
+- [ ] Workers Cron Triggers 검토 — Azure Timer를 Workers Cron으로 옮길 수 있는지
+  - 단순 cron (ranking rebuild 같은 D1만 건드리는 것) → Workers Cron 즉시 가능
+  - yfinance batch / Pillow / DeepSeek prewarm → Azure 유지
+
+**Phase 4 — 통합 테스트 & cutover (3일)**
+- [ ] dev 환경에서 Workers ↔ Azure HMAC e2e
+- [ ] DNS TTL 낮춤 (60s) → cutover
+- [ ] Telegram BotFather에서 webhook URL → Workers로 변경
+- [ ] 24h 모니터링 (Workers Analytics + Azure App Insights 병행)
+- [ ] 롤백 계획 (DNS 한 줄 변경으로 즉시 원복)
 
 ---
 
@@ -491,20 +641,79 @@ DeepSeek 4국어 모두 한 모델 — 비용 변화 없음.
 
 ---
 
-## 7. 결론
+## 7. 결론 (외부 검토 의견 통합)
 
-**즉시 시작 추천**: Plan A (1주 작업, 90% 효과). 검증 후 Plan B 단계 전환.
+### 최종 추천 — **Plan A+ 하이브리드로 직행**
 
-**Asia 확대 직전 필수**: Plan B 완료 — 한국 단일 region 의존 제거 + 무료 티어
-유지로 사용자 100배 증가에도 비용 거의 그대로.
+외부 LLM 검토 의견의 핵심 통찰 채택:
+> "사용자 경험에 직접 영향을 주는 실시간 Chat API는 반드시 Workers로,
+> 백그라운드 배치는 Azure에 남겨도 무방."
 
-**예상 ROI** (DAU 10k 가정 6개월):
-- Azure 유지: $120/년 + 한국 외 latency 손실
-- Plan A: $18/년 + Cloudflare 무료 = **85% 비용 절감**
-- Plan B: $0-60/년 (Bundled 옵션) = **95% 비용 절감 + real-time 추가**
+이 분류 기준이 Plan A의 "캐시 hit률" 기준보다 **사용자 체감 측면에서 더
+직관적이고 효과 큰** 접근이다. 캐시 miss 10%가 곧 persona 분석 등 가장
+짜증나는 순간이라는 점이 결정적.
 
-**리스크**:
-- Plan A — 거의 없음, 롤백 쉬움
-- Plan B — Pillow brag card 복잡, yfinance 대체 (그러나 Yahoo Finance Workers 호출 가능, 단지 rate-limit 관리 추가)
+### 단계 권장
 
-다음 결정: **Plan A 시작 여부**.
+| 단계 | 기간 | 결정 사항 |
+|---|---|---|
+| **A+** | **2.5주 (즉시 시작)** | 실시간 → Workers, 배치 → Azure |
+| 검증 6개월 | — | 사용자 만족도 + 비용 + Pillow 대체 가능성 |
+| **B로 전환** | 추가 2주 (선택) | Pillow → @vercel/og, yfinance → Workers fetch |
+
+### 예상 ROI (DAU 10k 6개월 기준)
+
+| 시나리오 | 인프라 비용/년 | 사용자 체감 | 운영 복잡도 |
+|---|---|---|---|
+| Azure 유지 | $120 + 한국 외 latency 손실 | 한국 OK / 아시아 부족 | 단일 |
+| Plan A (proxy) | $18 | 캐시 hit만 빠름, persona 분석 느림 | 중간 |
+| **Plan A+ (하이브리드)** | **$36–60** (Azure 배치만) | **모든 실시간 5ms, 어디서나** | **중간, 역할 분리 명확** |
+| Plan B (전면) | $0–60 | 전부 5ms + WebSocket | 단일 (Cloudflare) |
+
+### 위험 / 완화
+
+| 위험 | Plan A+에서의 완화 |
+|---|---|
+| Pillow brag card 복잡도 | Azure 도구상자로 유지 — 우회 |
+| yfinance Workers 호출 안정성 | Azure batch가 4시간마다 R2 mirror → Workers는 R2 read |
+| Workers ↔ Azure 신뢰 체인 | HMAC + retry + idempotency key (Workers Secrets) |
+| DeepSeek streaming (Workers) | Workers는 SSE 지원, fetch streaming OK |
+| D1 단일 region (현재) | 초기는 Tokyo, Asia POP read replica (beta) 활성화 |
+
+### 다음 결정 사항
+
+**Q1**: Plan A+ 즉시 시작? (2.5주 작업, 외부 의견 + 본 문서 합본 plan)
+**Q2**: 작업 우선 모듈 — persona_engine (Chat API)부터? 아니면 /profile/check (cache miss 최다)부터?
+**Q3**: D1 Tokyo region 단일 시작 vs Asia 4-region read replica 즉시 활성화?
+
+---
+
+## 8. 외부 검토 의견 — 비교 분석 (참고)
+
+본 문서 작성 후 별도 LLM의 의견을 검토했고, 두 가지 점에서 본 문서가 보완되었다:
+
+### 채택한 점
+
+1. **"실시간 vs 배치" 분류**가 "캐시 hit/miss" 분류보다 더 직관적이고
+   사용자 체감 개선 효과가 크다 — Plan A+로 정식 채택
+2. **Azure 도구상자 패턴** (Workers + Azure로 작업 위임) — Plan B의 점진
+   경로로 활용
+3. **Phase 1-4 타임라인** (3+7+3+3 = 약 2.5주) — 본 문서의 Plan B "3-4주"
+   보다 정확한 분해
+
+### 보완한 점
+
+1. **외부 의견은 Plan A+를 최종 권장**으로 종결지만, 본 문서는 **Plan B로의
+   점진 전환 경로**를 추가로 제시 — Asia 확대 시 D1 read replica + WebSocket
+   필요성 강조
+2. **외부 의견은 "Workers + Queue 기반"을 대안으로** 언급했는데, 이는 본
+   문서의 Plan B 변종에 해당 — 명시적으로 두 안 다 통합
+3. **데이터 모델 변환 (Blob → D1 SQL)** 세부는 본 문서가 더 상세 — 추후
+   재작성 시 활용
+4. **비용 시뮬레이션 (DAU 10k)** 은 본 문서가 더 정밀 — 외부 의견은 정성
+   비교만
+
+### 한 줄 합본 결론
+
+> **Plan A+ 하이브리드로 직행 (2.5주)** → 6개월 검증 후 Asia 확대 직전
+> Plan B로 전환 검토. Pillow / yfinance는 마지막까지 Azure 잔류 OK.
