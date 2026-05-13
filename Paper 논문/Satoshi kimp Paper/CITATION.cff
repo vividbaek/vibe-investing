@@ -1,0 +1,94 @@
+cff-version: 1.2.0
+message: "If you use this paper, its data, or its reproduction scripts, please cite it as below."
+preferred-citation:
+  type: report
+  title: "The Bithumb–Binance BTC-numéraire Premium: A Theoretical Framework with Calibrated Simulation Evidence on BNB Chain Tokens"
+  authors:
+    - family-names: "Kim"
+      given-names: "HoKwang"
+      name-particle: "김호광"
+      affiliation: "Betalabs Inc."
+      orcid: "https://orcid.org/0009-0002-0962-2175"
+      email: "gameworker@gmail.com"
+  abstract: >-
+    This paper redefines the price discrepancy between the Korean exchange
+    Bithumb and the global exchange Binance using a new measure of the kimchi
+    premium expressed in BTC units, denoted π^BTC_X(t), accompanied by
+    calibrated simulation evidence on daily series over 2020–2025. The
+    BTC-numéraire premium is invariant to exchange-rate and stablecoin-level
+    fluctuations by numerator–denominator cancellation (Proposition 1). A
+    normalised variance ratio ρ_X controls for token-level own volatility,
+    OLS regressions are reported with Newey–West HAC standard errors, and
+    asymmetric volatility is estimated with an EGARCH(1,1) model using
+    Student-t innovations. A cross-exchange comparison among Binance, OKX,
+    Bybit and Bithumb identifies the kimchi premium as a regulatory cost
+    rather than a market inefficiency, and KCS-detected illegal forex
+    transactions of approximately 14.2 trillion KRW (2018–2025) and 2.04
+    trillion KRW (2024–2025 partial) are reported as lower-bound indicators
+    of the policy cost. Available in Korean, English, and Chinese editions.
+  keywords:
+    - "kimchi premium"
+    - "BTC-numéraire"
+    - "satoshi premium"
+    - "BNB Chain"
+    - "capital controls"
+    - "triangular arbitrage"
+    - "limits to arbitrage"
+    - "EGARCH"
+    - "Newey-West HAC"
+    - "Bithumb"
+    - "Binance"
+    - "cryptocurrency regulation"
+    - "Korean cryptocurrency market"
+    - "Travel Rule"
+    - "VAUPA"
+    - "KoFIU"
+  year: 2026
+  month: 5
+  date-published: "2026-05-13"
+  version: "5.1"
+  url: "https://github.com/gameworkerkim/vibe-investing/tree/main/Paper%20%EB%85%BC%EB%AC%B8"
+  repository-code: "https://github.com/gameworkerkim/vibe-investing"
+  license: CC-BY-4.0
+  languages:
+    - ko
+    - en
+    - zh
+title: "The Bithumb–Binance BTC-numéraire Premium (Trilingual Edition)"
+authors:
+  - family-names: "Kim"
+    given-names: "HoKwang"
+    affiliation: "Betalabs Inc."
+    orcid: "https://orcid.org/0009-0002-0962-2175"
+    email: "gameworker@gmail.com"
+abstract: >-
+  Theoretical framework and calibrated simulation evidence for a new
+  BTC-numéraire measure of the kimchi premium, applied to BNB Chain tokens
+  (BNB, Venus/XVS) and ETH baseline on Bithumb and Binance. Includes
+  cross-exchange comparison with OKX and Bybit, and quantitative policy
+  cost analysis using Korea Customs Service detection data. Available in
+  Korean, English, and Chinese editions.
+keywords:
+  - "kimchi premium"
+  - "BTC-numéraire"
+  - "BNB Chain"
+  - "capital controls"
+  - "triangular arbitrage"
+  - "EGARCH"
+  - "Newey-West HAC"
+  - "Bithumb"
+  - "Binance"
+date-released: "2026-05-13"
+version: "5.1"
+license: CC-BY-4.0
+repository-code: "https://github.com/gameworkerkim/vibe-investing"
+url: "https://github.com/gameworkerkim/vibe-investing/tree/main/Paper%20%EB%85%BC%EB%AC%B8"
+contact:
+  - family-names: "Kim"
+    given-names: "HoKwang"
+    email: "gameworker@gmail.com"
+    orcid: "https://orcid.org/0009-0002-0962-2175"
+identifiers:
+  - type: other
+    value: "orcid:0009-0002-0962-2175"
+    description: "Author ORCID identifier"

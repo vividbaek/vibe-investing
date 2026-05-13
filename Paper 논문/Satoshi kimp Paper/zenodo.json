@@ -1,0 +1,75 @@
+{
+  "title": "The Bithumb–Binance BTC-numéraire Premium: A Theoretical Framework with Calibrated Simulation Evidence on BNB Chain Tokens (Trilingual Edition)",
+  "description": "<p>This paper redefines the price discrepancy between the Korean exchange Bithumb and the global exchange Binance using a new measure of the kimchi premium expressed in BTC units, denoted π<sup>BTC</sup><sub>X</sub>(t), accompanied by calibrated simulation evidence on daily series over 2020–2025.</p><p>The BTC-numéraire premium is invariant to exchange-rate and stablecoin-level fluctuations by numerator–denominator cancellation (Proposition 1). A normalised variance ratio ρ<sub>X</sub> controls for token-level own volatility, OLS regressions are reported with Newey–West HAC standard errors, and asymmetric volatility is estimated with an EGARCH(1,1) model using Student-t innovations. A cross-exchange comparison among Binance, OKX, Bybit and Bithumb identifies the kimchi premium as a regulatory cost rather than a market inefficiency, and KCS-detected illegal forex transactions (approximately 14.2 trillion KRW over 2018–2025, of which 2.04 trillion KRW in 2024–2025) are reported as lower-bound indicators of the policy cost.</p><p>Available in Korean (한국어), English, and Chinese (中文) editions. The release includes the full LaTeX sources, compiled PDFs, all 11 figures (English-labeled, shared across editions), 15 data CSVs, and reproduction scripts (Python + docx-js).</p>",
+  "creators": [
+    {
+      "name": "Kim, HoKwang",
+      "affiliation": "Betalabs Inc.",
+      "orcid": "0009-0002-0962-2175"
+    }
+  ],
+  "keywords": [
+    "kimchi premium",
+    "BTC-numéraire",
+    "satoshi premium",
+    "BNB Chain",
+    "capital controls",
+    "triangular arbitrage",
+    "limits to arbitrage",
+    "EGARCH",
+    "Newey-West HAC",
+    "Bithumb",
+    "Binance",
+    "Korean cryptocurrency market",
+    "Travel Rule",
+    "KoFIU",
+    "FATF Recommendation 16"
+  ],
+  "subjects": [
+    {
+      "term": "G14 General Financial Markets: Information and Market Efficiency",
+      "identifier": "https://www.aeaweb.org/jel/guide/jel.php#G14",
+      "scheme": "JEL"
+    },
+    {
+      "term": "G15 International Financial Markets",
+      "identifier": "https://www.aeaweb.org/jel/guide/jel.php#G15",
+      "scheme": "JEL"
+    },
+    {
+      "term": "F31 Foreign Exchange",
+      "identifier": "https://www.aeaweb.org/jel/guide/jel.php#F31",
+      "scheme": "JEL"
+    },
+    {
+      "term": "G18 Financial Markets: Government Policy and Regulation",
+      "identifier": "https://www.aeaweb.org/jel/guide/jel.php#G18",
+      "scheme": "JEL"
+    }
+  ],
+  "upload_type": "publication",
+  "publication_type": "workingpaper",
+  "publication_date": "2026-05-13",
+  "version": "5.1",
+  "language": "eng",
+  "access_right": "open",
+  "license": "CC-BY-4.0",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/gameworkerkim/vibe-investing",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://orcid.org/0009-0002-0962-2175",
+      "relation": "isIdenticalTo",
+      "resource_type": "other"
+    }
+  ],
+  "communities": [
+    {
+      "identifier": "fintech"
+    }
+  ],
+  "notes": "Three language editions (Korean / English / Chinese) included in the release. Empirical results are based on synthetic data calibrated to published stylized facts; precise parameter values must be re-estimated on real exchange data by follow-up empirical work."
+}

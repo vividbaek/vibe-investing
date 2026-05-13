@@ -1,0 +1,24 @@
+# Python dependencies for reproducing the paper.
+# Tested on Python 3.10+.
+#
+#   pip install -r requirements.txt
+#
+# Note: building the docx version additionally requires Node.js 18+
+# and the `docx` npm package (npm install -g docx@8).
+# Building the PDFs requires XeLaTeX with the following packages:
+#   xeCJK, amsmath, amssymb, booktabs, graphicx, hyperref, geometry,
+#   caption, float, array, xcolor, fontspec.
+
+# Core numeric and data
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+
+# Plotting
+matplotlib>=3.7
+
+# Statistics (EGARCH supplementary checks; primary EGARCH uses scipy.optimize)
+statsmodels>=0.14
+
+# Optional but recommended for development convenience
+ipython>=8.0
