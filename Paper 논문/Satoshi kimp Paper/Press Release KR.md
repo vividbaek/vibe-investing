@@ -122,9 +122,9 @@
 
 | 항목 | 내용 |
 |---|---|
-| **제목 (한)** | 바이낸스–빗썸 사이의 사토시 김프 연구: BNB 체인 토큰에 대한 이론적 프레임워크와 calibrated simulation evidence |
+| **제목 (한)** | 바이낸스–빗썸 사이의 사토시 김프 연구 - BNB 체인 토큰에 대한 보정된 시뮬레이션 증거를 포함한 이론적 프레임워크 |
 | **제목 (영)** | The Bithumb–Binance BTC-numéraire Premium: A Theoretical Framework with Calibrated Simulation Evidence on BNB Chain Tokens |
-| **저자** | 김호광 (HoKwang Kim), Betalabs Inc., Cyworld Z 전 CEO |
+| **저자** | 김호광 (HoKwang Kim), Betalabs Inc., CyworldZ 전 CEO |
 | **저자 약력** | 2017년부터 Blockchain · Web3 사업과 개발을 수행한 실무 경험자 |
 | **ORCID** | [0009-0002-0962-2175](https://orcid.org/0009-0002-0962-2175) |
 | **공개일** | 2026년 5월 13일 (Version 5.1, Trilingual Edition) |
