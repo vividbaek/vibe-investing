@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 790" font-family="'Noto Sans CJK KR', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif">
+  <!-- Definitions -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-thick" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f172a"/>
+    </marker>
+    <marker id="arrow-claude" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C97149"/>
+    </marker>
+    <marker id="arrow-gemini" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4285F4"/>
+    </marker>
+    <marker id="arrow-chatgpt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#10A37F"/>
+    </marker>
+    <marker id="arrow-deepseek" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4D6BFE"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="780" fill="#fafaf9"/>
+
+  <!-- Title bar -->
+  <text x="700" y="50" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a" letter-spacing="-0.5">
+    6.3  미래 퀀트 시스템의 함의 — Single Super-AI vs. Multi-Agent Committee
+  </text>
+  <text x="700" y="78" text-anchor="middle" font-size="14" fill="#64748b" letter-spacing="0.3">
+    "퀀트 투자의 미래는 단일 초지능 AI 가 아니다"
+  </text>
+
+  <!-- Vertical divider -->
+  <line x1="700" y1="120" x2="700" y2="720" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 6"/>
+
+  <!-- ====================================================================== -->
+  <!-- LEFT PANEL : Traditional Hypothesis                                     -->
+  <!-- ====================================================================== -->
+
+  <!-- Panel label -->
+  <rect x="50" y="120" width="160" height="32" rx="4" fill="#e2e8f0"/>
+  <text x="130" y="142" text-anchor="middle" font-size="14" font-weight="600" fill="#334155" letter-spacing="0.5">
+    [ 전통 가설 ]
+  </text>
+  <text x="225" y="142" font-size="13" fill="#64748b" font-style="italic">
+    Traditional Hypothesis
+  </text>
+
+  <!-- Investment capital box -->
+  <rect x="60" y="380" width="150" height="70" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+  <text x="135" y="410" text-anchor="middle" font-size="15" font-weight="600" fill="#0f172a">투자 자본</text>
+  <text x="135" y="432" text-anchor="middle" font-size="11" fill="#64748b">Investment Capital</text>
+
+  <!-- Arrow 1 -->
+  <line x1="215" y1="415" x2="265" y2="415" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Super-AI box -->
+  <rect x="270" y="350" width="190" height="130" rx="8" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+  <text x="365" y="395" text-anchor="middle" font-size="18" font-weight="700" fill="#7c2d12">초지능 AI</text>
+  <text x="365" y="418" text-anchor="middle" font-size="12" fill="#9a3412">Single Super-AI</text>
+  <line x1="295" y1="435" x2="435" y2="435" stroke="#fed7aa" stroke-width="1"/>
+  <text x="365" y="455" text-anchor="middle" font-size="10" fill="#9a3412" font-style="italic">monolithic model</text>
+
+  <!-- Arrow 2 -->
+  <line x1="465" y1="415" x2="515" y2="415" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Decision box -->
+  <rect x="520" y="380" width="150" height="70" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+  <text x="595" y="410" text-anchor="middle" font-size="15" font-weight="600" fill="#0f172a">결정</text>
+  <text x="595" y="432" text-anchor="middle" font-size="11" fill="#64748b">Decision</text>
+
+  <!-- Bottom caption (left) -->
+  <rect x="60" y="600" width="610" height="100" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="80" y="628" font-size="12" font-weight="700" fill="#475569" letter-spacing="0.5">전통적 가정</text>
+  <text x="80" y="654" font-size="14" fill="#1e293b">더 큰 단일 모델 → 더 나은 의사결정</text>
+  <text x="80" y="676" font-size="11" fill="#64748b" font-style="italic">"Bigger, smarter monolithic model leads to better decisions."</text>
+
+  <!-- ====================================================================== -->
+  <!-- RIGHT PANEL : Multi-Agent Committee                                     -->
+  <!-- ====================================================================== -->
+
+  <!-- Panel label -->
+  <rect x="750" y="120" width="220" height="32" rx="4" fill="#dcfce7"/>
+  <text x="860" y="142" text-anchor="middle" font-size="14" font-weight="600" fill="#166534" letter-spacing="0.5">
+    [ 본 연구가 시사하는 대안 ]
+  </text>
+  <text x="985" y="142" font-size="13" fill="#64748b" font-style="italic">
+    Multi-Agent Committee
+  </text>
+
+  <!-- Investment capital (right) -->
+  <rect x="740" y="380" width="130" height="70" rx="6" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+  <text x="805" y="410" text-anchor="middle" font-size="15" font-weight="600" fill="#0f172a">투자 자본</text>
+  <text x="805" y="432" text-anchor="middle" font-size="11" fill="#64748b">Investment Capital</text>
+
+  <!-- Fan-out hub (small node from capital to 4 LLMs) -->
+  <line x1="875" y1="415" x2="925" y2="415" stroke="#475569" stroke-width="2"/>
+  <circle cx="930" cy="415" r="5" fill="#475569"/>
+
+  <!-- Fan-out lines to each LLM -->
+  <!-- to Claude (top) -->
+  <path d="M 930 415 Q 970 415 970 220 L 1000 220" fill="none" stroke="#C97149" stroke-width="2" marker-end="url(#arrow-claude)"/>
+  <!-- to Gemini -->
+  <path d="M 930 415 Q 970 415 970 305 L 1000 305" fill="none" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow-gemini)"/>
+  <!-- to ChatGPT -->
+  <path d="M 930 415 Q 970 415 970 390 L 1000 390" fill="none" stroke="#10A37F" stroke-width="2" marker-end="url(#arrow-chatgpt)"/>
+  <!-- to DeepSeek -->
+  <path d="M 930 415 Q 970 415 970 475 L 1000 475" fill="none" stroke="#4D6BFE" stroke-width="2" marker-end="url(#arrow-deepseek)"/>
+
+  <!-- Claude box -->
+  <rect x="1005" y="190" width="200" height="60" rx="6" fill="#ffffff" stroke="#C97149" stroke-width="2"/>
+  <text x="1020" y="215" font-size="15" font-weight="700" fill="#C97149">Claude</text>
+  <text x="1020" y="236" font-size="12" fill="#475569">Risk PM</text>
+  <text x="1195" y="236" text-anchor="end" font-size="10" fill="#94a3b8" font-style="italic">규율 기반 분산</text>
+
+  <!-- Gemini box -->
+  <rect x="1005" y="275" width="200" height="60" rx="6" fill="#ffffff" stroke="#4285F4" stroke-width="2"/>
+  <text x="1020" y="300" font-size="15" font-weight="700" fill="#4285F4">Gemini</text>
+  <text x="1020" y="321" font-size="12" fill="#475569">Risk Officer</text>
+  <text x="1195" y="321" text-anchor="end" font-size="10" fill="#94a3b8" font-style="italic">Tail-risk 보수</text>
+
+  <!-- ChatGPT box -->
+  <rect x="1005" y="360" width="200" height="60" rx="6" fill="#ffffff" stroke="#10A37F" stroke-width="2"/>
+  <text x="1020" y="385" font-size="15" font-weight="700" fill="#10A37F">ChatGPT</text>
+  <text x="1020" y="406" font-size="12" fill="#475569">Quant Strategist</text>
+  <text x="1195" y="406" text-anchor="end" font-size="10" fill="#94a3b8" font-style="italic">체계화 · 백테스트</text>
+
+  <!-- DeepSeek box -->
+  <rect x="1005" y="445" width="200" height="60" rx="6" fill="#ffffff" stroke="#4D6BFE" stroke-width="2"/>
+  <text x="1020" y="470" font-size="15" font-weight="700" fill="#4D6BFE">DeepSeek</text>
+  <text x="1020" y="491" font-size="12" fill="#475569">Alpha Hunter</text>
+  <text x="1195" y="491" text-anchor="end" font-size="10" fill="#94a3b8" font-style="italic">Alpha 추구</text>
+
+  <!-- Converging lines from 4 LLMs to Voting -->
+  <path d="M 1205 220 Q 1255 220 1255 415 L 1265 415" fill="none" stroke="#C97149" stroke-width="1.6" opacity="0.85"/>
+  <path d="M 1205 305 Q 1255 305 1255 415 L 1265 415" fill="none" stroke="#4285F4" stroke-width="1.6" opacity="0.85"/>
+  <path d="M 1205 390 Q 1255 390 1255 415 L 1265 415" fill="none" stroke="#10A37F" stroke-width="1.6" opacity="0.85"/>
+  <path d="M 1205 475 Q 1255 475 1255 415 L 1265 415" fill="none" stroke="#4D6BFE" stroke-width="1.6" opacity="0.85"/>
+  <circle cx="1265" cy="415" r="5" fill="#0f172a"/>
+
+  <!-- Voting node -->
+  <rect x="1275" y="385" width="100" height="60" rx="30" fill="#0f172a"/>
+  <text x="1325" y="410" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">Voting</text>
+  <text x="1325" y="430" text-anchor="middle" font-size="10" fill="#cbd5e1">Ensemble</text>
+
+  <!-- Bottom caption (right) -->
+  <rect x="740" y="600" width="640" height="100" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="760" y="628" font-size="12" font-weight="700" fill="#166534" letter-spacing="0.5">본 연구가 시사하는 대안</text>
+  <text x="760" y="654" font-size="14" fill="#1e293b">서로 다른 투자 철학을 가진 Multi-Agent Committee → 단일 모델보다 robust 한 의사결정</text>
+  <text x="760" y="676" font-size="11" fill="#64748b" font-style="italic">"A committee of LLMs with divergent investment philosophies yields more robust decisions</text>
+  <text x="760" y="690" font-size="11" fill="#64748b" font-style="italic">than any single model."</text>
+
+  <!-- Footer attribution -->
+  <text x="700" y="765" text-anchor="middle" font-size="11" fill="#94a3b8">
+    ARDS — Adaptive Recession-Defensive Strategy  |  4-LLM Cross-Validation Study  |  Dennis Kim · Betalabs Inc. · 2026-05-18
+  </text>
+</svg>
