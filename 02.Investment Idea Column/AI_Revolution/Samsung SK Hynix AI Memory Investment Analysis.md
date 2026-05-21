@@ -90,6 +90,15 @@ For investors, the question is not whether memory is important to AI—that is n
 
 ## About the Author
 
-**Kim (Gameworker)** is a quantitative analyst and AI researcher specializing in the convergence of artificial intelligence and global financial markets. He runs the Vibe Investing repository, where he publishes deep-dive investment columns and develops AI-driven trading systems. His work focuses on turning macroeconomic narratives and AI-driven signals into actionable market insights.
+# Dennis Kim
 
-Connect on LinkedIn: [https://www.linkedin.com/in/gameworkerkim](https://www.linkedin.com/in/gameworkerkim)
+**Dennis Kim** is a quantitative analyst and AI researcher operating at the convergence of artificial intelligence and global financial markets. Over a two-decade career, he has moved fluidly between roles few people combine in one résumé: software engineer, security expert, technology executive, and published columnist.
+
+He served as **CEO of Cyworld** (CyworldZ), steering one of Korea's most iconic social platforms, and built his foundation as a hands-on **programmer** with deep roots in the game security industry. Microsoft recognized his technical leadership with the **Azure MVP** award for nine consecutive years (**2015–2023**), and he remains an active **cyber threat intelligence and security expert**, publishing multilingual threat research read across the industry.
+
+As a **columnist**, Dennis writes for both technical and general audiences, translating complex macroeconomic narratives and AI-driven signals into clear, actionable insight. Today, much of that work lives in his **Vibe Investing** repository, where he publishes deep-dive investment columns and develops AI-driven trading systems—turning the noise of markets and machine learning into a coherent investment edge.
+
+His current focus sits squarely on the future he's spent his career preparing for: **the fusion of AI and financial markets**, where engineering rigor, security discipline, and market intuition meet.
+
+Connect on LinkedIn: testcode
+Repo: https://github.com/gameworkerkim/vibe-investing/tree/main/02.Investment%20Idea%20Column/AI_Revolution
