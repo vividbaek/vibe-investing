@@ -1,1 +1,43 @@
+# 스타트업 주식 베스팅의 구조와 역베스팅의 이해
 
+> 스타트업이 한정된 자금으로 인재를 모으기 위해 스톡옵션과 베스팅(vesting) 조항을 두는 이유, 그리고 창업자·핵심 인력에게 적용되는 역베스팅(reverse vesting)의 작동 원리를 해설하는 칼럼. 목표 기간을 채우지 못한 사람에게서 미성숙(unvested) 주식을 액면가로 환수하는 것이 왜 계약의 본질이며 부당한 헐값 매각이 아닌지를 설명하고, 동시에 베스팅 구조가 모든 법적 쟁점에서 자유로운 만능 장치는 아니라는 한계(세법 우선, 매수 주체, 공직·이해충돌 맥락)까지 균형 있게 다룬다.
+
+본 칼럼은 일반적인 스타트업 보상 구조에 대한 해설이며, 특정 개인이나 사건에 대한 법률 자문이 아니다. 핵심 주장: (1) 신규 인재 모집 시 스톡옵션에 베스팅 조항을 두는 것은 표준 관행이다. (2) 미성숙 주식의 액면가 환수는 처음부터 당사자가 동의한 게임의 규칙이다. (3) 다만 세법·회사법·공직 윤리 맥락에서는 별도의 엄격한 검토가 필요하다.
+
+## 주요 섹션 (Core Sections)
+
+- [왜 스타트업은 주식을 '나눠서, 조건을 걸어' 주는가](스타트업_베스팅과_역베스팅_칼럼.md): 자금 부족이라는 스타트업의 근본 제약과, 현금 대신 지분으로 보상하는 구조. '먹튀' 방지를 위한 Restricted Stock의 역할.
+- [베스팅(Vesting)과 클리프(Cliff)](스타트업_베스팅과_역베스팅_칼럼.md): 소유권을 즉시 부여하지 않고 기간에 걸쳐 확정하는 베스팅 개념, 최소 재직 기간인 클리프, 한국 상법상 2년 최소 재직 강행규정.
+- [역베스팅(Reverse Vesting)](스타트업_베스팅과_역베스팅_칼럼.md): 창업자에게 적용되는 거울 구조. 주식을 먼저 부여하되 미성숙분에 회사의 재매입권을 거는 방식. 미성숙 주식 액면가 환수의 정당성.
+- [스타트업의 기본 생리](스타트업_베스팅과_역베스팅_칼럼.md): '주고-묶고-돌려받는' 사이클이 인재 확보와 잔여 구성원·투자자 지분 보호의 핵심 메커니즘인 이유.
+- [한계 — 베스팅은 만능이 아니다](스타트업_베스팅과_역베스팅_칼럼.md): 세법은 사적 계약에 우선한다(증여세·양도세, 83(b) election), 매수 주체가 대표 개인일 때의 자기거래·충실의무 쟁점, 공직·이해충돌 맥락의 엄격한 잣대.
+
+## 핵심 개념 (Key Concepts)
+
+- 스톡옵션(Stock Option): 미래의 정해진 가격으로 자사 주식을 매수할 수 있는 권리.
+- 베스팅(Vesting): 부여 결의 수량을 여러 행사 기간으로 나눠 점진적으로 권리를 확정.
+- 클리프(Cliff): 최초 권리 행사가 가능해지는 최소 재직 기간(한국 상법상 최소 2년).
+- 역베스팅(Reverse Vesting): 창업자에게 주식을 먼저 부여하되 미성숙분에 회사 재매입권을 거는 구조.
+- 미성숙(Unvested) 주식: 조건 미충족 상태의 불완전 소유권. 시장가와 직접 비교 대상이 아님.
+- Restricted Stock / 83(b) election: 제한주식과 부여 시점 과세 선택 제도(미국).
+
+## 참고 자료 (References)
+
+- [헬프미 — 스타트업 CEO를 위한 스톡옵션 기초 가이드](https://www.help-me.kr/blog/article/%EC%8A%A4%ED%83%80%ED%8A%B8%EC%97%85%EC%9D%84_%EC%9C%84%ED%95%9C_%EC%8A%A4%ED%86%A1%EC%98%B5%EC%85%98_%EA%B8%B0%EC%B4%88%EA%B0%80%EC%9D%B4%EB%93%9C/)
+- [ZUZU — 스톡옵션 베스팅 가이드](https://zuzu.network/resource/guide/vesting/)
+- [ZUZU — 스타트업 스톡옵션 협상 시 고려할 point](https://zuzu.network/resource/blog/checkpoint-when-you-get-stockoption/)
+- [매쉬업벤처스 — 스톡옵션 설계 가이드와 계약서 샘플](https://www.mashupventures.co/contents/stock-option-practical-guide-and-template)
+- [더올로그 — 주식매수선택권 부여계약서 주요 조항](https://www.talaw.co.kr)
+- [법률사무소 화음 — 스톡옵션의 모든 것](https://library.cello.bz/article/131-all-about-stock-option)
+- [벤처스퀘어 — 조건부 불완전 주식부여(Vesting)](https://www.venturesquare.net/831513)
+- [벤처스퀘어 — 미국 진출 스타트업 법률 가이드: 스톡옵션이란](https://www.venturesquare.net/720847)
+- [벤처스퀘어 — Vesting Acceleration(베스팅 가속화)](https://www.venturesquare.net/852041)
+- [The Startup Bible — 스톡옵션 개론 (Cliff / Reverse vesting)](https://www.thestartupbible.com/2014/10/stock-option-101.html)
+- [창업자 주식과 베스팅 (83(b) election 포함)](https://brunch.co.kr/@attorneysung/272)
+- [Law Insider — Reverse Vesting Clause Samples (영문 표준 조항)](https://www.lawinsider.com/clause/reverse-vesting)
+
+## Optional
+
+- 면책: 본 칼럼은 일반적인 스타트업 보상 구조 해설이며 법률 자문이 아니다. 개별 거래의 법적·세무적 평가는 구체적 사실관계와 전문가 검토가 필요하다.
+- 저자: Dennis Kim (HoKwang Kim)
+- 형식: 의견 칼럼 (opinion column)
