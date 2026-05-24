@@ -154,7 +154,7 @@ Each strategy is for research and education only and is not investment advice. B
 
 ## Author
 
-Dennis Kim (HoKwang Kim / 김호광) — CEO of Betalabs Inc., Microsoft Azure MVP, former CEO of Cyworld Z
+Dennis Kim (HoKwang Kim / 김호광) — CEO of Betalabs Inc., Microsoft Azure ex-MVP, former CEO of CyworldZ
 
 - ORCID: [0009-0002-0962-2175](https://orcid.org/0009-0002-0962-2175)
 - GitHub: [@gameworkerkim](https://github.com/gameworkerkim)
