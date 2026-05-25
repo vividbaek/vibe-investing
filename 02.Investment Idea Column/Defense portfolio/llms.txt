@@ -1,6 +1,6 @@
 # US Defense & AI National Security ETF Portfolio
 
-> A structured investment portfolio covering US traditional defense primes and next-generation defense-AI companies, built around the thesis of a global rearmament supercycle. Prepared by Betalabs / vibe-investing, as of 2026-05-25. Informational only — not investment advice. Available in Korean and English.
+> A structured investment portfolio covering US traditional defense primes and next-generation defense-AI companies, built around the thesis of a global rearmament supercycle. Part of the Investment Idea Column series in the vibe-investing repository, as of 2026-05-25. Informational only — not investment advice. Available in Korean and English.
 
 This document analyzes the structural investment opportunity created by record-high global defense spending (projected >$3T in 2026, $3.7T by 2030) driven by the Ukraine war, the Iran–Israel conflict, German and Japanese rearmament, and NATO's 5%-of-GDP commitment. It recommends a barbell strategy combining traditional defense primes with defense-AI growth names, accessed efficiently through ETFs. All return and dividend figures are estimates as of May 2026 and vary by source.
 
@@ -44,6 +44,7 @@ This document analyzes the structural investment opportunity created by record-h
 - [English version (Markdown)]: defense_etf_portfolio_en.md — full English report.
 - [PDF]: defense_etf_portfolio.pdf — formatted two-page report with tables and color hierarchy.
 - [DOCX]: defense_etf_portfolio.docx — editable Word source document.
+- [Investment Idea Column]: https://github.com/gameworkerkim/vibe-investing/tree/main/02.Investment%20Idea%20Column — the column series this piece belongs to.
 
 ## Optional
 

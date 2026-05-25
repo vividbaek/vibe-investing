@@ -2,7 +2,7 @@
 
 > From Pax Americana to an Era of Global Rearmament — A Geopolitical Paradigm Shift and Structural Investment Opportunity
 
-**As of:** May 25, 2026 | **Source:** Betalabs / vibe-investing
+**As of:** May 25, 2026 | **Source:** vibe-investing — Investment Idea Column
 **Disclaimer:** This document is for informational purposes only and is not investment advice.
 
 ---
@@ -89,3 +89,8 @@ Given individual-stock volatility and the access constraints on private companie
 ## Disclaimer
 
 This document is prepared for informational purposes only and is not a solicitation to buy or sell any specific security, nor is it investment advice. All return and dividend figures are estimates based on publicly available data as of May 2026, vary by source, and past performance does not guarantee future results. Before making any investment decision, always verify the latest data directly and consult a qualified investment professional as needed.
+
+---
+
+> This piece is part of the **Investment Idea Column** series in the vibe-investing repository.
+> 📂 https://github.com/gameworkerkim/vibe-investing/tree/main/02.Investment%20Idea%20Column
