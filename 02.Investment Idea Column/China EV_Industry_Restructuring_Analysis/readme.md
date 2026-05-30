@@ -13,7 +13,7 @@ Part of the [vibe-investing](https://github.com/gameworkerkim/vibe-investing) re
 
 | Language | Markdown | Word (DOCX) | PDF |
 |---|---|---|---|
-| 한국어 (Korean, original) | [KO Markdown](./China_EV_Industry_Restructuring_Analysis_DennisKim_2026_KO.md) | [DOCX](./China_EV_Industry_Restructuring_Analysis_DennisKim_2026.docx) | [PDF](./China_EV_Industry_Restructuring_Analysis_DennisKim_2026.pdf) |
+| 한국어 (Korean, original) | [KO Markdown](./China_EV_Industry_Restructuring_Analysis_DennisKim_2026_KO.md) | [DOCX](./China_EV_Industry_Restructuring_Analysis_DennisKim_2026.docx) | [PDF](./02.Investment Idea Column/China EV_Industry_Restructuring_Analysis/China EV_Industry_Restructuring_Analysis_DennisKim_2026.pdf) |
 | English (translation) | [EN Markdown](./China_EV_Industry_Restructuring_Analysis_DennisKim_2026_EN.md) | — | — |
 
 The PDF and DOCX are the Korean-language source documents (27 pages). The English Markdown is a full translation of the same content.
