@@ -1,0 +1,5 @@
+strategy,CAGR,AnnVol,Sharpe,MaxDD,HitRate,t_HAC,boot_p_sharpe,InfoRatio_vs_BH,Trades,Days,Verdict
+LeadLag_LongShort,1.1228,0.1708,4.497,-0.0557,0.43,7.204,0.0,3.078,,755,유의미 (edge likely real)
+LeadLag_LongFlat,0.3342,0.1171,2.522,-0.0735,0.3698,4.074,0.0,2.244,,755,유의미 (edge likely real)
+BuyHold_Hynix,-0.291,0.2932,-1.026,-0.7487,0.4675,-1.571,0.95,,,755,무의미 (no evidence)
+MeanReversion_pair,-0.0596,0.1881,-0.233,-0.3487,0.4695,-0.463,0.712,,16,755,무의미 (no evidence)
