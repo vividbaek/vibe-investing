@@ -3,7 +3,8 @@
 > 마이크론(MU)과 SK하이닉스(000660.KS)의 통계적 관계를 계산해 **리드-래그 모멘텀**과
 > **스프레드 평균회귀** 신호를 산출하고, 거래비용을 반영한 백테스트 로그를 CSV로 남기며,
 > 두 신호의 가치를 통계적으로 판정하는 퀀트 도구.
-> *LLM은 엑셀이지 오라클이 아니다* — 신호도 판정도 추정이 아니라 계산 결과다.
+> 
+> *LLM은 내 인사이트를 보여주는 엑셀이지 오라클이 아니다* — 신호도 판정도 추정이 아니라 계산 결과다.
 
 ![python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![data](https://img.shields.io/badge/data-yfinance-orange)
@@ -20,7 +21,7 @@
 
 | 경로 | 설명 |
 |---|---|
-| `Column mu hynix leadlag.md` | 가설 칼럼: MU가 하이닉스를 하루 선행하는가 |
+| `Column mu hynix leadlag.md` | 가설 칼럼: MU가 하이닉스를 하루 선행하는가? |
 | `quant_prompt.md` | LLM에 직접 넣는 분석 프롬프트(계산 강제형, 5단계) |
 | `script/` | `mu_hynix_pairs_full.py` 풀버전: 거래비용 + CSV 로그 3종 + 통계적 유의성 판정 |
 | `data/` | 입력/참고 데이터 |
@@ -332,4 +333,4 @@ python script/mu_hynix_pairs_full.py --mock --mock-no-leadlag --outdir result_nu
 ---
 
 *Part of [`vibe-investing`](https://github.com/gameworkerkim/vibe-investing) ·
-maintained by HoKwang Kim (Dennis)*
+maintained by Dennis Kim*
