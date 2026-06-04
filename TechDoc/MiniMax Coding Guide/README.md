@@ -8,8 +8,8 @@ A practical guide to using **MiniMax** as an AI coding assistant — VS Code int
 
 | 언어 / Language | 파일 / File |
 |---|---|
-| 🇰🇷 한국어 | [`minimax-coding-guide.ko.md`](minimax-coding-guide.ko.md) |
-| 🇺🇸 English | [`minimax-coding-guide.en.md`](minimax-coding-guide.en.md) |
+| 한국어 | [`minimax-coding-guide.ko.md`](minimax-coding-guide.ko.md) |
+| English | [`minimax-coding-guide.en.md`](minimax-coding-guide.en.md) |
 
 ### 2. Visual Studio C# LLM Guide (검증판 + DeepSeek·멀티 LLM / verified + DeepSeek & multi-LLM)
 
@@ -18,8 +18,8 @@ Recommendations for C# coding AI assistants in Visual Studio + how to wire DeepS
 
 | 언어 / Language | 파일 / File |
 |---|---|
-| 🇰🇷 한국어 | [`visual-studio-csharp-llm-guide.ko.md`](visual-studio-csharp-llm-guide.ko.md) |
-| 🇺🇸 English | [`visual-studio-csharp-llm-guide.en.md`](visual-studio-csharp-llm-guide.en.md) |
+| 한국어 | [`visual-studio-csharp-llm-guide.ko.md`](visual-studio-csharp-llm-guide.ko.md) |
+| English | [`visual-studio-csharp-llm-guide.en.md`](visual-studio-csharp-llm-guide.en.md) |
 
 - **버전 / Version**: 1.1
 - **기준일 / As of**: 2026-06-02
