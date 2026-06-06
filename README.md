@@ -7,7 +7,7 @@ AI를 엑셀과 같은 도구로 보고, 시장의 소음에서 신호를 가려
 미국 나스닥·S&P500, 가상화폐, 명품 섹터, 크립토-주식 상관관계를 리서치하며 파과적 혁신 산업에서 알파 수익을 추구하고 있습니다.
 
 이 레포는 Dennis 저의 산만한 성격처럼 일본의 만물상 돈키호테와 같이 산만한 가운데서 보석이 있습니다. 
-매주 readme 업데이트는 가능성이 낮으며 랜덤 주기로 업데이트됩니다.
+readme 실시간 업데이트는 가능성이 낮으며 랜덤 주기로 업데이트됩니다.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Made with](https://img.shields.io/badge/Made%20with-Claude%20%2B%20Python-blue)](https://github.com/gameworkerkim/vibe-investing/blob/main)
@@ -19,7 +19,7 @@ AI를 엑셀과 같은 도구로 보고, 시장의 소음에서 신호를 가려
 
 ---
 
-## NEW · 이번에 터진 콘텐츠 — Toss × AMQS 퀀트 대시보드
+## NEW · 핫해핫해 콘텐츠 — Toss × AMQS 퀀트 대시보드
 
 > 토스증권 **Open API** 로 한국인이 실제로 사고·검색하는 국내 주식·ETF에 **Adaptive Momentum Quant Strategy (AMQS)** 룰을 *기계적으로* 적용해 **매수 / 보유 / 매도** 를 한 화면에서 판정하는 풀스택 대시보드입니다. 미국 백테스트로 검증한 모멘텀 전략을 처음으로 **한국 시장에 이식**하고, 그 결과를 정직하게 공개합니다.
 
