@@ -3065,6 +3065,60 @@ async def vibe_market_snapshot_timer(timer: func.TimerRequest) -> None:
             pass
 
 
+# DeepSeek 시장 요약 — 시장 시작 (UTC 13:30 = NYSE 09:30 EST) 평일
+@app.timer_trigger(
+    schedule="0 30 13 * * 1-5",
+    arg_name="timer",
+    run_on_startup=False,
+    use_monitor=True,
+)
+async def vibe_market_summary_open_timer(timer: func.TimerRequest) -> None:
+    await _bootstrap()
+    if not _config:
+        return
+    from services.vibe.admin_stats import record_cron_run
+    from services.vibe.market_summary import refresh_market_summary
+    try:
+        result = await refresh_market_summary(_config, kind="open")
+        logger.info("vibe_market_summary_open %s", result)
+        await record_cron_run(_config.storage_account_name,
+                              "market_summary_open", result)
+    except Exception as exc:
+        logger.exception("vibe_market_summary_open_timer failed")
+        try:
+            await record_cron_run(_config.storage_account_name,
+                                  "market_summary_open", {"error": str(exc)[:200]})
+        except Exception:
+            pass
+
+
+# DeepSeek 시장 요약 — 시장 마감 (UTC 21:00 = NYSE 16:00 EST) 평일
+@app.timer_trigger(
+    schedule="0 0 21 * * 1-5",
+    arg_name="timer",
+    run_on_startup=False,
+    use_monitor=True,
+)
+async def vibe_market_summary_close_timer(timer: func.TimerRequest) -> None:
+    await _bootstrap()
+    if not _config:
+        return
+    from services.vibe.admin_stats import record_cron_run
+    from services.vibe.market_summary import refresh_market_summary
+    try:
+        result = await refresh_market_summary(_config, kind="close")
+        logger.info("vibe_market_summary_close %s", result)
+        await record_cron_run(_config.storage_account_name,
+                              "market_summary_close", result)
+    except Exception as exc:
+        logger.exception("vibe_market_summary_close_timer failed")
+        try:
+            await record_cron_run(_config.storage_account_name,
+                                  "market_summary_close", {"error": str(exc)[:200]})
+        except Exception:
+            pass
+
+
 # 일1회 시그널 산출 — UTC 21:30 (평일 미장 마감 직후 = KST 06:30 토)
 # ARDS-X + AMQS 를 순차 실행, signals/latest.json 으로 결합.
 @app.timer_trigger(
@@ -3133,13 +3187,17 @@ async def vibe_dashboard(req: func.HttpRequest) -> func.HttpResponse:
         return _vibe_options()
     await _bootstrap()
     if not _config or not _config.storage_account_name:
-        return _vibe_json_response({"data": None, "stale": True})
+        return _vibe_json_response({"data": None, "updated_at": None, "stale": True})
     from services.vibe.admin_stats import record_endpoint_hit
     from services.vibe.api_cache import cached_blob_read
     record_endpoint_hit("dashboard")
     data = await cached_blob_read(_config.storage_account_name,
                                   "signals/latest.json", ttl_s=60.0)
-    return _vibe_json_response({"data": data, "stale": data is None}, max_age=60)
+    updated_at = (data or {}).get("as_of") if isinstance(data, dict) else None
+    return _vibe_json_response(
+        {"data": data, "updated_at": updated_at, "stale": data is None},
+        max_age=60,
+    )
 
 
 @app.route(route="vibe/market", auth_level=func.AuthLevel.ANONYMOUS,
@@ -3150,12 +3208,16 @@ async def vibe_market(req: func.HttpRequest) -> func.HttpResponse:
         return _vibe_options()
     await _bootstrap()
     if not _config or not _config.storage_account_name:
-        return _vibe_json_response({"data": None, "stale": True})
+        return _vibe_json_response({"data": None, "updated_at": None, "stale": True})
     from services.vibe.admin_stats import record_endpoint_hit
     from services.vibe.market_snapshot import get_cached_market
     record_endpoint_hit("market")
     data = await get_cached_market(_config.storage_account_name)
-    return _vibe_json_response({"data": data, "stale": data is None}, max_age=120)
+    updated_at = (data or {}).get("ts") if isinstance(data, dict) else None
+    return _vibe_json_response(
+        {"data": data, "updated_at": updated_at, "stale": data is None},
+        max_age=120,
+    )
 
 
 @app.route(route="vibe/movers", auth_level=func.AuthLevel.ANONYMOUS,
@@ -3172,11 +3234,13 @@ async def vibe_movers(req: func.HttpRequest) -> func.HttpResponse:
     record_endpoint_hit("movers")
     snap = await get_cached_market(_config.storage_account_name)
     if not snap:
-        return _vibe_json_response({"data": None, "stale": True}, max_age=120)
-    payload = {"ts": snap.get("ts"),
+        return _vibe_json_response({"data": None, "updated_at": None, "stale": True}, max_age=120)
+    ts = snap.get("ts")
+    payload = {"ts": ts,
                "gainers": snap.get("movers", {}).get("gainers", []),
                "losers": snap.get("movers", {}).get("losers", [])}
-    return _vibe_json_response({"data": payload, "stale": False}, max_age=300)
+    return _vibe_json_response(
+        {"data": payload, "updated_at": ts, "stale": False}, max_age=300)
 
 
 @app.route(route="vibe/news", auth_level=func.AuthLevel.ANONYMOUS,
@@ -3195,17 +3259,23 @@ async def vibe_news(req: func.HttpRequest) -> func.HttpResponse:
     from services.vibe.admin_stats import record_endpoint_hit
     from services.vibe.api_cache import cached_blob_read
     record_endpoint_hit("news")
-    payload = await cached_blob_read(_config.storage_account_name,
-                                     "news/summary-latest.json", ttl_s=300.0)
-    if not payload:
-        return _vibe_json_response({"data": {"items": [], "market_summary": ""},
-                                     "stale": True}, max_age=300)
-    items = (payload.get("items") or [])[:limit]
+
+    # news_service 가 ingest 로 푸시한 items (없으면 빈 리스트)
+    news_payload = await cached_blob_read(
+        _config.storage_account_name, "news/summary-latest.json", ttl_s=300.0)
+    items = ((news_payload or {}).get("items") or [])[:limit]
+
+    # DeepSeek 시장요약 (cron 이 시장 시작·마감에 2회 갱신, market-summary/latest.json)
+    summary_blob = await cached_blob_read(
+        _config.storage_account_name, "market-summary/latest.json", ttl_s=600.0)
+    summary_ko = (summary_blob or {}).get("summary_ko", "").strip()
+    market_summary = {"summary_ko": summary_ko} if summary_ko else None
+
+    ts = (summary_blob or {}).get("ts") or (news_payload or {}).get("ts")
     return _vibe_json_response(
-        {"data": {"items": items,
-                  "market_summary": payload.get("market_summary", ""),
-                  "ts": payload.get("ts")},
-         "stale": False},
+        {"data": {"items": items, "market_summary": market_summary, "ts": ts},
+         "updated_at": ts,
+         "stale": not (items or summary_ko)},
         max_age=300,
     )
 
@@ -3224,7 +3294,12 @@ async def vibe_rankings(req: func.HttpRequest) -> func.HttpResponse:
     record_endpoint_hit("rankings")
     data = await cached_blob_read(_config.storage_account_name,
                                   "rankings/latest.json", ttl_s=300.0)
-    return _vibe_json_response({"data": data, "stale": data is None}, max_age=300)
+    # 빈 데이터일 때도 {top: []} 셰이프 유지 (프론트가 .top 참조)
+    payload = data if data else {"top": []}
+    updated_at = (data or {}).get("ts") if isinstance(data, dict) else None
+    return _vibe_json_response(
+        {"data": payload, "updated_at": updated_at, "stale": data is None},
+        max_age=300)
 
 
 @app.route(route="vibe/health", auth_level=func.AuthLevel.ANONYMOUS,
@@ -3313,7 +3388,10 @@ async def vibe_search(req: func.HttpRequest) -> func.HttpResponse:
         _config.user_id_salt,
     ))
 
-    return _vibe_nostore_response(200, {"ticker": ticker, "signals": rows})
+    return _vibe_nostore_response(200, {
+        "data": {"ticker": ticker, "signals": rows},
+        "updated_at": (signals or {}).get("as_of") if isinstance(signals, dict) else None,
+    })
 
 
 @app.route(route="vibe/admin/stats", auth_level=func.AuthLevel.ANONYMOUS,
@@ -3369,6 +3447,18 @@ async def vibe_admin_refresh(req: func.HttpRequest) -> func.HttpResponse:
             logger.exception("vibe_admin_refresh: market failed")
             out["results"]["market"] = {"error": str(exc)[:200]}
 
+    if what in ("summary", "all"):
+        from services.vibe.admin_stats import record_cron_run
+        from services.vibe.market_summary import refresh_market_summary
+        try:
+            r = await refresh_market_summary(_config, kind="auto")
+            await record_cron_run(_config.storage_account_name,
+                                  "market_summary_manual", r)
+            out["results"]["summary"] = r
+        except Exception as exc:
+            logger.exception("vibe_admin_refresh: summary failed")
+            out["results"]["summary"] = {"error": str(exc)[:200]}
+
     if what in ("signals", "all"):
         from services.vibe.admin_stats import record_cron_run
         from services.vibe.runner import build_combined_signals
@@ -3410,7 +3500,7 @@ async def vibe_track(req: func.HttpRequest) -> func.HttpResponse:
     counts = await record_visit(
         _config.storage_account_name, ip, ua, _config.user_id_salt,
     )
-    return _vibe_nostore_response(200, counts)
+    return _vibe_nostore_response(200, {"data": counts, "updated_at": None})
 
 
 # ---------------------------------------------------------------------

@@ -611,6 +611,7 @@ async function loadVibeStats() {
       signals: ${a.signals_ts ? `<code>${a.signals_ts}</code>` : "—"}
        · market: ${a.market_ts ? `<code>${a.market_ts}</code>` : "—"}
        · news: ${a.news_ts ? `<code>${a.news_ts}</code> (${a.news_items}건)` : "—"}
+       · AI 요약: ${a.market_summary_ts ? `<code>${a.market_summary_ts}</code> (${a.market_summary_kind || "?"})` : "—"}
        · ARDS complex rows: ${a.signals_size || 0}`;
   } catch (e) {
     summaryEl.textContent = "통계 로드 실패: " + e;

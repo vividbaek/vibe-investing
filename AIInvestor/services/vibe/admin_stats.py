@@ -72,6 +72,8 @@ async def build_admin_stats(account_name: str) -> dict[str, Any]:
         account_name, "market/latest.json", default=None)
     news = await blob_state.load_json(
         account_name, "news/summary-latest.json", default=None)
+    summary = await blob_state.load_json(
+        account_name, "market-summary/latest.json", default=None)
 
     return {
         "as_of": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -82,6 +84,8 @@ async def build_admin_stats(account_name: str) -> dict[str, Any]:
             "signals_ts": (signals or {}).get("as_of") if signals else None,
             "market_ts": (market or {}).get("ts") if market else None,
             "news_ts": (news or {}).get("ts") if news else None,
+            "market_summary_ts": (summary or {}).get("ts") if summary else None,
+            "market_summary_kind": (summary or {}).get("kind") if summary else None,
             "signals_size": len(((signals or {}).get("ards") or {}).get("complex") or []) if signals else 0,
             "news_items": len((news or {}).get("items") or []) if news else 0,
         },
