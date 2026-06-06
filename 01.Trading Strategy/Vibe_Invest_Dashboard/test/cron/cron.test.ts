@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
-import { parseYahooChart } from "../../cron-worker/src/providers/yahoo";
+import { parseYahooChart, parseQuoteFromChart, parseScreener } from "../../cron-worker/src/providers/yahoo";
+import { buildMarketSnapshot } from "../../cron-worker/src/market";
 import { parseFredCsv } from "../../cron-worker/src/providers/fred";
 import { computeSignals } from "../../cron-worker/src/signals";
 import { persistSignals } from "../../cron-worker/src/daily";
@@ -45,6 +46,61 @@ describe("providers/fred parseFredCsv", () => {
     const ds = parseFredCsv("DATE,VALUE\n2024-01-01,4.5\n2024-01-02,.\n2024-01-03,4.6\n");
     expect(ds.dates).toEqual(["2024-01-01", "2024-01-03"]);
     expect(ds.values).toEqual([4.5, 4.6]);
+  });
+});
+
+describe("yahoo quote/screener 파싱", () => {
+  it("parseQuoteFromChart: meta 현재가·전일종가→등락%", () => {
+    const q = parseQuoteFromChart({ chart: { result: [{ meta: { regularMarketPrice: 705.06, chartPreviousClose: 740.61 } }] } });
+    expect(q.price).toBe(705.06);
+    expect(q.chgPct).toBeCloseTo(-4.8, 1);
+  });
+  it("parseScreener: quotes→행 추출", () => {
+    const rows = parseScreener({
+      finance: {
+        result: [
+          {
+            quotes: [
+              { symbol: "COO", shortName: "Cooper", regularMarketPrice: 67.34, regularMarketChangePercent: 8.57, regularMarketVolume: 9084331 },
+              { symbol: "BAD" }, // 불완전 → 제외
+            ],
+          },
+        ],
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ ticker: "COO", name: "Cooper", price: 67.34 });
+  });
+});
+
+describe("buildMarketSnapshot 조립", () => {
+  it("지수·섹터·VIX·급등락·리스크게이지 + D1 mover 행", () => {
+    const quotes = {
+      SPY: { price: 560, prevClose: 550, chgPct: 1.818 },
+      QQQ: { price: 700, prevClose: 690, chgPct: 1.449 },
+      "^VIX": { price: 15, prevClose: 16, chgPct: -6.25 },
+      XLK: { price: 200, prevClose: 195, chgPct: 2.56 },
+      XLF: { price: 40, prevClose: 40.5, chgPct: -1.23 },
+    };
+    const gainers = [
+      { ticker: "AAA", name: "Alpha", price: 10, chgPct: 20.1, volume: 1_000_000 },
+      { ticker: "BBB", name: "Beta", price: 5, chgPct: 15.4, volume: 800_000 },
+    ];
+    const losers = [{ ticker: "ZZZ", name: "Zeta", price: 3, chgPct: -18.2, volume: 900_000 }];
+    const { snapshot, moverRows } = buildMarketSnapshot(quotes, gainers, losers, "2026-06-06T20:00:00Z");
+
+    expect(snapshot.indices.find((i) => i.ticker === "SPY")?.chg_pct).toBe(1.82);
+    expect(snapshot.vix).toBe(15);
+    expect(snapshot.sectors).toHaveLength(2);
+    expect(snapshot.breadth).toEqual({ sectors_up: 1, sectors_down: 1 });
+    expect(snapshot.risk_score).toBeGreaterThanOrEqual(0);
+    expect(snapshot.risk_score).toBeLessThanOrEqual(100);
+    expect(["RISK_OFF", "NEUTRAL", "RISK_ON"]).toContain(snapshot.risk_label);
+    expect(snapshot.movers.gainers[0]).toMatchObject({ rank: 1, ticker: "AAA", chg_pct: 20.1 });
+    expect(snapshot.movers.losers[0]).toMatchObject({ rank: 1, ticker: "ZZZ", chg_pct: -18.2 });
+    // D1 행: 2 gainer + 1 loser
+    expect(moverRows).toHaveLength(3);
+    expect(moverRows[0]).toEqual(["2026-06-06T20:00:00Z", "gainer", 1, "AAA", "Alpha", 10, 20.1, 1_000_000]);
   });
 });
 

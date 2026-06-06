@@ -7,7 +7,14 @@ Pages Functions(API)는 읽기만 + CDN 엣지 캐시.
 | cron (UTC) | 핸들러 | 동작 | 상태 |
 |---|---|---|---|
 | `30 21 * * 1-5` | `runDailySignals` | 일봉 수집 → ARDS/AMQS 엔진 → D1 signals + R2 스냅샷 + 상태 영속화 | ✅ |
-| `*/10 * * * *` | `runMarketSnapshot` | 시세/급등락 → R2 + D1 | ⏸ 스텁(Finnhub 키 필요) |
+| `*/10 * * * *` | `runMarketSnapshot` | 지수/섹터/VIX + 급등락 Top10 → R2 market-latest.json + D1 movers + stats_cache | ✅ Yahoo 키리스 |
+
+## 10분 시세 스냅샷 (`market.ts`) — 키 불필요
+- 지수(SPY/QQQ/DIA/IWM)+VIX+섹터 ETF11: Yahoo **chart meta**(현재가÷전일종가→등락%)
+- 급등/급락 Top10: Yahoo **사전정의 스크리너**(`day_gainers`/`day_losers`, 키 불필요)
+- 리스크 게이지(0~100, heuristic): 지수등락 + VIX + 섹터폭 → RISK_OFF/NEUTRAL/RISK_ON
+- 산출: R2 `market-latest.json`(`/api/market`) + D1 `movers`(`/api/movers`) + `stats_cache.last_update`
+- 장외시간(UTC 13:00–21:30 밖) 조기 스킵.
 
 ## 데이터 소스 (무료, 키 불필요)
 - **Yahoo chart API** (`providers/yahoo.ts`) — 가격/지수/금리/VIX. 엔진 심볼(`^GSPC` 등) 그대로, adjclose.

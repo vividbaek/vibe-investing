@@ -38,7 +38,7 @@ docs/            분석·프롬프트 문서
 | 3 | `/api/ingest/news`(HMAC) + 단위테스트 | ✅ |
 | 4 | Pages + Pages Functions + Cron Worker 재구성 | ✅ |
 | 5 | 시그널 TS 포팅 (ARDS·AMQS) | ✅ Python 골든 일치 |
-| 6 | Cron Worker | ◐ 일1회 시그널 ✅ / 10분 시세 스텁(키 필요) |
+| 6 | Cron Worker | ✅ 일1회 시그널 + 10분 시세(Yahoo 키리스) |
 | 7 | API (dashboard·news·movers·rankings·search·track) | ✅ 로컬 D1/R2 검증 |
 | 8 | 프론트 (PART B, 전략 카드 2장) | ⬜ |
 | 9 | AIInvestor 뉴스 함수 연결 | ⬜ |
