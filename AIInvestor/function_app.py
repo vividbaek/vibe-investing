@@ -3336,6 +3336,62 @@ async def vibe_admin_stats(req: func.HttpRequest) -> func.HttpResponse:
         return _vibe_nostore_response(500, {"error": "stats_failed"})
 
 
+@app.route(route="vibe/admin/refresh", auth_level=func.AuthLevel.ANONYMOUS,
+           methods=["POST", "GET", "OPTIONS"])
+async def vibe_admin_refresh(req: func.HttpRequest) -> func.HttpResponse:
+    """POST/GET /api/vibe/admin/refresh?key=…&what=market|signals|all
+    — 시간/요일 제한 무시하고 강제로 한 번 실행. 테스트/긴급 갱신용.
+
+    market_snapshot 은 force=True 로 호출 → 미장외에도 Yahoo 받아옴.
+    signals 는 ARDS+AMQS 둘 다 실행.
+    """
+    if req.method == "OPTIONS":
+        return _vibe_options()
+    if not _check_dashboard_key(req):
+        return _vibe_nostore_response(401, {"error": "unauthorized"})
+    await _bootstrap()
+    if not _config or not _config.storage_account_name:
+        return _vibe_nostore_response(503, {"error": "storage_not_set"})
+
+    what = (req.params.get("what") or "all").lower()
+    out: dict = {"requested": what, "results": {}}
+
+    if what in ("market", "all"):
+        from services.vibe.admin_stats import record_cron_run
+        from services.vibe.market_snapshot import refresh_market_snapshot
+        try:
+            r = await refresh_market_snapshot(
+                _config.storage_account_name, force=True)
+            await record_cron_run(_config.storage_account_name,
+                                  "market_snapshot", r)
+            out["results"]["market"] = r
+        except Exception as exc:
+            logger.exception("vibe_admin_refresh: market failed")
+            out["results"]["market"] = {"error": str(exc)[:200]}
+
+    if what in ("signals", "all"):
+        from services.vibe.admin_stats import record_cron_run
+        from services.vibe.runner import build_combined_signals
+        try:
+            r = await build_combined_signals(_config.storage_account_name)
+            await record_cron_run(_config.storage_account_name, "daily_signals", {
+                "ards_ok": bool(r.get("ards")),
+                "amqs_ok": bool(r.get("amqs")),
+                "errors": r.get("errors") or [],
+                "manual": True,
+            })
+            out["results"]["signals"] = {
+                "ards_ok": bool(r.get("ards")),
+                "amqs_ok": bool(r.get("amqs")),
+                "errors": r.get("errors") or [],
+            }
+        except Exception as exc:
+            logger.exception("vibe_admin_refresh: signals failed")
+            out["results"]["signals"] = {"error": str(exc)[:200]}
+
+    return _vibe_nostore_response(200, out)
+
+
 @app.route(route="vibe/track", auth_level=func.AuthLevel.ANONYMOUS,
            methods=["POST", "OPTIONS"])
 async def vibe_track(req: func.HttpRequest) -> func.HttpResponse:
