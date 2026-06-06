@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { parseYahooChart, parseQuoteFromChart, parseScreener } from "../../cron-worker/src/providers/yahoo";
-import { buildMarketSnapshot } from "../../cron-worker/src/market";
+import { buildMarketSnapshot, buildMovers } from "../../cron-worker/src/market";
 import { parseFredCsv } from "../../cron-worker/src/providers/fred";
 import { computeSignals } from "../../cron-worker/src/signals";
 import { persistSignals } from "../../cron-worker/src/daily";
@@ -73,8 +73,8 @@ describe("yahoo quote/screener 파싱", () => {
   });
 });
 
-describe("buildMarketSnapshot 조립", () => {
-  it("지수·섹터·VIX·급등락·리스크게이지 + D1 mover 행", () => {
+describe("buildMarketSnapshot 조립 (intraday, movers 제외)", () => {
+  it("지수·섹터·VIX·리스크게이지", () => {
     const quotes = {
       SPY: { price: 560, prevClose: 550, chgPct: 1.818 },
       QQQ: { price: 700, prevClose: 690, chgPct: 1.449 },
@@ -82,13 +82,7 @@ describe("buildMarketSnapshot 조립", () => {
       XLK: { price: 200, prevClose: 195, chgPct: 2.56 },
       XLF: { price: 40, prevClose: 40.5, chgPct: -1.23 },
     };
-    const gainers = [
-      { ticker: "AAA", name: "Alpha", price: 10, chgPct: 20.1, volume: 1_000_000 },
-      { ticker: "BBB", name: "Beta", price: 5, chgPct: 15.4, volume: 800_000 },
-    ];
-    const losers = [{ ticker: "ZZZ", name: "Zeta", price: 3, chgPct: -18.2, volume: 900_000 }];
-    const { snapshot, moverRows } = buildMarketSnapshot(quotes, gainers, losers, "2026-06-06T20:00:00Z");
-
+    const snapshot = buildMarketSnapshot(quotes, "2026-06-06T20:00:00Z");
     expect(snapshot.indices.find((i) => i.ticker === "SPY")?.chg_pct).toBe(1.82);
     expect(snapshot.vix).toBe(15);
     expect(snapshot.sectors).toHaveLength(2);
@@ -96,11 +90,22 @@ describe("buildMarketSnapshot 조립", () => {
     expect(snapshot.risk_score).toBeGreaterThanOrEqual(0);
     expect(snapshot.risk_score).toBeLessThanOrEqual(100);
     expect(["RISK_OFF", "NEUTRAL", "RISK_ON"]).toContain(snapshot.risk_label);
-    expect(snapshot.movers.gainers[0]).toMatchObject({ rank: 1, ticker: "AAA", chg_pct: 20.1 });
-    expect(snapshot.movers.losers[0]).toMatchObject({ rank: 1, ticker: "ZZZ", chg_pct: -18.2 });
-    // D1 행: 2 gainer + 1 loser
-    expect(moverRows).toHaveLength(3);
-    expect(moverRows[0]).toEqual(["2026-06-06T20:00:00Z", "gainer", 1, "AAA", "Alpha", 10, 20.1, 1_000_000]);
+    expect(snapshot).not.toHaveProperty("movers");
+  });
+});
+
+describe("buildMovers (장종료 후 1회)", () => {
+  it("급등/급락 리스트 + D1 행", () => {
+    const gainers = [
+      { ticker: "AAA", name: "Alpha", price: 10, chgPct: 20.1, volume: 1_000_000 },
+      { ticker: "BBB", name: "Beta", price: 5, chgPct: 15.4, volume: 800_000 },
+    ];
+    const losers = [{ ticker: "ZZZ", name: "Zeta", price: 3, chgPct: -18.2, volume: 900_000 }];
+    const { gainers: g, losers: l, rows } = buildMovers(gainers, losers, "2026-06-06T20:00:00Z");
+    expect(g[0]).toMatchObject({ rank: 1, ticker: "AAA", chg_pct: 20.1 });
+    expect(l[0]).toMatchObject({ rank: 1, ticker: "ZZZ", chg_pct: -18.2 });
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toEqual(["2026-06-06T20:00:00Z", "gainer", 1, "AAA", "Alpha", 10, 20.1, 1_000_000]);
   });
 });
 

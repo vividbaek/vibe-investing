@@ -9,7 +9,7 @@
  */
 
 import { runDailySignals } from "./daily";
-import { runMarketSnapshot } from "./market";
+import { runMarketSnapshot, runMoversSnapshot } from "./market";
 
 export interface Env {
   DB: D1Database;
@@ -33,6 +33,9 @@ export default {
         case "30 21 * * 1-5": {
           const r = await runDailySignals(env);
           console.log("[cron daily] signals", JSON.stringify(r));
+          // 장 종료 후 1회: 급등/급락 갱신(휴장이면 직전값 유지)
+          const mv = await runMoversSnapshot(env);
+          console.log("[cron daily] movers", JSON.stringify(mv));
           break;
         }
       }

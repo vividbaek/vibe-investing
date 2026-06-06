@@ -84,7 +84,7 @@ function gaugeSvg(score: number, label: string): string {
 interface Tile { ticker: string; name: string; price: number; chg_pct: number; }
 interface MarketData {
   ts: string; indices: Tile[]; vix: number | null; sectors: Tile[]; etfs?: Tile[];
-  movers: { gainers: Mover[]; losers: Mover[] }; risk_score: number; risk_label: string;
+  risk_score: number; risk_label: string;
 }
 interface Mover { rank: number; ticker: string; name: string; price: number; chg_pct: number; volume: number; }
 
@@ -126,9 +126,6 @@ function renderMarket(m: MarketData | null) {
         )
         .join("")
     : '<div class="sub" style="color:var(--text-dim);padding:4px 0">—</div>';
-
-  renderMovers("gainers", m.movers.gainers);
-  renderMovers("losers", m.movers.losers);
 }
 
 function renderMovers(id: string, list: Mover[]) {
@@ -399,6 +396,9 @@ async function loadAll() {
       .then((r) => { renderStrategies(r.data); renderWatchlist(r.data?.watchlist); updated = r.updated_at ?? updated; })
       .catch(() => { renderStrategies(null); renderWatchlist(undefined); }),
     getJSON<MarketData>("/api/market").then((r) => { renderMarket(r.data); updated = r.updated_at ?? updated; }).catch(() => renderMarket(null)),
+    getJSON<{ gainers: Mover[]; losers: Mover[] }>("/api/movers")
+      .then((r) => { renderMovers("gainers", r.data?.gainers ?? []); renderMovers("losers", r.data?.losers ?? []); })
+      .catch(() => { renderMovers("gainers", []); renderMovers("losers", []); }),
     getJSON<{ market_summary: { summary_ko: string } | null; items: NewsItem[] }>("/api/news?limit=12")
       .then((r) => renderNews(r.data.market_summary, r.data.items ?? [])).catch(() => renderNews(null, [])),
     getJSON<{ top: Array<{ rank: number; ticker: string; search_count: number }> }>("/api/rankings")

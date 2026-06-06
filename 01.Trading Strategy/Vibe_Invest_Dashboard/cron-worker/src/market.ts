@@ -59,7 +59,6 @@ export interface MarketSnapshot {
   vix: number | null;
   sectors: Tile[];
   etfs: Tile[];
-  movers: { gainers: Mover[]; losers: Mover[] };
   breadth: { sectors_up: number; sectors_down: number };
   risk_score: number; // 0~100 (heuristic)
   risk_label: "RISK_OFF" | "NEUTRAL" | "RISK_ON";
@@ -86,13 +85,8 @@ function toMovers(rows: ScreenerRow[], limit = 10): Mover[] {
   }));
 }
 
-/** 순수 조립: quote 맵 + 스크리너 → 스냅샷 + D1 mover 행. */
-export function buildMarketSnapshot(
-  quotes: Record<string, Quote>,
-  gainers: ScreenerRow[],
-  losers: ScreenerRow[],
-  ts: string,
-): { snapshot: MarketSnapshot; moverRows: Array<[string, string, number, string, string, number, number, number]> } {
+/** 순수 조립: quote 맵 → 지수/섹터/ETF/VIX/리스크 스냅샷 (intraday, movers 제외). */
+export function buildMarketSnapshot(quotes: Record<string, Quote>, ts: string): MarketSnapshot {
   const tile = (sym: string, name: string): Tile | null => {
     const q = quotes[sym];
     if (!q) return null;
@@ -114,53 +108,14 @@ export function buildMarketSnapshot(
   score = pyRound(clamp(score, 0, 100), 0);
   const risk_label = score < 40 ? "RISK_OFF" : score > 60 ? "RISK_ON" : "NEUTRAL";
 
-  const gMovers = toMovers(gainers);
-  const lMovers = toMovers(losers);
-
-  const snapshot: MarketSnapshot = {
-    ts,
-    indices,
-    vix,
-    sectors,
-    etfs,
-    movers: { gainers: gMovers, losers: lMovers },
-    breadth: { sectors_up: sectorsUp, sectors_down: sectorsDown },
-    risk_score: score,
-    risk_label,
-  };
-
-  // D1 movers 행: [ts, direction, rank, ticker, name, price, chg_pct, volume]
-  const moverRows: Array<[string, string, number, string, string, number, number, number]> = [
-    ...gMovers.map((m) => [ts, "gainer", m.rank, m.ticker, m.name, m.price, m.chg_pct, m.volume] as [string, string, number, string, string, number, number, number]),
-    ...lMovers.map((m) => [ts, "loser", m.rank, m.ticker, m.name, m.price, m.chg_pct, m.volume] as [string, string, number, string, string, number, number, number]),
-  ];
-
-  return { snapshot, moverRows };
+  return { ts, indices, vix, sectors, etfs, breadth: { sectors_up: sectorsUp, sectors_down: sectorsDown }, risk_score: score, risk_label };
 }
 
-async function persistMarket(db: D1Like, snapshot: MarketSnapshot, moverRows: ReturnType<typeof buildMarketSnapshot>["moverRows"]): Promise<void> {
-  const moverStmt = db.prepare(
-    `INSERT INTO movers (ts, direction, rank, ticker, name, price, chg_pct, volume)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT(ts, direction, rank) DO UPDATE SET
-       ticker=excluded.ticker, name=excluded.name, price=excluded.price, chg_pct=excluded.chg_pct, volume=excluded.volume`,
-  );
-  const statements = moverRows.map((r) => moverStmt.bind(...r));
-  statements.push(
-    db
-      .prepare(
-        `INSERT INTO stats_cache (key, value, ts) VALUES ('last_update', ?, ?)
-         ON CONFLICT(key) DO UPDATE SET value=excluded.value, ts=excluded.ts`,
-      )
-      .bind(snapshot.ts, snapshot.ts),
-  );
-  if (statements.length) await db.batch(statements);
-}
-
+/** 10분 크론: 지수/섹터/ETF/VIX 시세 → R2 스냅샷 + stats_cache.last_update. (movers 제외 — 장종료 후 별도) */
 export async function runMarketSnapshot(
   env: MarketEnv,
   now: Date = new Date(),
-): Promise<{ skipped: boolean; reason?: string; risk?: number; gainers?: number; losers?: number }> {
+): Promise<{ skipped: boolean; reason?: string; risk?: number }> {
   if (!isUsMarketWindowUtc(now)) return { skipped: true, reason: "off-hours" };
 
   const ts = now.toISOString();
@@ -172,6 +127,60 @@ export async function runMarketSnapshot(
       // 부분 성공 허용
     }
   }
+
+  const snapshot = buildMarketSnapshot(quotes, ts);
+  await env.SNAPSHOTS.put(SNAPSHOT_KEY, JSON.stringify(snapshot), {
+    httpMetadata: { contentType: "application/json", cacheControl: "public, s-maxage=300" },
+  });
+  await env.DB.prepare(
+    `INSERT INTO stats_cache (key, value, ts) VALUES ('last_update', ?, ?)
+     ON CONFLICT(key) DO UPDATE SET value=excluded.value, ts=excluded.ts`,
+  )
+    .bind(ts, ts)
+    .run();
+
+  return { skipped: false, risk: snapshot.risk_score };
+}
+
+// ===========================================================================
+// 급등/급락 (movers) — 장 종료 후 1회만 갱신·캐시. 휴장이면 직전값 유지(빈 응답 스킵).
+// ===========================================================================
+const MOVERS_KEY = "movers-latest.json";
+type MoverRow = [string, string, number, string, string, number, number, number];
+
+/** 순수 조립: 스크리너 → mover 리스트 + D1 행. */
+export function buildMovers(
+  gainers: ScreenerRow[],
+  losers: ScreenerRow[],
+  ts: string,
+): { gainers: Mover[]; losers: Mover[]; rows: MoverRow[] } {
+  const g = toMovers(gainers);
+  const l = toMovers(losers);
+  const rows: MoverRow[] = [
+    ...g.map((m) => [ts, "gainer", m.rank, m.ticker, m.name, m.price, m.chg_pct, m.volume] as MoverRow),
+    ...l.map((m) => [ts, "loser", m.rank, m.ticker, m.name, m.price, m.chg_pct, m.volume] as MoverRow),
+  ];
+  return { gainers: g, losers: l, rows };
+}
+
+async function persistMovers(db: D1Like, rows: MoverRow[]): Promise<void> {
+  const stmt = db.prepare(
+    `INSERT INTO movers (ts, direction, rank, ticker, name, price, chg_pct, volume)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(ts, direction, rank) DO UPDATE SET
+       ticker=excluded.ticker, name=excluded.name, price=excluded.price, chg_pct=excluded.chg_pct, volume=excluded.volume`,
+  );
+  await db.batch(rows.map((r) => stmt.bind(...r)));
+}
+
+/**
+ * 장 종료 후 1회: 나스닥 급등/급락 Top10 → D1 movers + R2 movers-latest.json.
+ * 스크리너가 비면(휴장 등) 스킵 → 직전값 유지.
+ */
+export async function runMoversSnapshot(
+  env: MarketEnv,
+  now: Date = new Date(),
+): Promise<{ skipped: boolean; reason?: string; gainers?: number; losers?: number }> {
   let gainers: ScreenerRow[] = [];
   let losers: ScreenerRow[] = [];
   try {
@@ -184,12 +193,17 @@ export async function runMarketSnapshot(
   } catch {
     /* 비움 */
   }
+  if (gainers.length === 0 && losers.length === 0) {
+    return { skipped: true, reason: "no_data (휴장/실패 — 직전값 유지)" };
+  }
 
-  const { snapshot, moverRows } = buildMarketSnapshot(quotes, gainers, losers, ts);
-  await env.SNAPSHOTS.put(SNAPSHOT_KEY, JSON.stringify(snapshot), {
-    httpMetadata: { contentType: "application/json", cacheControl: "public, s-maxage=300" },
-  });
-  await persistMarket(env.DB, snapshot, moverRows);
-
-  return { skipped: false, risk: snapshot.risk_score, gainers: snapshot.movers.gainers.length, losers: snapshot.movers.losers.length };
+  const ts = now.toISOString();
+  const built = buildMovers(gainers, losers, ts);
+  await env.SNAPSHOTS.put(
+    MOVERS_KEY,
+    JSON.stringify({ ts, gainers: built.gainers, losers: built.losers }),
+    { httpMetadata: { contentType: "application/json", cacheControl: "public, s-maxage=1800" } },
+  );
+  await persistMovers(env.DB, built.rows);
+  return { skipped: false, gainers: built.gainers.length, losers: built.losers.length };
 }

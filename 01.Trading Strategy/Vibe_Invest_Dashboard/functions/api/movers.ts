@@ -1,7 +1,7 @@
 import { jsonResponse } from "../../shared/http";
 
 /**
- * GET /api/movers — D1 movers 최신 ts 의 급등/급락. CDN 캐시 300s.
+ * GET /api/movers — D1 movers 최신 ts 의 급등/급락. 장 종료 후 1회 갱신 → 캐시 30분.
  */
 interface Env {
   DB: D1Database;
@@ -24,6 +24,6 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
       gainers: all.filter((r) => r.direction === "gainer"),
       losers: all.filter((r) => r.direction === "loser"),
     },
-    { updatedAt: latest.ts, cacheSeconds: 300 },
+    { updatedAt: latest.ts, cacheSeconds: 1800 },
   );
 };

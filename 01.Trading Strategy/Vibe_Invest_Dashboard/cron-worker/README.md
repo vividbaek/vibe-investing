@@ -6,8 +6,10 @@ Pages Functions(API)는 읽기만 + CDN 엣지 캐시.
 ## 크론
 | cron (UTC) | 핸들러 | 동작 | 상태 |
 |---|---|---|---|
-| `30 21 * * 1-5` | `runDailySignals` | 일봉 수집 → ARDS/AMQS 엔진 → D1 signals + R2 스냅샷 + 상태 영속화 | ✅ |
-| `*/10 * * * *` | `runMarketSnapshot` | 지수/섹터/VIX + 급등락 Top10 → R2 market-latest.json + D1 movers + stats_cache | ✅ Yahoo 키리스 |
+| `30 21 * * 1-5` | `runDailySignals` + `runMoversSnapshot` | 일봉 시그널 + **급등/급락 Top10(장종료 후 1회)** → D1/R2 | ✅ |
+| `*/10 * * * *` | `runMarketSnapshot` | 지수/섹터/VIX/ETF 시세 → R2 market-latest.json + stats_cache (movers 제외) | ✅ Yahoo 키리스 |
+
+> **급등/급락(movers)**: 장 종료 후 1회만 갱신(`runMoversSnapshot`, 일1회 크론) → D1 movers + R2 `movers-latest.json`(s-maxage=1800). 스크리너가 비면(휴장/실패) 스킵해 **직전값 유지**. 프론트는 `/api/movers`(D1)로 조회.
 
 ## 10분 시세 스냅샷 (`market.ts`) — 키 불필요
 - 지수(SPY/QQQ/DIA/IWM)+VIX+섹터 ETF11: Yahoo **chart meta**(현재가÷전일종가→등락%)
