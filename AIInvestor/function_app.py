@@ -3204,8 +3204,102 @@ async def vibe_health(req: func.HttpRequest) -> func.HttpResponse:
     """GET /api/vibe/health — 스캐폴드 확인."""
     if req.method == "OPTIONS":
         return _vibe_options()
-    return _vibe_json_response({"ok": True, "service": "vibe", "stage": "P3"},
+    return _vibe_json_response({"ok": True, "service": "vibe", "stage": "P4"},
                                 max_age=30)
+
+
+# ── Vibe 쓰기 API (P4) ──────────────────────────────────────────────────────
+def _vibe_client_ip(req: func.HttpRequest) -> str:
+    """Function 앞 reverse proxy 체인에서 client IP 추출 (best-effort)."""
+    xff = req.headers.get("X-Forwarded-For", "")
+    if xff:
+        return xff.split(",")[0].strip() or "0.0.0.0"
+    return req.headers.get("CF-Connecting-IP") or req.headers.get(
+        "X-Azure-ClientIP", "0.0.0.0")
+
+
+def _vibe_nostore_response(status: int, payload: dict) -> func.HttpResponse:
+    headers = {**_VIBE_CORS, "Cache-Control": "no-store"}
+    return func.HttpResponse(
+        json.dumps(payload, ensure_ascii=False),
+        status_code=status, mimetype="application/json", headers=headers,
+    )
+
+
+@app.route(route="vibe/ingest/news", auth_level=func.AuthLevel.ANONYMOUS,
+           methods=["POST", "OPTIONS"])
+async def vibe_ingest_news(req: func.HttpRequest) -> func.HttpResponse:
+    """POST /api/vibe/ingest/news — HMAC-SHA256 검증 후 news_summary upsert."""
+    if req.method == "OPTIONS":
+        return _vibe_options()
+    await _bootstrap()
+    if not _config or not _config.storage_account_name:
+        return _vibe_nostore_response(503, {"ok": False, "error": "storage_not_set"})
+
+    from services.vibe.ingest import handle_ingest_news
+    raw_body = req.get_body() or b""
+    status, body = await handle_ingest_news(
+        _config.storage_account_name,
+        _config.ingest_secret,
+        req.headers.get("X-Timestamp"),
+        req.headers.get("X-Signature"),
+        raw_body,
+    )
+    return _vibe_nostore_response(status, body)
+
+
+@app.route(route="vibe/search", auth_level=func.AuthLevel.ANONYMOUS,
+           methods=["GET", "OPTIONS"])
+async def vibe_search(req: func.HttpRequest) -> func.HttpResponse:
+    """GET /api/vibe/search?q=NVDA — signals/latest.json 에서 해당 ticker 발췌."""
+    if req.method == "OPTIONS":
+        return _vibe_options()
+    await _bootstrap()
+    if not _config or not _config.storage_account_name:
+        return _vibe_nostore_response(503, {"error": "storage_not_set"})
+
+    from services.vibe.search_track import (
+        append_search_log, extract_signals_for_ticker, normalize_ticker,
+    )
+    from services.vibe.api_cache import cached_blob_read
+
+    q = req.params.get("q") or ""
+    ticker = normalize_ticker(q)
+    if ticker is None:
+        return _vibe_nostore_response(400, {"error": "invalid_query"})
+
+    signals = await cached_blob_read(_config.storage_account_name,
+                                     "signals/latest.json", ttl_s=60.0)
+    rows = extract_signals_for_ticker(signals, ticker)
+
+    # 검색 로그 fire-and-forget (응답 가속)
+    ip = _vibe_client_ip(req)
+    ua = req.headers.get("User-Agent", "")
+    asyncio.create_task(append_search_log(
+        _config.storage_account_name, ticker, ip, ua,
+        _config.user_id_salt,
+    ))
+
+    return _vibe_nostore_response(200, {"ticker": ticker, "signals": rows})
+
+
+@app.route(route="vibe/track", auth_level=func.AuthLevel.ANONYMOUS,
+           methods=["POST", "OPTIONS"])
+async def vibe_track(req: func.HttpRequest) -> func.HttpResponse:
+    """POST /api/vibe/track — 익명 방문 기록 후 {dau, total_au} 반환."""
+    if req.method == "OPTIONS":
+        return _vibe_options()
+    await _bootstrap()
+    if not _config or not _config.storage_account_name:
+        return _vibe_nostore_response(503, {"error": "storage_not_set"})
+
+    from services.vibe.search_track import record_visit
+    ip = _vibe_client_ip(req)
+    ua = req.headers.get("User-Agent", "")
+    counts = await record_visit(
+        _config.storage_account_name, ip, ua, _config.user_id_salt,
+    )
+    return _vibe_nostore_response(200, counts)
 
 
 # ---------------------------------------------------------------------
