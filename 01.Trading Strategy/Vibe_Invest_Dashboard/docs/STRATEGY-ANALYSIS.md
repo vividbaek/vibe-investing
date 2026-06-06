@@ -208,8 +208,11 @@ movers/검색 결과 패널용으로 한정 권장.) — ⚠️ 확정 필요.
 
 1. **FRED CSV fetch in Workers** — ARDS 거시축. Worker `fetch`로 CSV 수집 가능하나 7개 시리즈 = I/O 다수.
    일 1회 크론이라 무방하나 실패 시 yfinance 프록시 폴백 로직까지 포팅 필요.
-2. **yfinance 대체** — Workers엔 yfinance 없음. 가이드대로 **Stooq CSV**(무료) 우선, 백업 비공식 yfinance HTTP.
-   지수/ETF/`^` 심볼이 Stooq에서 되는지 검증 필요(ARDS의 `^GSPC ^NDX ^TNX ^VIX` 등).
+2. **yfinance 대체 → Yahoo chart API 채택(2026-06-06 확정)**. Workers엔 yfinance 없음.
+   가이드는 Stooq CSV를 상정했으나 **Stooq는 현재 JavaScript proof-of-work 봇 차단**으로 Worker fetch 불가.
+   → **Yahoo chart API**(`query1.finance.yahoo.com/v8/finance/chart/<sym>`, 키 불필요) 사용. 엔진이 쓰는
+   `^GSPC ^NDX ^TNX ^IRX ^FVX ^VIX ^MOVE` + 종목/ETF 심볼을 **그대로** 지원, adjclose 제공.
+   구현: `cron-worker/src/providers/yahoo.ts`. FRED는 best-effort(막히면 ARDS가 시장 프록시로 자동 폴백).
 3. **ARDS 히스테리시스 상태 영속화** — `regime_state.json` → D1/R2. 크론 재실행 간 `committed/since/count` 유지.
 4. **Python 결과 대조 fixture** — 각 전략을 특정 날짜로 고정 실행한 native JSON을 `tests/fixtures/`에 보관,
    TS 포팅 결과와 수치 대조(가이드 §6.3 step 6 + 운영 체크리스트의 1주 병행 검증).

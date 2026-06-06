@@ -37,8 +37,8 @@ docs/            분석·프롬프트 문서
 | 2 | Pages/Cron 설정 + `migrations/0001_init.sql` | ✅ |
 | 3 | `/api/ingest/news`(HMAC) + 단위테스트 | ✅ |
 | 4 | Pages + Pages Functions + Cron Worker 재구성 | ✅ |
-| 5 | 시그널 TS 포팅 (ARDS·AMQS) | ⬜ |
-| 6 | Cron Worker (10분 + 일1회) | ⬜ |
+| 5 | 시그널 TS 포팅 (ARDS·AMQS) | ✅ Python 골든 일치 |
+| 6 | Cron Worker | ◐ 일1회 시그널 ✅ / 10분 시세 스텁(키 필요) |
 | 7 | 나머지 API (dashboard·movers·news·…) | ⬜ |
 | 8 | 프론트 (PART B, 전략 카드 2장) | ⬜ |
 | 9 | AIInvestor 뉴스 함수 연결 | ⬜ |
