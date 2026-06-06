@@ -1,14 +1,96 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vibe Investing</title>
-    <meta name="description" content="ARDS · AMQS · MU_Hynix 룰 기반 퀀트 시그널 대시보드. 투자 자문 아님." />
+    <title>Vibe Investing — 룰 기반 퀀트 대시보드</title>
+    <meta name="description" content="ARDS · AMQS 룰 기반 퀀트 시그널과 미국 시장 현황. 투자 자문 아님." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="/main.css" />
   </head>
   <body>
-    <div id="app">로딩 중…</div>
-    <!-- 빌드 시 esbuild 산출물 main.js 로드. 스캐폴드 단계 플레이스홀더. -->
+    <!-- [A] 헤더 -->
+    <header class="hdr">
+      <div class="hdr-row">
+        <div class="brand">VIBE INVESTING<span class="cursor">▮</span></div>
+        <div class="hdr-search">
+          <input id="search" type="search" placeholder="티커 검색 (예: NVDA)" autocomplete="off" />
+          <div id="search-result" class="search-result" hidden></div>
+        </div>
+        <div class="hdr-ctrl">
+          <button id="lang" class="btn" title="언어">KO</button>
+          <button id="theme" class="btn" title="테마">☾</button>
+        </div>
+      </div>
+      <div id="updated" class="updated" aria-live="polite">데이터 불러오는 중…</div>
+    </header>
+
+    <main class="grid">
+      <!-- [B] 시장 다이어그램 -->
+      <section class="panel span-12 market" aria-labelledby="t-market">
+        <h2 id="t-market" class="panel-t" data-i18n="market">시장 상황</h2>
+        <div class="market-grid">
+          <div id="gauge" class="gauge" aria-label="리스크 게이지"></div>
+          <div id="heatmap" class="heatmap" aria-label="섹터 히트맵"></div>
+          <div id="indices" class="indices" aria-label="주요 지수"></div>
+        </div>
+        <p id="market-summary" class="ai-summary"></p>
+      </section>
+
+      <!-- [C] 전략 시그널 카드 -->
+      <section id="strategies" class="span-12 strat-row" aria-label="전략 시그널"></section>
+
+      <!-- [D]/[E] 급등 / 급락 -->
+      <section class="panel span-6" aria-labelledby="t-gainers">
+        <h2 id="t-gainers" class="panel-t up" data-i18n="gainers">나스닥 급등 TOP 10</h2>
+        <div id="gainers" class="movers"></div>
+      </section>
+      <section class="panel span-6" aria-labelledby="t-losers">
+        <h2 id="t-losers" class="panel-t down" data-i18n="losers">나스닥 급락 TOP 10</h2>
+        <div id="losers" class="movers"></div>
+      </section>
+
+      <!-- [F] 뉴스 -->
+      <section class="panel span-12" aria-labelledby="t-news">
+        <div class="panel-head">
+          <h2 id="t-news" class="panel-t" data-i18n="news">주요 경제 뉴스 요약</h2>
+          <div id="news-filter" class="chips"></div>
+        </div>
+        <div id="news" class="news"></div>
+      </section>
+
+      <!-- [G]/[H] 인기검색 / 통계 -->
+      <section class="panel span-6" aria-labelledby="t-rank">
+        <h2 id="t-rank" class="panel-t" data-i18n="rankings">인기 검색 TOP 5</h2>
+        <div id="rankings" class="rankings"></div>
+      </section>
+      <section class="panel span-6" aria-labelledby="t-stats">
+        <h2 id="t-stats" class="panel-t" data-i18n="stats">사이트 통계</h2>
+        <div id="stats" class="stats"></div>
+      </section>
+    </main>
+
+    <!-- [I] 푸터 -->
+    <footer class="ftr">
+      <div class="ftr-links">
+        <a href="https://github.com/gameworkerkim/vibe-investing" target="_blank" rel="noopener">메인 레포</a>
+        <a href="https://github.com/gameworkerkim/vibe-investing/tree/main/01.Trading%20Strategy" target="_blank" rel="noopener">전략 폴더</a>
+      </div>
+      <p class="disclaimer">
+        ⚠️ 본 사이트의 모든 시그널은 룰 기반 백테스트 산출물이며, 투자 자문이나 매수·매도 권유가 아닙니다.
+        투자의 책임은 전적으로 투자자 본인에게 있습니다. 데이터는 지연·오류가 있을 수 있습니다.<br />
+        This is not investment advice. All signals are rule-based research outputs. Data may be delayed or inaccurate.
+      </p>
+      <p class="built">Built with Claude Code · Cloudflare Pages · 데이터: Yahoo Finance · FRED</p>
+    </footer>
+
+    <div id="tooltip" class="up-tip" hidden>적색 = 상승 · 청색 = 하락 (한국식)</div>
     <script type="module" src="/main.js"></script>
   </body>
 </html>

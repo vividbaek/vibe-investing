@@ -12,6 +12,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["01.Trading Strategy/ARDS — Adaptive Recession-Defensive Strategy for AI_QQQ/dashboard/serve.py", "3142"],
       "port": 3142
+    },
+    {
+      "name": "vibe-dashboard",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd '01.Trading Strategy/Vibe_Invest_Dashboard' && exec npx wrangler pages dev --port 8788"],
+      "port": 8788
     }
   ]
 }
