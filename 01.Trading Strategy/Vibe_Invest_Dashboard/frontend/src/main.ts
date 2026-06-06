@@ -5,6 +5,7 @@
  */
 import "./styles.css";
 import { searchSymbols, SYM_BY_TICKER } from "../../shared/symbols";
+import { FEATURES } from "./features";
 
 // ---------------------------------------------------------------------------
 // 유틸
@@ -446,6 +447,30 @@ function boot() {
     if (chip?.dataset.cat) { newsFilter = chip.dataset.cat; renderNews(null, allNews); return; }
     if (!(e.target as HTMLElement).closest(".hdr-search")) $("search-result").hidden = true;
   });
+  // 기능 메뉴 → 모달
+  const modal = $("modal");
+  const openFeature = (name: string) => {
+    const f = FEATURES[name];
+    if (!f) return;
+    f.render($("modal-body"));
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+  };
+  const closeFeature = () => {
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  };
+  document.querySelectorAll<HTMLElement>(".menu-btn").forEach((b) => {
+    b.onclick = () => openFeature(b.dataset.feature!);
+  });
+  modal.querySelectorAll<HTMLElement>("[data-close]").forEach((c) => (c.onclick = closeFeature));
+  document.addEventListener("keydown", (e) => {
+    if ((e as KeyboardEvent).key === "Escape" && !modal.hidden) closeFeature();
+  });
+  // 딥링크: #saju 등으로 열기
+  const hash = location.hash.slice(1);
+  if (FEATURES[hash]) openFeature(hash);
+
   // 상승색 안내 1회
   if (!localStorage.getItem("up-tip")) {
     $("tooltip").hidden = false;

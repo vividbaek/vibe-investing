@@ -29,7 +29,22 @@
         </div>
       </div>
       <div id="updated" class="updated" aria-live="polite">데이터 불러오는 중…</div>
+      <nav class="menu" aria-label="기능 메뉴">
+        <button class="menu-btn" data-feature="persona">🧠 페르소나</button>
+        <button class="menu-btn" data-feature="predict">🎯 예측</button>
+        <button class="menu-btn" data-feature="saju">🔮 사주</button>
+        <button class="menu-btn" data-feature="referral">👥 친구추천</button>
+      </nav>
     </header>
+
+    <!-- 기능 모달 -->
+    <div id="modal" class="modal" hidden>
+      <div class="modal-back" data-close></div>
+      <div class="modal-box" role="dialog" aria-modal="true">
+        <button class="modal-close" data-close aria-label="닫기">✕</button>
+        <div id="modal-body"></div>
+      </div>
+    </div>
 
     <main class="grid">
       <!-- [B] 시장 다이어그램 -->

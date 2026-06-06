@@ -682,6 +682,347 @@ body {
   }
 }
 
+/* 기능 메뉴 (검색 하단) */
+.menu {
+  max-width: 1200px;
+  margin: 10px auto 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.menu-btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+}
+.menu-btn:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+/* 모달 */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 16px;
+  overflow-y: auto;
+}
+.modal-back {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+.modal-box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+/* 기능 패널 공통 */
+.ft-h {
+  font-family: var(--display);
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+.ft-sub {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #1a1205;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.disc {
+  margin-top: 14px;
+  color: var(--text-dim);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.ft-card {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 14px;
+}
+.ft-card-h {
+  font-family: var(--display);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* 사주 */
+.saju-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.saju-form input,
+.saju-form select,
+.pred-form input,
+.persona-ask input,
+.ref-link input {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-family: var(--mono);
+}
+.saju-result {
+  margin-top: 16px;
+}
+.saju-top .lab,
+.ref-code .lab {
+  color: var(--text-dim);
+  font-size: 12px;
+  margin-right: 8px;
+}
+.saju-top > div {
+  padding: 3px 0;
+}
+.saju-top .rel {
+  margin-top: 8px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.saju-bars {
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: 56px 90px auto;
+  gap: 8px;
+  align-items: center;
+}
+.bar-row .bk {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+.bar-row .bt {
+  background: var(--line);
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar-row .bf {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.bar-row .bs {
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.bar-row .bx {
+  grid-column: 1 / -1;
+  color: var(--text-dim);
+  font-size: 12px;
+  padding-left: 56px;
+}
+.saju-focus,
+.saju-fav {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.saju-focus b,
+.saju-fav b {
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+/* 예측 */
+.points-bar {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+}
+.points-bar b {
+  color: var(--accent);
+  font-family: var(--mono);
+}
+.attend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.attend-row .streak b {
+  color: var(--accent);
+  font-family: var(--mono);
+}
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.pred-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pred-form input {
+  flex: 1;
+  min-width: 120px;
+}
+.btn-up,
+.btn-down {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--surface);
+}
+.btn-up {
+  color: var(--up);
+}
+.btn-down {
+  color: var(--down);
+}
+.pred-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.pred-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.pred-item .tk {
+  font-family: var(--display);
+  font-weight: 700;
+}
+.pred-item .ko {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+/* 페르소나 */
+.persona-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+.persona-card {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+}
+.persona-card.on {
+  border-color: var(--accent);
+}
+.persona-card .pn {
+  font-family: var(--display);
+  font-weight: 700;
+}
+.persona-card .pt {
+  color: var(--accent);
+  font-size: 12px;
+  margin: 2px 0 6px;
+}
+.persona-card .pd {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.persona-ask {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.persona-ask input {
+  flex: 1;
+  min-width: 140px;
+}
+.persona-out {
+  margin-top: 12px;
+}
+
+/* 친구추천 */
+.ref-code {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.ref-code b.mono {
+  font-family: var(--mono);
+  font-size: 18px;
+  letter-spacing: 0.1em;
+}
+.ref-link {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ref-link input {
+  flex: 1;
+  font-size: 12px;
+}
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ref-table th,
+.ref-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px 6px;
+  text-align: left;
+}
+.ref-table th {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
 /* 반응형 */
 @media (max-width: 860px) {
   .span-6 {
