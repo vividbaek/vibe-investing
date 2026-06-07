@@ -28,6 +28,45 @@
 - **멀티 알람** — Slack, Telegram, 이메일, 대시보드로 탐지 결과 실시간 통보
 - **크로스플랫폼** — macOS, Linux, Windows (WSL)
 
+### 보안 스캔 확장 (v0.3+)
+
+클라우드 키 탐지 외에 추가 보안 취약점도 함께 감사합니다:
+
+| 카테고리 | 탐지 항목 |
+|---|---|
+| SQL Injection | 쿼리 문자열 연결, `rawQuery`, `db.execute()`, PreparedStatement 누락 |
+| DB 연결정보 노출 | `jdbc:`, `mongodb://`, `redis://`, `DATABASE_URL`, `DB_PASSWORD` 평문 |
+| TLS/SSL 설정 | `rejectUnauthorized: false`, `NODE_TLS_REJECT_UNAUTHORIZED=0`, `insecure=true` |
+| 구버전 취약점 | OpenSSL 0.x/1.0, TLSv1.0, Apache 2.2, PHP 5.x/7.0-3, MySQL 5.0-6, WordPress 1-5 |
+
+### 테스트 방법
+
+**방법 1: CLI (빠른 단발 스캔)**
+
+```bash
+# 전체 스캔
+npx laon-vaultguard scan .
+
+# 카테고리별 스캔
+npx laon-vaultguard scan . --mode sql       # SQL injection 만
+npx laon-vaultguard scan . --mode secrets   # 클라우드 키·토큰 만
+npx laon-vaultguard scan . --mode versions  # 구버전 취약점 만
+npx laon-vaultguard scan . --mode db        # DB 연결정보 노출 만
+npx laon-vaultguard scan . --mode tls       # TLS/SSL 설정 만
+
+# LLM 없이 원시 후보만 확인
+npx laon-vaultguard scan . --no-llm
+```
+
+**방법 2: 대시보드 (주기적 모니터링)**
+
+```bash
+npm run dev                           # http://localhost:3101/dashboard
+# -> "지금 스캔" 버튼 or cron 자동 스캔
+# -> 결과를 대시보드에서 필터링·확인 처리
+# -> Slack/Telegram/Email/Discord/Teams 알람 연동 가능
+```
+
 ![대시보드 스크린샷](public/dashboard.png)
 
 ## 빠른 시작

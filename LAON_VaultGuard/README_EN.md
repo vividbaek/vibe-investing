@@ -28,6 +28,45 @@ Regex handles speed. LLMs handle context. **Use both, for real stability.**
 - **Multi-channel alerts** — Slack, Telegram, Email, and Dashboard notifications
 - **Cross-platform** — macOS, Linux, Windows (WSL)
 
+### Extended Security Scanning (v0.3+)
+
+Beyond cloud key detection, additional vulnerability categories are audited:
+
+| Category | Detection |
+|---|---|
+| SQL Injection | Query string concatenation, `rawQuery`, `db.execute()`, missing PreparedStatement |
+| DB Credential Exposure | `jdbc:`, `mongodb://`, `redis://`, `DATABASE_URL`, plaintext `DB_PASSWORD` |
+| TLS/SSL Misconfig | `rejectUnauthorized: false`, `NODE_TLS_REJECT_UNAUTHORIZED=0`, `insecure=true` |
+| Outdated Versions | OpenSSL 0.x/1.0, TLSv1.0, Apache 2.2, PHP 5.x/7.0-3, MySQL 5.0-6, WordPress 1-5 |
+
+### Test Methods
+
+**Method 1: CLI (quick single scan)**
+
+```bash
+# Full scan
+npx laon-vaultguard scan .
+
+# Category-specific scan
+npx laon-vaultguard scan . --mode sql       # SQL injection only
+npx laon-vaultguard scan . --mode secrets   # Cloud keys/tokens only
+npx laon-vaultguard scan . --mode versions  # Outdated versions only
+npx laon-vaultguard scan . --mode db        # DB credential exposure only
+npx laon-vaultguard scan . --mode tls       # TLS/SSL config only
+
+# Raw candidates without LLM
+npx laon-vaultguard scan . --no-llm
+```
+
+**Method 2: Dashboard (periodic monitoring)**
+
+```bash
+npm run dev                           # http://localhost:3101/dashboard
+# -> "Scan Now" button or cron auto-scan
+# -> Filter and acknowledge results in dashboard
+# -> Slack/Telegram/Email/Discord/Teams alert integration
+```
+
 ![Dashboard screenshot](public/dashboard.png)
 
 ## Quick Start
