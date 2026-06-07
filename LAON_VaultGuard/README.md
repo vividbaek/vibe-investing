@@ -146,6 +146,59 @@ VS Code에서:
 | `laon-vaultguard.scanOnOpen` | `false` | 파일 열 때 스캔 |
 | `laon-vaultguard.severity` | `medium` | 최소 심각도 (critical/high/medium/all) |
 
+## Pre-commit Hook
+
+커밋 전에 변경된 파일에서 시크릿을 자동 검사합니다.
+
+```bash
+npx laon-vaultguard hook install     # 현재 레포에 설치
+npx laon-vaultguard hook uninstall   # 제거
+```
+
+**동작 방식**:
+- `git commit` 실행 시 `pre-commit` 훅이 자동 발동
+- 스테이징된 파일만 빠른 정규식 스캔 (LLM 호출 없음, <1초)
+- critical/high 패턴 감지 시 커밋 차단
+- `git commit --no-verify` 로 긴급 bypass 가능
+
+### 유사 솔루션 대비 장점
+
+| | LAON VaultGuard | gitleaks | trufflehog | GitHub Push Protection |
+|---|---|---|---|---|
+| 설치 | `npx` 1줄 | `brew install` | `pip install` | 설정 불필요 |
+| 동작 위치 | **로컬 pre-commit** | pre-commit | pre-commit | push 시점 |
+| LLM 분석 | Deep Scan 연동 | ❌ (정규식만) | ❌ (정규식+엔트로피) | ❌ |
+| 커스텀 패턴 | git grep 60+ 패턴 | `.gitleaks.toml` | 제한적 | GitHub 관리 |
+| 오프라인 | ✅ Ollama 연동 | ✅ | ✅ | ❌ |
+| 차단 타이밍 | **커밋 전** (가장 빠름) | 커밋 전 | 커밋 전 | **푸시 후** (이미 노출) |
+
+## 대시보드 인증
+
+`HOST=0.0.0.0` 로 팀 공유 시 Bearer token 인증으로 API를 보호합니다.
+
+```bash
+# .env
+DASHBOARD_TOKEN=my-secret-team-token
+```
+
+- 미설정 시: 모든 요청 허용 (개인 로컬 사용)
+- 설정 시: `Authorization: Bearer <token>` 필요
+- 대시보드 페이지(`/dashboard`)와 상태 확인(`/api/status`)은 인증 없이 접근 가능
+- docker-compose에서도 `DASHBOARD_TOKEN` 환경변수로 설정
+
+## PDF 리포트
+
+스캔 결과를 PDF로 내보낼 수 있습니다.
+
+```bash
+open http://localhost:3101/api/report/pdf   # 브라우저에서 열기 → "PDF로 저장"
+```
+
+- print-optimized HTML로 렌더링, 브라우저 `Cmd+P` → PDF로 저장
+- severity별 color coding (critical=빨강, high=주황)
+- masked fingerprint만 포함 (보안 유지)
+- 외부 의존성 없음 (브라우저 내장 기능 활용)
+
 ### 보안 스캔 확장 (v0.3+)
 
 클라우드 키 탐지 외에 추가 보안 취약점도 함께 감사합니다:

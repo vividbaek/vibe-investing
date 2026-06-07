@@ -151,6 +151,58 @@ In VS Code:
 | `laon-vaultguard.scanOnOpen` | `false` | Scan when file opens |
 | `laon-vaultguard.severity` | `medium` | Minimum severity (critical/high/medium/all) |
 
+## Pre-commit Hook
+
+Automatically checks staged files for secrets before every commit.
+
+```bash
+npx laon-vaultguard hook install     # Install in current repo
+npx laon-vaultguard hook uninstall   # Remove
+```
+
+**How it works**:
+- `git commit` triggers the hook automatically
+- Fast regex scan on staged files only (no LLM, <1 second)
+- Blocks commit if critical/high pattern detected
+- Bypass with `git commit --no-verify`
+
+### Advantages Over Similar Solutions
+
+| | LAON VaultGuard | gitleaks | trufflehog | GitHub Push Protection |
+|---|---|---|---|---|
+| Install | `npx` 1 line | `brew install` | `pip install` | No setup |
+| Timing | **pre-commit** (earliest) | pre-commit | pre-commit | **post-push** (too late) |
+| LLM analysis | Deep Scan integration | ❌ (regex only) | ❌ (regex+entropy) | ❌ |
+| Custom patterns | git grep 60+ rules | `.gitleaks.toml` | Limited | GitHub managed |
+| Offline | ✅ with Ollama | ✅ | ✅ | ❌ |
+
+## Dashboard Auth
+
+Protect mutating API endpoints with a Bearer token when sharing via `HOST=0.0.0.0`.
+
+```bash
+# .env
+DASHBOARD_TOKEN=my-secret-team-token
+```
+
+- Not set: all requests allowed (personal local use)
+- Set: `Authorization: Bearer <token>` required for mutating APIs
+- Dashboard page (`/dashboard`) and status check (`/api/status`) remain public
+- Also configurable via `DASHBOARD_TOKEN` in docker-compose
+
+## PDF Export
+
+Export scan results as a print-optimized PDF.
+
+```bash
+open http://localhost:3101/api/report/pdf   # Browser → Save as PDF
+```
+
+- Print-optimized HTML, rendered in browser
+- Severity color coding (critical=red, high=orange)
+- Masked fingerprints only (security-first)
+- Zero external dependencies (uses browser print)
+
 ## Architecture Overview
 
 ```
