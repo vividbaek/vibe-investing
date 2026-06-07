@@ -262,16 +262,31 @@ Cloud targets: AWS, Azure, GCP, **KT Cloud**, **Naver Cloud Platform (NCP)**
 - [x] SQLite vs RocksDB storage engine evaluation (`docs/Storage_Engine_Comparison.md`)
 - [x] 2026-06-07 code review: 7 bug fixes (llm-harness, cli, scan-runner, candidate-filter, git-monitor)
 
-### v0.5 (Planned)
+### v0.5 — SQLite + SARIF + Differential Privacy + Prometheus + Docker
 
-- [ ] Docker image: SQLite + Ollama + dashboard pre-configured
-- [ ] SQLite migration (`findings.json` / `repos.json` → SQLite WAL)
-- [ ] SARIF export
-- [ ] Differential Privacy: code masking before LLM transmission
-- [ ] False positive feedback loop
-- [ ] Prometheus metrics (`/metrics`)
+- [x] **SQLite migration** — `better-sqlite3` WAL mode, ACID transactions, `npm run migrate`
+- [x] **Dual-engine** — `db.ts` facade switches `STORAGE_ENGINE=sqlite|json` at runtime
+- [x] **SARIF v2.1.0** — `npm run export-sarif` → GitHub Code Scanning / GitLab SAST compatible
+- [x] **Differential Privacy** — 14 secret masking rules before LLM transmission (`DP_ENABLED=true`)
+- [x] **Prometheus metrics** — `/metrics` endpoint (scans, findings, tokens, latency histograms)
+- [x] **Docker image** — multi-stage Alpine, docker-compose (app + Ollama profile)
+
+### v0.6 (Planned)
+
+- [ ] VS Code extension plugin
+- [ ] False positive feedback loop (few-shot prompt improvement)
+- [ ] Fine-tuned model evaluation pipeline
+- [ ] Pre-commit hook integration (`npx laon-vaultguard hook install`)
 
 ## Update History
+
+### 2026-06-07 — v0.5 SQLite + SARIF + DP + Prometheus + Docker
+
+- **SQLite**: WAL mode, ACID, `npm run migrate` one-shot JSON→SQLite, `STORAGE_ENGINE` runtime switch
+- **SARIF v2.1.0**: `npm run export-sarif -- --output results.sarif`, GitHub Code Scanning upload ready
+- **Differential Privacy**: 14 masking rules (AWS, GCP, GitHub, JWT, PEM, passwords, connection strings)
+- **Prometheus**: `/metrics` with counters (scans, findings, tokens), gauges (open findings), histograms (latency)
+- **Docker**: Multi-stage Alpine, `docker-compose up -d` + `--profile ollama` for local LLM
 
 ### 2026-06-07 — v0.5 Setup Wizard + Ollama Multi-Model
 

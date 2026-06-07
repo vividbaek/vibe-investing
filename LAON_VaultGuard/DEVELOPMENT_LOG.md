@@ -2,6 +2,30 @@
 
 > macOS / Linux / Windows (WSL) · Node.js/TypeScript · LLM 기반 시크릿 탐지 감사 도구
 
+## 2026-06-07 — v0.5 SQLite + SARIF + DP + Prometheus + Docker 빌드아웃
+
+### 완료
+- [x] `src/db-sqlite.ts` — SQLite(better-sqlite3) WAL 모드, ACID 트랜잭션, 4개 테이블 + 3개 인덱스
+- [x] `src/db-json.ts` — 기존 JSON 저장소 코드 분리 (레거시 백엔드)
+- [x] `src/db.ts` — `STORAGE_ENGINE` 환경변수로 json/sqlite 런타임 전환 facade
+- [x] `src/migrate-json-to-sqlite.ts` — `npm run migrate` 원클릭 JSON→SQLite 변환
+- [x] `src/sarif-export.ts` — SARIF v2.1.0, GitHub Code Scanning / GitLab SAST 호환
+- [x] `src/differential-privacy.ts` — 14개 시크릿 패턴 마스킹 (AWS, GCP, JWT, PEM, DB conn 등)
+- [x] `src/llm-harness.ts` — DP 마스킹 통합 (LLM 전송 전 자동 적용, `DP_ENABLED` 토글)
+- [x] `src/metrics.ts` — Prometheus `/metrics` (counters, gauges, histograms), 의존성 없음
+- [x] `src/routes/api.ts` — `/metrics` 엔드포인트 추가
+- [x] `Dockerfile` — Multi-stage Node 20 Alpine, better-sqlite3 네이티브 컴파일
+- [x] `docker-compose.yml` — app + 데이터 볼륨 + Ollama 프로필 (GPU 패스스루)
+- [x] `.dockerignore` — node_modules, dist, data, tests 제외
+- [x] `README.md`, `README_EN.md` — v0.5 완료 + v0.6 계획 업데이트
+- [x] `npm run typecheck` → 정상 통과
+
+### v0.6 계획
+1. [ ] VS Code 확장 플러그인
+2. [ ] 오탐 피드백 루프
+3. [ ] fine-tuned 모델 평가 파이프라인
+4. [ ] pre-commit hook 통합 코드
+
 ## 2026-06-07 — v0.5 설치 마법사 + Ollama 멀티 모델 + 스토리지 엔진
 
 ### 완료

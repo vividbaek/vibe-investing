@@ -265,16 +265,46 @@ LAON_VaultGuard/
 - [x] SQLite vs RocksDB 스토리지 엔진 비교 평가 (`docs/Storage_Engine_Comparison.md`)
 - [x] 2026-06-07 코드 리뷰 버그 7건 패치 (llm-harness, cli, scan-runner, candidate-filter, git-monitor)
 
-### v0.5 (계획)
+### v0.5 — SQLite + SARIF + Differential Privacy + Prometheus + Docker
 
-- [ ] Docker 이미지: SQLite + Ollama + 대시보드 사전 구성
-- [ ] SQLite 마이그레이션 (`findings.json` / `repos.json` → SQLite WAL)
-- [ ] 결과 내보내기 (SARIF)
-- [ ] Differential Privacy: LLM 전송 전 코드 마스킹 전처리
-- [ ] 오탐/진탐 피드백 루프
-- [ ] Prometheus 메트릭 (`/metrics`)
+- [x] **SQLite 마이그레이션** — `better-sqlite3` WAL 모드, ACID 트랜잭션, `npm run migrate` JSON→SQLite 변환
+- [x] **Dual-Engine** — `db.ts` facade → `STORAGE_ENGINE=sqlite|json` 으로 런타임 전환
+- [x] **SARIF v2.1.0** — `npm run export-sarif` → GitHub Code Scanning / GitLab SAST 호환
+- [x] **Differential Privacy** — 14개 룰로 LLM 전송 전 시크릿 마스킹 (`DP_ENABLED=true`)
+- [x] **Prometheus 메트릭** — `/metrics` 엔드포인트 (scans, findings, tokens, latency)
+- [x] **Docker 이미지** — multi-stage Alpine, docker-compose (app + Ollama 프로필)
+
+### v0.6 (계획)
+
+- [ ] VS Code 확장 플러그인
+- [ ] 오탐 피드백 루프 (few-shot 프롬프트 개선)
+- [ ] fine-tuned 모델 평가 파이프라인
+- [ ] pre-commit hook 통합 코드 (`npx laon-vaultguard hook install`)
 
 ## 업데이트 내역
+
+### 2026-06-07 — v0.5 SQLite + SARIF + DP + Prometheus + Docker
+
+**스토리지 엔진**
+- `better-sqlite3` WAL 모드 — ACID 트랜잭션, 무제한 concurrent read
+- `npm run migrate` — 기존 JSON 파일 → SQLite 원클릭 마이그레이션
+- `db.ts` → `STORAGE_ENGINE` 환경변수로 json/sqlite 런타임 전환
+
+**SARIF v2.1.0**
+- `npm run export-sarif -- --output results.sarif` — GitHub Code Scanning 업로드 가능
+- severity→level 매핑, confidence→rank 스코어링
+
+**Differential Privacy**
+- 14개 시크릿 패턴 마스킹 (AWS, GCP, GitHub, JWT, PEM, connection string 등)
+- `DP_ENABLED=true` (기본) — LLM 전송 전 자동 마스킹
+
+**Prometheus /metrics**
+- `laon_scans_total`, `laon_findings_*`, `laon_llm_tokens_total`, 히스토그램
+- Grafana 대시보드 연동 가능
+
+**Docker**
+- Multi-stage Alpine 이미지 (better-sqlite3 네이티브 컴파일)
+- `docker-compose up -d` → 앱 + 데이터 볼륨, `--profile ollama` → GPU LLM 추가
 
 ### 2026-06-07 — v0.5 설치 마법사 + Ollama 멀티 모델 + 스토리지 엔진
 

@@ -209,14 +209,20 @@ interface AggregatedResult {
 - [~] 단위 테스트 작성 (vitest) — 일부 작성됨, v0.5에서 확장
 - [x] README / 가이드 문서 완성
 
-### Phase 5: v0.5 — 프로덕션 배포 준비 (진행 중)
+### Phase 5: v0.5 — 프로덕션 배포 준비 ✅ 완료
 
-- [ ] Docker 이미지 (SQLite + Ollama + 대시보드 사전 구성)
-- [ ] SQLite 마이그레이션 (`findings.json` → SQLite WAL)
-- [ ] SARIF 결과 내보내기
-- [ ] Differential Privacy 전처리
+- [x] SQLite 마이그레이션 (`better-sqlite3`, WAL 모드, `npm run migrate`)
+- [x] SARIF v2.1.0 결과 내보내기 (`npm run export-sarif`)
+- [x] Differential Privacy 전처리 (14개 시크릿 마스킹 룰, `DP_ENABLED`)
+- [x] Prometheus `/metrics` 엔드포인트 (counters, gauges, histograms)
+- [x] Docker 이미지 (multi-stage Alpine) + docker-compose (app + Ollama 프로필)
+
+### Phase 6: v0.6 — 에코시스템 확장 (계획)
+
+- [ ] VS Code 확장 플러그인
 - [ ] 오탐 피드백 루프
-- [ ] Prometheus 메트릭
+- [ ] fine-tuned 모델 평가 파이프라인
+- [ ] pre-commit hook 통합 코드
 
 ## 5. 테스트 전략
 
