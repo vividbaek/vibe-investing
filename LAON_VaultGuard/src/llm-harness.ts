@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import type { Candidate, LlmScanResult, LlmProvider } from './types.js';
 import { config } from './config.js';
 import { logAudit } from './db.js';
+import { maskCandidates, summarizeMasking } from './differential-privacy.js';
 
 // ── System Prompt (abbreviated — full version in docs/LLM_Prompt.md) ──
 
@@ -138,7 +139,28 @@ async function callSingleLLM(
     maxRetries: 1,
   });
 
-  const userPrompt = buildUserPrompt(candidates);
+  // ── Differential Privacy: mask actual secret values before LLM ──
+  const dpEnabled = process.env.DP_ENABLED !== 'false'; // enabled by default
+  const maskedCands = dpEnabled ? maskCandidates(candidates) : candidates;
+
+  if (dpEnabled) {
+    const summary = summarizeMasking(maskedCands as ReturnType<typeof maskCandidates>);
+    if (summary.masked > 0) {
+      logAudit('dp_masking', 'info',
+        `DP masked ${summary.masked}/${summary.total} candidates (${summary.replacements} secrets)`,
+        { replaced: summary.replacements, rules: Object.fromEntries(summary.rules) },
+      );
+    }
+  }
+
+  const feedToLLM: Candidate[] = dpEnabled
+    ? (maskedCands as ReturnType<typeof maskCandidates>).map(m => ({
+      filePath: m.filePath, lineNumber: m.lineNumber,
+      snippet: m.snippet, matchedPattern: m.matchedPattern,
+    })) as Candidate[]
+    : candidates;
+
+  const userPrompt = buildUserPrompt(feedToLLM);
   const startTime = Date.now();
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), config.scan.timeoutMs);
