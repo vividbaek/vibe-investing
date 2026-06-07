@@ -95,7 +95,7 @@ laon-vaultguard scan .
 
 ```bash
 npx laon-vaultguard version
-# → LAON VaultGuard v0.1.1
+# → LAON VaultGuard v0.5.0
 ```
 
 ### help — 도움말
@@ -103,6 +103,72 @@ npx laon-vaultguard version
 ```bash
 npx laon-vaultguard help
 npx laon-vaultguard --help
+```
+
+### hook — Pre-commit 훅 관리
+
+```bash
+npx laon-vaultguard hook install     # 현재 레포에 pre-commit 훅 설치
+npx laon-vaultguard hook install --force  # 기존 훅 덮어쓰기
+npx laon-vaultguard hook uninstall   # LAON 설치 훅 제거
+```
+
+**설치 후**: `git commit` 시 자동으로 스테이징 파일 검사. 시크릿 발견 시 커밋 차단.
+
+### 리포트 및 알람
+
+#### PDF 리포트
+
+```bash
+# 서버 실행 후
+curl http://localhost:3101/api/report/pdf -o laon-report.html
+open laon-report.html  # 브라우저에서 열기 → Cmd+P → PDF로 저장
+```
+
+#### SARIF (GitHub Code Scanning)
+
+```bash
+npx laon-vaultguard export-sarif --output results.sarif
+gh code scanning upload-sarif --file results.sarif
+```
+
+#### 리포트 조회 (API)
+
+```bash
+# 대시보드 서버 필요 (npm run dev)
+curl http://localhost:3101/api/report          # HTML 리포트
+curl http://localhost:3101/api/report/pdf      # PDF용 HTML
+curl http://localhost:3101/api/status          # 스캔 상태
+curl http://localhost:3101/api/findings        # 탐지 목록 (JSON)
+curl http://localhost:3101/metrics             # Prometheus 메트릭
+```
+
+### 알람 테스트
+
+```bash
+# Slack 웹훅 테스트
+curl -X POST $SLACK_WEBHOOK_URL \
+  -H "Content-Type: application/json" \
+  -d '{"text":"🛡 LAON VaultGuard 알람 테스트"}'
+
+# Telegram 테스트
+curl -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+  -d "chat_id=$TELEGRAM_CHAT_ID" \
+  -d "text=🛡 LAON VaultGuard 알람 테스트"
+```
+
+알람 설정은 `.env` 파일에서:
+
+```bash
+# .env
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+TELEGRAM_BOT_TOKEN=123456:ABC-DEF
+TELEGRAM_CHAT_ID=-456789
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=you@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_TO=team@company.com
 ```
 
 ## 환경변수 레퍼런스
