@@ -17,6 +17,7 @@
     "cli": "tsx src/cli.ts",
     "migrate": "tsx src/migrate-json-to-sqlite.ts",
     "export-sarif": "tsx src/sarif-export.ts",
+    "backtest": "tsx tests/backtest.ts",
     "test": "vitest run",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"

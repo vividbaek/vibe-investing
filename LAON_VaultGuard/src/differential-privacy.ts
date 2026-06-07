@@ -62,7 +62,7 @@ const MASK_RULES: MaskRule[] = [
   // JWT tokens (eyJ...)
   {
     name: 'JWT Token',
-    pattern: /\b(eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,})\b/g,
+    pattern: /\b(eyJ[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,})\b/g,
     replace: () => '[MASKED:JWT]',
   },
   // Private key blocks (PEM format)
@@ -121,9 +121,9 @@ export function maskSecrets(text: string): MaskReport {
     let count = 0;
     // reset regex lastIndex for global patterns
     rule.pattern.lastIndex = 0;
-    masked = masked.replace(rule.pattern, (...args) => {
+    masked = masked.replace(rule.pattern, (...args: string[]) => {
       count++;
-      return rule.replace(args[0]);
+      return rule.replace(...args);
     });
     if (count > 0) {
       rulesTriggered.push({ rule: rule.name, count });
