@@ -25,7 +25,7 @@
 - **2단계 탐지** — 1차 `git grep` 키워드 필터 → 2차 LLM 문맥 분석으로 거짓양성 최소화
 - **웹 대시보드** — 같은 네트워크의 팀이 함께 모니터링 가능한 로컬 웹 UI
 - **멀티 알람** — Slack, Telegram, 이메일, 대시보드로 탐지 결과 실시간 통보
-- **크로스플랫폼** — macOS 지원 (Linux, Windows 추후)
+- **크로스플랫폼** — macOS, Linux, Windows (WSL)
 
 ![대시보드 스크린샷](public/dashboard.png)
 

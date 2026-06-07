@@ -1,6 +1,6 @@
 {
   "name": "laon-vaultguard",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "LLM-based Automated Observer for Non-public Keys",
   "type": "module",

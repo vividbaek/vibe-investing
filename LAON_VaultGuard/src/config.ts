@@ -69,6 +69,9 @@ export const config = {
   },
 
   isMacOS: process.platform === 'darwin',
+  isLinux: process.platform === 'linux',
+  isWindows: process.platform === 'win32',
+  platform: process.platform as 'darwin' | 'linux' | 'win32',
   deviceName: process.env.DEVICE_NAME || hostname(),
   reportSchedule: (process.env.REPORT_SCHEDULE || 'daily') as 'daily' | 'weekly' | 'off',
 };

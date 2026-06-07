@@ -1,10 +1,10 @@
-# Architecture — LAON VaultGuard (macOS)
+# Architecture — LAON VaultGuard
 
 > 🇰🇷 LAON VaultGuard의 전체 아키텍처와 컴포넌트 설계를 설명합니다.
 > 🇺🇸 Describes the overall architecture and component design of LAON VaultGuard.
 > 🇨🇳 描述 LAON VaultGuard 的整体架构和组件设计。
 
-> **v0.1**: macOS 우선 지원, 파일 기반 스토리지 (추후 SQLite 확장)
+> **v0.2**: 크로스플랫폼 지원 (macOS / Linux / Windows WSL), 파일 기반 JSON 저장소
 
 ## High-Level Flow
 

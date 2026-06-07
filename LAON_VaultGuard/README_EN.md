@@ -25,7 +25,7 @@ Regex handles speed. LLMs handle context. **Use both, for real stability.**
 - **Two-stage detection** — Stage 1: `git grep` keyword filter → Stage 2: LLM contextual analysis to minimize false positives
 - **Web dashboard** — local web UI with SSE real-time updates, accessible to the team on the same network
 - **Multi-channel alerts** — Slack, Telegram, Email, and Dashboard notifications
-- **Cross-platform** — macOS (Linux, Windows coming soon)
+- **Cross-platform** — macOS, Linux, Windows (WSL)
 
 ![Dashboard screenshot](public/dashboard.png)
 

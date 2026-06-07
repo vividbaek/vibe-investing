@@ -12,7 +12,7 @@
 
 - Node.js ≥18
 - npm ≥9
-- Git
+- Git (macOS: `brew install git`, Linux: `apt install git`, Windows: WSL + `apt install git`)
 
 ### 설치
 

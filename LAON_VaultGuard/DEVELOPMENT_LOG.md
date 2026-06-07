@@ -1,6 +1,21 @@
 # DEVELOPMENT LOG — LAON VaultGuard
 
-> macOS · Node.js/TypeScript · LLM 기반 시크릿 탐지 감사 도구
+> macOS / Linux / Windows (WSL) · Node.js/TypeScript · LLM 기반 시크릿 탐지 감사 도구
+
+## 2026-06-07 — v0.2.0 크로스플랫폼 + 이메일 리포트
+
+### 완료
+- [x] 크로스플랫폼: macOS, Linux, Windows (WSL) 공식 지원
+- [x] `config.ts` — platform detection (`darwin`/`linux`/`win32`)
+- [x] `alert-engine.ts` — nodemailer 이메일 알람 (실시간/일간/주간 HTML)
+- [x] `scheduler.ts` — 일간(9am)/주간(Mon 9am) 리포트 cron
+- [x] `db.ts` — `alert_config.json` 저장소, 채널별 토글
+- [x] `routes/api.ts` — `GET/PUT /api/alerts/config`, OAuth 엔드포인트
+- [x] `public/index.html` + `dashboard.js` — 알람 설정 UI, GitHub OAuth 패널
+- [x] `src/oauth.ts` — GitHub App OAuth (token exchange, repo listing)
+- [x] `src/git-monitor.ts` — GitHub 원격 레포 shallow clone + cleanup
+- [x] `docs/Slack.md`, `docs/E2E_TEST.md`, `docs/GitHub_OAuth.md`
+- [x] `package.json` v0.2.0, `npm run typecheck`/`build` 통과
 
 ## 2026-06-07 — v0.1.1 에러 처리 + 대시보드 UX + CLI
 
