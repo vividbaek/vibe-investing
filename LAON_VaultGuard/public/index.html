@@ -75,6 +75,7 @@ header h1 { font-size: 20px; color: var(--green); }
   border-bottom: 1px solid var(--border);
 }
 .findings-table tr:hover { background: rgba(255,255,255,0.03); }
+.findings-table tr.selected { background: rgba(63,185,80,0.08); }
 .badge {
   display: inline-block;
   padding: 2px 8px;
@@ -98,17 +99,40 @@ header h1 { font-size: 20px; color: var(--green); }
 }
 .btn:hover { background: var(--border); }
 .btn.primary { background: var(--green); color: #000; border-color: var(--green); }
+.btn.danger { background: var(--critical); color: #fff; border-color: var(--critical); }
 .filter-bar {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  align-items: center;
 }
 .filter-bar .btn.active { background: var(--green); color: #000; border-color: var(--green); }
+.filter-bar select, .filter-bar input {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.filter-bar input { width: 140px; }
+.bulk-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.bulk-bar.hidden { display: none; }
 .empty-state { text-align: center; padding: 40px; color: var(--muted); }
 .scan-info { font-size: 13px; color: var(--muted); margin-top: 8px; }
-.refresh { animation: spin 1s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.check-col { width: 30px; text-align: center; }
+.check-col input { cursor: pointer; }
 </style>
 </head>
 <body>
@@ -119,11 +143,11 @@ header h1 { font-size: 20px; color: var(--green); }
     <div style="font-size:13px;color:var(--muted);margin-top:4px">
       <span class="status-dot online" id="status-dot"></span>
       <span id="connection-status">연결됨</span>
-      · macOS v0.1.0
+      · macOS v0.1.1
     </div>
   </div>
   <div style="display:flex;gap:8px">
-    <button class="btn primary" onclick="triggerScan()">🔄 지금 스캔</button>
+    <button class="btn primary" id="scan-btn" onclick="triggerScan()">🔄 지금 스캔</button>
   </div>
 </header>
 
@@ -152,14 +176,30 @@ header h1 { font-size: 20px; color: var(--green); }
   <button class="btn" onclick="setFilter('high')">High</button>
   <button class="btn" onclick="setFilter('medium')">Medium</button>
   <button class="btn" onclick="setFilter('info')">Info</button>
+  <span style="margin-left:12px;font-size:13px;color:var(--muted)">레포:</span>
+  <select id="repo-filter" onchange="setRepoFilter(this.value)">
+    <option value="">전체</option>
+  </select>
+  <span style="font-size:13px;color:var(--muted)">기간:</span>
+  <input type="date" id="date-from" onchange="loadFindings()" title="시작일">
+  <span style="font-size:13px;color:var(--muted)">~</span>
+  <input type="date" id="date-to" onchange="loadFindings()" title="종료일">
   <span style="flex:1"></span>
-  <button class="btn" onclick="loadFindings()">새로고침</button>
+  <button class="btn" onclick="loadFindings()">🔄 새로고침</button>
+</div>
+
+<div class="bulk-bar hidden" id="bulk-bar">
+  <span id="bulk-count" style="font-size:13px;color:var(--muted)">0개 선택</span>
+  <button class="btn primary" onclick="bulkAcknowledge()">✅ 선택 항목 확인</button>
+  <button class="btn" onclick="clearSelection()">취소</button>
 </div>
 
 <table class="findings-table" id="findings-table">
   <thead>
     <tr>
+      <th class="check-col"><input type="checkbox" id="select-all" onchange="toggleSelectAll()" title="전체 선택"></th>
       <th>심각도</th>
+      <th>레포</th>
       <th>Provider</th>
       <th>유형</th>
       <th>파일</th>
@@ -169,7 +209,7 @@ header h1 { font-size: 20px; color: var(--green); }
     </tr>
   </thead>
   <tbody id="findings-body">
-    <tr><td colspan="7" class="empty-state">로딩 중...</td></tr>
+    <tr><td colspan="9" class="empty-state">로딩 중...</td></tr>
   </tbody>
 </table>
 

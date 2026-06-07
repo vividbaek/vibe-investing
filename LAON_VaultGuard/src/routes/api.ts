@@ -85,7 +85,7 @@ apiRouter.post('/api/scan/trigger', async (_req, res) => {
 // ── Findings ──
 
 apiRouter.get('/api/findings', (req, res) => {
-  const { severity, acknowledged, repo_id, limit, offset } = req.query;
+  const { severity, acknowledged, repo_id, limit, offset, from, to } = req.query;
   const result = listFindings({
     severity: severity as string | undefined,
     acknowledged: acknowledged !== undefined ? acknowledged === 'true' : undefined,
@@ -93,13 +93,23 @@ apiRouter.get('/api/findings', (req, res) => {
     limit: limit ? parseInt(limit as string, 10) : undefined,
     offset: offset ? parseInt(offset as string, 10) : undefined,
   });
+  // date range filter
+  let filtered = result.findings;
+  if (from) {
+    const fromDate = new Date(from as string).toISOString();
+    filtered = filtered.filter(f => f.detectedAt >= fromDate);
+  }
+  if (to) {
+    const toDate = new Date(to as string).toISOString();
+    filtered = filtered.filter(f => f.detectedAt <= toDate);
+  }
   // attach repo name
   const repos = listRepos();
-  const withRepoName = result.findings.map(f => ({
+  const withRepoName = filtered.map(f => ({
     ...f,
     repo_name: repos.find(r => r.id === f.repoId)?.name || 'unknown',
   }));
-  res.json({ total: result.total, findings: withRepoName });
+  res.json({ total: withRepoName.length, findings: withRepoName });
 });
 
 apiRouter.get('/api/findings/:id', (req, res) => {
@@ -115,6 +125,23 @@ apiRouter.put('/api/findings/:id/acknowledge', (req, res) => {
   if (!f) return res.status(404).json({ error: 'Finding not found' });
   emitSse('finding:acknowledged', { id: f.id });
   res.json(f);
+});
+
+// ── Bulk acknowledge ──
+apiRouter.put('/api/findings/acknowledge/bulk', (req, res) => {
+  const { ids, note } = req.body;
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: 'ids array required' });
+  }
+  let count = 0;
+  for (const id of ids) {
+    const f = acknowledgeFinding(id, note || 'Bulk acknowledged');
+    if (f) {
+      count++;
+      emitSse('finding:acknowledged', { id: f.id });
+    }
+  }
+  res.json({ acknowledged: count });
 });
 
 // ── Dashboard ──

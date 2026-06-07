@@ -3,13 +3,16 @@
 import { randomUUID } from 'node:crypto';
 import type { Repository, ScanRun, Finding, LlmProvider, Candidate } from './types.js';
 import { saveScanRun, saveFindings, logAudit } from './db.js';
-import { getLocalChanges, getWholeRepoChanges, getGithubChanges } from './git-monitor.js';
+import { checkGitInstalled } from './git-monitor.js';
 import { extractCandidates } from './candidate-filter.js';
 import { analyzeCandidates } from './llm-harness.js';
 import { emitSse } from './sse.js';
 import { sendAlerts } from './alert-engine.js';
+import { config } from './config.js';
 
-export async function scanRepository(repo: Repository) {
+const MAX_CANDIDATES = config.scan.maxCandidates;
+
+export async function scanRepository(repo: Repository, trigger: 'scheduled' | 'manual' = 'scheduled') {
   const scanId = randomUUID();
   const startedAt = new Date().toISOString();
 
@@ -17,7 +20,7 @@ export async function scanRepository(repo: Repository) {
     id: scanId,
     repoId: repo.id,
     status: 'running',
-    trigger: 'scheduled',
+    trigger,
     startedAt,
     completedAt: null,
     filesScanned: 0,
@@ -33,27 +36,27 @@ export async function scanRepository(repo: Repository) {
   logAudit('scan_repo_started', 'info', `Scan started: ${repo.name}`, { scanId, repoId: repo.id });
 
   try {
-    // Phase 1: Get changes
-    const isFirstScan = !repo.lastScan;
+    // Pre-flight: check git
+    if (repo.type === 'local' && !checkGitInstalled()) {
+      throw new Error('Git is not installed or not in PATH');
+    }
+
+    // Phase 1: Extract candidates via git grep
     let candidates: Candidate[] = [];
 
-    if (repo.type === 'local') {
-      if (isFirstScan) {
-        // For first scan, we still use candidate filter (git grep) only — no full file send
-        candidates = await extractCandidates(repo.pathOrUrl);
-        scanRun.filesScanned = 0; // counted via grep
-      } else {
-        // delta scan via diff
-        candidates = await extractCandidates(repo.pathOrUrl);
-        scanRun.filesScanned = candidates.length > 0 ? 0 : 0; // approximate
-      }
-    } else if (repo.type === 'github') {
-      // GitHub remote: extract candidates from compareCommits diff
-      candidates = await extractCandidates(repo.pathOrUrl); // uses local git if cloned
-    } else {
-      // GitLab (future)
-      candidates = await extractCandidates(repo.pathOrUrl);
+    candidates = await extractCandidates(repo.pathOrUrl);
+
+    if (candidates.length > MAX_CANDIDATES) {
+      logAudit('scan_truncated', 'warn',
+        `Candidates truncated: ${candidates.length} → ${MAX_CANDIDATES} (max)`,
+        { scanId, repoId: repo.id },
+      );
+      candidates = candidates.slice(0, MAX_CANDIDATES);
     }
+
+    scanRun.filesScanned = candidates.length > 0
+      ? new Set(candidates.map(c => c.filePath)).size
+      : 0;
 
     // Phase 2: LLM analysis
     let findings: Finding[] = [];
@@ -61,29 +64,37 @@ export async function scanRepository(repo: Repository) {
     let totalTokens = 0;
 
     if (candidates.length > 0) {
-      const result = await analyzeCandidates(candidates);
-      findings = result.findings.map((f, idx) => ({
-        id: `F-${scanId.slice(0, 8)}-${String(idx + 1).padStart(3, '0')}`,
-        scanId,
-        repoId: repo.id,
-        filePath: f.file,
-        line: f.line,
-        provider: f.provider,
-        secretType: f.secretType,
-        maskedFingerprint: f.maskedFingerprint,
-        confidence: f.confidence,
-        severity: f.severity,
-        isPlaceholder: f.isPlaceholder,
-        evidenceNote: f.evidenceNote,
-        remediation: f.remediation,
-        acknowledged: false,
-        acknowledgedAt: null,
-        acknowledgedNote: null,
-        detectedAt: new Date().toISOString(),
-        llmSources: result.providersUsed,
-      }));
-      providersUsed = result.providersUsed;
-      totalTokens = result.totalTokens;
+      try {
+        const result = await analyzeCandidates(candidates);
+        findings = result.findings.map((f, idx) => ({
+          id: `F-${scanId.slice(0, 8)}-${String(idx + 1).padStart(3, '0')}`,
+          scanId,
+          repoId: repo.id,
+          filePath: f.file,
+          line: f.line,
+          provider: f.provider,
+          secretType: f.secretType,
+          maskedFingerprint: f.maskedFingerprint,
+          confidence: f.confidence,
+          severity: f.severity,
+          isPlaceholder: f.isPlaceholder,
+          evidenceNote: f.evidenceNote,
+          remediation: f.remediation,
+          acknowledged: false,
+          acknowledgedAt: null,
+          acknowledgedNote: null,
+          detectedAt: new Date().toISOString(),
+          llmSources: result.providersUsed,
+        }));
+        providersUsed = result.providersUsed;
+        totalTokens = result.totalTokens;
+      } catch (llmErr) {
+        // LLM errors are non-fatal — log and continue
+        logAudit('llm_error', 'error',
+          `LLM analysis failed, scan continues without LLM results: ${llmErr instanceof Error ? llmErr.message : String(llmErr)}`,
+          { scanId, repoId: repo.id },
+        );
+      }
     }
 
     // Phase 3: Save
@@ -123,4 +134,6 @@ export async function scanRepository(repo: Repository) {
       scanId, repoId: repo.id, error: scanRun.errorMessage,
     });
   }
+
+  return scanRun;
 }

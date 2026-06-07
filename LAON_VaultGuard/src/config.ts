@@ -37,6 +37,9 @@ export const config = {
 
   scan: {
     cron: process.env.SCAN_CRON || '0 */6 * * *',
+    timeoutMs: parseInt(process.env.SCAN_TIMEOUT_MS || '60000', 10),
+    maxCandidates: parseInt(process.env.SCAN_MAX_CANDIDATES || '500', 10),
+    maxFileSizeKb: parseInt(process.env.SCAN_MAX_FILE_SIZE_KB || '1024', 10),
   },
 
   db: {

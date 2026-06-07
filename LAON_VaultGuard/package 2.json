@@ -1,20 +1,14 @@
 {
   "name": "laon-vaultguard",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "private": true,
   "description": "LLM-based Automated Observer for Non-public Keys",
   "type": "module",
   "main": "dist/index.js",
-  "bin": {
-    "laon-vaultguard": "./src/cli.ts"
-  },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm --external:simple-git",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm --external:better-sqlite2 --external:simple-git",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
-    "setup": "tsx src/setup.ts",
-    "scan": "tsx src/cli.ts scan",
-    "cli": "tsx src/cli.ts",
     "test": "vitest run",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"

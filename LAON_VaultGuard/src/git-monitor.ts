@@ -2,9 +2,24 @@
 
 import { simpleGit, type SimpleGit } from 'simple-git';
 import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 import { Octokit } from '@octokit/rest';
 import type { Repository, RepoType } from './types.js';
 import { config } from './config.js';
+
+let gitAvailable: boolean | null = null;
+
+export function checkGitInstalled(): boolean {
+  if (gitAvailable !== null) return gitAvailable;
+  try {
+    execSync('git --version', { stdio: 'pipe' });
+    gitAvailable = true;
+    return true;
+  } catch {
+    gitAvailable = false;
+    return false;
+  }
+}
 
 export interface GitChange {
   filePath: string;

@@ -107,35 +107,65 @@ async function callSingleLLM(
   const client = new OpenAI({
     apiKey: provider.apiKey,
     baseURL: provider.baseUrl,
+    timeout: config.scan.timeoutMs,
+    maxRetries: 1,
   });
 
   const userPrompt = buildUserPrompt(candidates);
   const startTime = Date.now();
 
-  const response = await client.chat.completions.create({
-    model: provider.model,
-    temperature: 0,
-    messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: userPrompt },
-    ],
-    max_tokens: 4096,
-  });
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), config.scan.timeoutMs);
 
-  const elapsed = Date.now() - startTime;
-  const content = response.choices[0]?.message?.content || '';
-  const tokensUsed = response.usage?.total_tokens || 0;
+    const response = await client.chat.completions.create({
+      model: provider.model,
+      temperature: 0,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: 4096,
+    }, { signal: controller.signal });
 
-  logAudit('llm_call', 'info',
-    `LLM call: ${provider.name} (${provider.model}) — ${elapsed}ms, ${tokensUsed} tokens`,
-    { provider: provider.name, model: provider.model, tokens: tokensUsed, elapsedMs: elapsed },
-  );
+    clearTimeout(timeoutId);
 
-  const sanitized = sanitizeResponse(content);
-  const result = JSON.parse(sanitized) as LlmScanResult;
-  result.scanSummary.filesScanned = candidates.length;
+    const elapsed = Date.now() - startTime;
+    const content = response.choices[0]?.message?.content || '';
+    const tokensUsed = response.usage?.total_tokens || 0;
 
-  return { provider: provider.name, result, tokensUsed };
+    logAudit('llm_call', 'info',
+      `LLM call: ${provider.name} (${provider.model}) — ${elapsed}ms, ${tokensUsed} tokens`,
+      { provider: provider.name, model: provider.model, tokens: tokensUsed, elapsedMs: elapsed },
+    );
+
+    const sanitized = sanitizeResponse(content);
+    let result: LlmScanResult;
+    try {
+      result = JSON.parse(sanitized) as LlmScanResult;
+    } catch {
+      logAudit('llm_parse_error', 'error', `Failed to parse LLM response: ${sanitized.slice(0, 200)}`);
+      throw new Error('LLM returned invalid JSON');
+    }
+    result.scanSummary.filesScanned = candidates.length;
+
+    return { provider: provider.name, result, tokensUsed };
+  } catch (err) {
+    clearTimeout(0); // clear any pending timeout
+    const msg = err instanceof Error ? err.message : String(err);
+
+    if (msg.includes('aborted') || msg.includes('timeout') || msg.includes('ETIMEDOUT')) {
+      throw new Error(`LLM timeout: ${provider.name} exceeded ${config.scan.timeoutMs}ms`);
+    }
+    if (msg.includes('429') || msg.includes('rate') || msg.includes('quota')) {
+      logAudit('llm_quota', 'warn', `LLM quota exceeded: ${provider.name}`, { provider: provider.name });
+      throw new Error(`LLM quota exceeded: ${provider.name}`);
+    }
+    if (msg.includes('401') || msg.includes('403') || msg.includes('auth')) {
+      throw new Error(`LLM auth failed: ${provider.name} — check API key`);
+    }
+    throw err;
+  }
 }
 
 // ── Multi-LLM Modes ──
