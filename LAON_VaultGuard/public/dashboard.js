@@ -71,10 +71,10 @@ async function loadFindings() {
         <td style="font-size:12px">${new Date(f.detected_at || f.detectedAt).toLocaleString('ko-KR')}</td>
         <td>
           ${f.acknowledged
-            ? '<span style="color:var(--green);font-size:12px">Done</span> <button class="btn" onclick="unacknowledge(\\'' + f.id + '\\')" style="margin-left:4px">Undo</button>'
-            : '<button class="btn" onclick="acknowledge(\\'' + f.id + '\\')">Confirm</button>'
+            ? '<span style="color:var(--green);font-size:12px">Done</span> <button class="btn" onclick="unacknowledge(\'' + f.id + '\')" style="margin-left:4px">Undo</button>'
+            : '<button class="btn" onclick="acknowledge(\'' + f.id + '\')">Confirm</button>'
           }
-          <button class="btn" onclick="addComment(\\'' + f.id + '\\')" style="margin-left:4px" title="Add note">Note</button>
+          <button class="btn" onclick="addComment('${f.id}')" style="margin-left:4px" title="Add note">Note</button>
         </td>
       </tr>`;
     }).join('');
