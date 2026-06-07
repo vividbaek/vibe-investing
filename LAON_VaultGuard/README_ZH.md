@@ -1,4 +1,4 @@
-# LAON VaultGuard
+# LAON VaultGuard ／ 澜安 VaultGuard
 
 > **LLM-based Automated Observer for Non-public Keys**
 >
@@ -132,6 +132,21 @@ npx laon-vaultguard scan . --no-llm
 - [ ] 误报反馈循环
 - [ ] 微调模型评估流水线
 - [ ] pre-commit hook 集成
+
+## 回测结果 (v0.5)
+
+`npm run backtest` — **54 项自动化测试全部通过** ✅
+
+| 模块 | 通过 | 已验证 |
+|------|------|--------|
+| 存储 (SQLite + JSON) | 12/12 | CRUD, WAL, 迁移 |
+| 差分隐私 | 10/10 | 14 种密钥掩码规则 |
+| SARIF 导出 | 4/4 | v2.1.0, GitHub Code Scanning |
+| Prometheus 指标 | 5/5 | `/metrics` 端点 |
+| 候选过滤器 | 4/4 | 60+ 模式, grep 集成 |
+| 配置 + 版本 | 7/7 | 验证, 默认值 |
+
+→ [完整清单](./docs/BACKTEST_CHECKLIST.md)
 
 ## 许可证
 

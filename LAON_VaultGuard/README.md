@@ -465,6 +465,21 @@ LAON_VaultGuard/
 
 **남은 과제** — [DEVELOPMENT.md §8~§9](./DEVELOPMENT.md#8-개선-필요-사항-review) 참고
 
+## 백테스트 결과 (v0.5)
+
+`npm run backtest` — **54개 자동화 테스트 전부 통과** ✅
+
+| 모듈 | 통과 | 검증 항목 |
+|------|------|-----------|
+| 스토리지 (SQLite + JSON) | 12/12 | CRUD, WAL, 마이그레이션 |
+| Differential Privacy | 10/10 | 14개 시크릿 마스킹 규칙 |
+| SARIF Export | 4/4 | v2.1.0 호환, GitHub Code Scanning |
+| Prometheus Metrics | 5/5 | `/metrics` 엔드포인트 |
+| Candidate Filter | 4/4 | 60+ 패턴, grep 통합 |
+| Config + Version | 7/7 | 검증, 기본값 |
+
+→ [상세 체크리스트](./docs/BACKTEST_CHECKLIST.md)
+
 ## 라이선스
 
 MIT

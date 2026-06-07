@@ -336,6 +336,21 @@ Cloud targets: AWS, Azure, GCP, **KT Cloud**, **Naver Cloud Platform (NCP)**
 - DEVELOPMENT.md §8~§9 design improvements + priority actions
 - 01.Trading Strategy/ARDS-Defense/ duplicate lowercase readme.md removed
 
+## Backtest Results (v0.5)
+
+`npm run backtest` — **54 automated tests, all passing** ✅
+
+| Module | Passed | Verified |
+|--------|--------|----------|
+| Storage (SQLite + JSON) | 12/12 | CRUD, WAL, migration |
+| Differential Privacy | 10/10 | 14 secret masking rules |
+| SARIF Export | 4/4 | v2.1.0, GitHub Code Scanning |
+| Prometheus Metrics | 5/5 | `/metrics` endpoint |
+| Candidate Filter | 4/4 | 60+ patterns, grep integration |
+| Config + Version | 7/7 | validation, defaults |
+
+→ [Full Checklist](./docs/BACKTEST_CHECKLIST.md)
+
 ## License
 
 MIT

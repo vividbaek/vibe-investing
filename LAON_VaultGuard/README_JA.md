@@ -119,6 +119,21 @@ npx laon-vaultguard scan . --no-llm
 - [ ] ファインチューニングモデル評価パイプライン
 - [ ] pre-commit hook 統合
 
+## バックテスト結果 (v0.5)
+
+`npm run backtest` — **54 の自動テストすべて合格** ✅
+
+| モジュール | 合格 | 検証項目 |
+|------------|------|----------|
+| ストレージ (SQLite + JSON) | 12/12 | CRUD, WAL, 移行 |
+| 差分プライバシー | 10/10 | 14 種類のシークレットマスクルール |
+| SARIF エクスポート | 4/4 | v2.1.0, GitHub Code Scanning |
+| Prometheus メトリクス | 5/5 | `/metrics` エンドポイント |
+| 候補フィルター | 4/4 | 60+ パターン, grep 統合 |
+| 設定 + バージョン | 7/7 | 検証, デフォルト値 |
+
+→ [詳細チェックリスト](./docs/BACKTEST_CHECKLIST.md)
+
 ## ライセンス
 
 MIT
