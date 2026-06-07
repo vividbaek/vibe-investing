@@ -154,3 +154,50 @@ export async function extractCandidates(repoPath: string): Promise<Candidate[]> 
 
   return candidates;
 }
+
+// ── Shannon Entropy (pre-filter) ──
+
+export function calculateEntropy(str: string): number {
+  const len = str.length;
+  if (len === 0) return 0;
+  const freq: Record<string, number> = {};
+  for (const ch of str) freq[ch] = (freq[ch] || 0) + 1;
+  let entropy = 0;
+  for (const count of Object.values(freq)) {
+    const p = count / len;
+    entropy -= p * Math.log2(p);
+  }
+  return entropy;
+}
+
+export function isHighEntropy(snippet: string, threshold = 3.5): boolean {
+  // Extract the "value" part after =, :, or whitespace
+  const valueMatch = snippet.match(/[=:]\s*(\S{8,})/);
+  const value = valueMatch?.[1] || snippet;
+  return calculateEntropy(value) >= threshold;
+}
+
+// ── Context Risk Classification ──
+
+const LOW_RISK_FILES = [
+  /\.env\.example$/,
+  /\.env\.sample$/,
+  /\.env\.template$/,
+  /README/i,
+  /\.md$/,
+  /LICENSE/,
+  /CHANGELOG/,
+  /CONTRIBUTING/,
+  /\.txt$/,
+  /test/i,
+  /spec/i,
+  /mock/i,
+  /fixture/i,
+  /example/i,
+];
+
+export function classifyContextRisk(filePath: string): 'high' | 'medium' | 'low' {
+  if (LOW_RISK_FILES.some(p => p.test(filePath))) return 'low';
+  if (filePath.includes('config') || filePath.includes('env') || filePath.includes('secret') || filePath.includes('credential')) return 'high';
+  return 'medium';
+}

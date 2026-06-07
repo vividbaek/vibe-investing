@@ -199,6 +199,26 @@ export function logAudit(
   fs.appendFileSync(file, entry + '\n', 'utf-8');
 }
 
+// ── Log Rotation ──
+
+const LOG_RETENTION_DAYS = parseInt(process.env.LOG_RETENTION_DAYS || '30', 10);
+
+export function rotateLogs() {
+  ensureDir(LOG_DIR);
+  const cutoff = Date.now() - LOG_RETENTION_DAYS * 86400000;
+  try {
+    for (const file of fs.readdirSync(LOG_DIR)) {
+      if (!file.endsWith('.log')) continue;
+      const dateStr = file.replace('.log', '');
+      const fileDate = new Date(dateStr).getTime();
+      if (fileDate < cutoff) {
+        fs.unlinkSync(path.join(LOG_DIR, file));
+        logAudit('log_rotated', 'info', `Rotated log: ${file}`);
+      }
+    }
+  } catch { /* ok */ }
+}
+
 // ── Alert Config ──
 
 interface AlertConfig {

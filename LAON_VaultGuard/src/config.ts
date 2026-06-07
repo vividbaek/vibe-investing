@@ -55,6 +55,11 @@ export const config = {
     timeoutMs: parseInt(process.env.SCAN_TIMEOUT_MS || '60000', 10),
     maxCandidates: parseInt(process.env.SCAN_MAX_CANDIDATES || '500', 10),
     maxFileSizeKb: parseInt(process.env.SCAN_MAX_FILE_SIZE_KB || '1024', 10),
+    cacheEnabled: process.env.SCAN_CACHE_ENABLED !== 'false',
+    tieredLLM: process.env.SCAN_TIERED_LLM !== 'false',
+    lightProviders: (process.env.SCAN_LIGHT_PROVIDERS || 'minimax,ollama').split(',').map(p => p.trim()),
+    heavyProviders: (process.env.SCAN_HEAVY_PROVIDERS || 'claude,deepseek').split(',').map(p => p.trim()),
+    batchSize: parseInt(process.env.SCAN_BATCH_SIZE || '50', 10),
   },
 
   db: {

@@ -227,6 +227,23 @@ LAON_VaultGuard/
 - [x] 이메일 리포트 (nodemailer · 일간/주간 HTML)
 - [x] GitHub 원격 레포 + OAuth
 - [x] 크로스플랫폼 (macOS / Linux / Windows WSL)
+
+### v0.3 — 성능 및 정확도 최적화
+
+- [x] 파일 해시 기반 증분 스캔 캐싱 (변경 없는 파일 스킵)
+- [x] 2-Tier LLM: 경량 1차 필터링 → 고성능 2차 정밀 분석
+- [x] 배치 처리: API 호출을 50건 단위로 분할해 비용 절감
+- [x] Shannon 엔트로피 사전 필터 (3.5 threshold)
+- [x] 컨텍스트 위험 분류 (.env.example, README, test = low risk)
+- [x] 로그 보관 주기 (LOG_RETENTION_DAYS, 기본 30일)
+- [x] CI/CD 통합 가이드: GitHub Actions, GitLab CI, pre-commit hook
+- [x] 보안 표준 매핑: OWASP Top 10, CWE, KISA, NIST CSF
+
+### v0.4 (계획)
+
+- [ ] Differential Privacy: LLM 전송 전 코드 마스킹 전처리
+- [ ] 오탐/진탐 피드백 루프
+- [ ] 정규식 스캐너(gitleaks/trufflehog) 벤치마크 비교
 - [ ] VSCode 확장
 
 ## 라이선스

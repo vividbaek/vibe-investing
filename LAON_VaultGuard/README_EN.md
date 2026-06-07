@@ -239,6 +239,23 @@ Cloud targets: AWS, Azure, GCP, **KT Cloud**, **Naver Cloud Platform (NCP)**
 - [x] Email reports (nodemailer · daily/weekly HTML)
 - [x] GitHub remote repos + OAuth
 - [x] Cross-platform (macOS / Linux / Windows WSL)
+
+### v0.3 — Performance & Accuracy Optimizations
+
+- [x] File hash-based incremental scan caching (skip unchanged files)
+- [x] 2-Tier LLM: lightweight first-pass filtering -> heavyweight precision analysis
+- [x] Batch processing: 50-candidate API call chunks for cost savings
+- [x] Shannon entropy pre-filter (3.5 threshold)
+- [x] Context risk classification (.env.example, README, test = low risk)
+- [x] Log rotation (LOG_RETENTION_DAYS, default 30 days)
+- [x] CI/CD integration: GitHub Actions, GitLab CI, pre-commit hook
+- [x] Security standards mapping: OWASP Top 10, CWE, KISA, NIST CSF
+
+### v0.4 (Planned)
+
+- [ ] Differential Privacy: code masking before LLM transmission
+- [ ] False positive/true positive feedback loop
+- [ ] Regex scanner (gitleaks/trufflehog) benchmark comparison
 - [ ] VSCode extension
 
 ## License
