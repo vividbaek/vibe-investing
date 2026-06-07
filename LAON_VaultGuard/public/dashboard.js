@@ -66,14 +66,15 @@ async function loadFindings() {
         <td style="font-size:12px;color:var(--muted)">${f.repo_name || '-'}</td>
         <td>${f.provider}</td>
         <td>${f.secret_type || f.secretType}</td>
-        <td title="${f.file_path || f.filePath} — click to open" style="cursor:pointer;color:var(--medium);text-decoration:underline" onclick="openInEditor('${f.file_path || f.filePath}')">${shortenPath(f.file_path || f.filePath)}</td>
+        <td title="Click for detail" style="cursor:pointer;color:var(--medium);text-decoration:underline" onclick="showFindingDetail('${f.id}')">${shortenPath(f.file_path || f.filePath)}</td>
         <td><code>${f.masked_fingerprint || f.maskedFingerprint}</code></td>
         <td style="font-size:12px">${new Date(f.detected_at || f.detectedAt).toLocaleString('ko-KR')}</td>
         <td>
           ${f.acknowledged
-            ? '<span style="color:var(--green)">✓ 확인됨</span>'
-            : `<button class="btn" onclick="acknowledge('${f.id}')">확인</button>`
+            ? '<span style="color:var(--green);font-size:12px">Done</span> <button class="btn" onclick="unacknowledge(\\'' + f.id + '\\')" style="margin-left:4px">Undo</button>'
+            : '<button class="btn" onclick="acknowledge(\\'' + f.id + '\\')">Confirm</button>'
           }
+          <button class="btn" onclick="addComment(\\'' + f.id + '\\')" style="margin-left:4px" title="Add note">Note</button>
         </td>
       </tr>`;
     }).join('');
@@ -84,15 +85,38 @@ async function loadFindings() {
 }
 
 async function acknowledge(id) {
+  const note = prompt('Review required: How was this resolved?\n\n(example: Rotated key, regenerated token, false positive, added to .gitignore, etc.)');
+  if (!note || !note.trim()) { alert('A comment is required to acknowledge. Please describe how this was resolved.'); return; }
   try {
     await fetch(`${API}/api/findings/${id}/acknowledge`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ note: 'Acknowledged via dashboard' }),
+      body: JSON.stringify({ note: note.trim() }),
     });
     selectedFindings.delete(id);
     loadFindings();
     loadStatus();
+  } catch (err) { console.error(err); }
+}
+
+async function unacknowledge(id) {
+  try {
+    await fetch(`${API}/api/findings/${id}/unacknowledge`, { method: 'PUT' });
+    loadFindings();
+    loadStatus();
+  } catch (err) { console.error(err); }
+}
+
+async function addComment(id) {
+  const comment = prompt('Add comment:');
+  if (!comment) return;
+  try {
+    await fetch(`${API}/api/findings/${id}/comment`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment }),
+    });
+    loadFindings();
   } catch (err) { console.error(err); }
 }
 
