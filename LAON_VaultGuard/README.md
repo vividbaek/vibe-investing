@@ -1,5 +1,9 @@
 # LAON VaultGuard
 
+[![npm version](https://img.shields.io/npm/v/laon-vaultguard)](https://www.npmjs.com/package/laon-vaultguard)
+[![npm downloads](https://img.shields.io/npm/dt/laon-vaultguard)](https://www.npmjs.com/package/laon-vaultguard)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > **LLM-based Automated Observer for Non-public Keys**
 >
 > 개발자 PC와 팀 환경에서 Git 레포지토리를 정기적으로 감시해 AWS, Azure, GCP, KT Cloud, Naver Cloud 등 클라우드 프라이빗 키가 노출되지 않도록 사전 차단하는 크로스플랫폼 보안 감사 도구.
@@ -199,6 +203,17 @@ npx laon-vaultguard scan tests/test-repo --no-llm
 ![대시보드 스크린샷](public/dashboard.png)
 
 ## 빠른 시작
+
+### npm (권장)
+
+```bash
+npx create-laon-vaultguard    # 대화형 설치 마법사 (한/영/중/일)
+npx laon-vaultguard scan .    # 현재 폴더 스캔
+```
+
+[npm 패키지](https://www.npmjs.com/package/laon-vaultguard) • `npm install -g laon-vaultguard`
+
+### 소스코드에서 실행
 
 ```bash
 cd LAON_VaultGuard
