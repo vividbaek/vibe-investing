@@ -261,6 +261,36 @@ LAON_VaultGuard/
 - [ ] 정규식 스캐너(gitleaks/trufflehog) 벤치마크 비교
 - [ ] VSCode 확장
 
+## 업데이트 내역
+
+### 2026-06-07 — v0.4 버그 패치 + 설계 개선 검토
+
+**코드 레벨 버그 수정 (7건)**
+
+| # | 파일 | 수정 내용 |
+|---|------|-----------|
+| 1 | `llm-harness.ts` | `AbortController`/`timeoutId`를 try 블록 밖으로 호이스트 — `catch`에서 `clearTimeout(0)`(무동작) → `clearTimeout(timeoutId)` |
+| 2 | `llm-harness.ts` | LLM 응답 JSON Schema 검증(`validateLlmScanResult()`) + cleartext 시크릿 유출 가드(`containsCleartextSecret()`) 추가 |
+| 3 | `cli.ts` | 버전 표시 `v0.2.0` → `v0.4.0` (`index.ts`와 불일치 해소) |
+| 4 | `scan-runner.ts` | 캐시 해시 `createHash('md5')` → `createHash('sha256')` (FIPS 호환) |
+| 5 | `candidate-filter.ts` | `simple-git` 에러 핸들링 개선 — `err.code` 대신 `exited with code 1` 메시지 정규식 검사 |
+| 6 | `git-monitor.ts` | `parseDiff()` 내 미사용 `filePattern` global regex 제거 |
+| 7 | `git-monitor.ts` | GitHub clone URL에서 토큰 제거 → `.netrc` 파일로 대체 (로그·프로세스 목록 노출 방지) |
+
+**문서 업데이트**
+
+| 파일 | 추가 내용 |
+|------|-----------|
+| `DEVELOPMENT.md` | §8 설계적 개선 필요 사항 (7건) + §8.2 추가 필요 기능 (9건) |
+| `DEVELOPMENT.md` | §9 경쟁 솔루션 대비 단점 및 보강 방안 (8건) + 우선순위 액션 Top 5 (상태 포함) |
+
+**기타 수정**
+
+- `01.Trading Strategy/ARDS-Defense/` — 중복 등록된 소문자 `readme.md` 제거 (macOS case-insensitive FS 충돌)
+- `README.md` → `0ae76d4` 버전으로 복원 (vibe-investing 한글 콘텐츠)
+
+**남은 과제** — [DEVELOPMENT.md §8~§9](./DEVELOPMENT.md#8-개선-필요-사항-review) 참고
+
 ## 라이선스
 
 MIT
