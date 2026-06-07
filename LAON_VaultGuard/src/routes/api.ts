@@ -288,6 +288,7 @@ apiRouter.get('/api/report', (_req, res) => {
       <td style="padding:6px 10px;border-bottom:1px solid #30363d"><code>${f.filePath}${f.line ? `:${f.line}` : ''}</code></td>
       <td style="padding:6px 10px;border-bottom:1px solid #30363d"><code>${f.maskedFingerprint}</code></td>
       <td style="padding:6px 10px;border-bottom:1px solid #30363d;font-size:12px">${f.detectedAt.slice(0, 10)}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #30363d;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(f.acknowledgedNote || '').replace(/"/g, '&quot;')}">${f.acknowledged ? (f.acknowledgedNote || '-') : ''}</td>
     </tr>`).join('');
 
   const html = `<!DOCTYPE html>
@@ -302,9 +303,9 @@ apiRouter.get('/api/report', (_req, res) => {
   <div style="background:#161b22;padding:12px;border-radius:8px;flex:1"><span style="color:#8b949e">HIGH</span><br><span style="font-size:24px;color:#d29922">${bySeverity('high')}</span></div>
 </div>
 <table style="width:100%;border-collapse:collapse;background:#161b22;border:1px solid #30363d">
-<thead><tr style="text-align:left;color:#8b949e"><th style="padding:10px">Severity</th><th>Repo</th><th>Type</th><th>File</th><th>Fingerprint</th><th>Date</th></tr></thead>
-<tbody>${rows || '<tr><td colspan="6" style="padding:20px;text-align:center;color:#3fb950">No open findings</td></tr>'}</tbody></table>
-<p style="color:#8b949e;margin-top:16px;font-size:12px">LAON VaultGuard v0.3.0 · ${config.deviceName}</p>
+<thead><tr style="text-align:left;color:#8b949e"><th style="padding:10px">Severity</th><th>Repo</th><th>Type</th><th>File</th><th>Fingerprint</th><th>Date</th><th>Resolution</th></tr></thead>
+<tbody>${rows || '<tr><td colspan="7" style="padding:20px;text-align:center;color:#3fb950">No open findings</td></tr>'}</tbody></table>
+<p style="color:#8b949e;margin-top:16px;font-size:12px">LAON VaultGuard v0.4.0 · ${config.deviceName}</p>
 </body></html>`;
   res.set('Content-Type', 'text/html; charset=utf-8');
   res.send(html);

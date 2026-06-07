@@ -85,13 +85,26 @@ async function loadFindings() {
 }
 
 async function acknowledge(id) {
-  const note = prompt('Review required: How was this resolved?\n\n(example: Rotated key, regenerated token, false positive, added to .gitignore, etc.)');
-  if (!note || !note.trim()) { alert('A comment is required to acknowledge. Please describe how this was resolved.'); return; }
+  // fetch current finding to check for existing note
+  var existingNote = '';
+  try {
+    var r = await fetch(API + '/api/findings/' + id);
+    var f = await r.json();
+    existingNote = f.acknowledged_note || f.acknowledgedNote || '';
+  } catch(e) {}
+
+  var note = existingNote;
+  if (!note) {
+    note = prompt('Review required: How was this resolved?\n\n(example: Rotated key, regenerated token, false positive, added to .gitignore, etc.)');
+    if (!note || !note.trim()) { alert('A comment is required to acknowledge. Please describe how this was resolved.'); return; }
+    note = note.trim();
+  }
+
   try {
     await fetch(`${API}/api/findings/${id}/acknowledge`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ note: note.trim() }),
+      body: JSON.stringify({ note: note }),
     });
     selectedFindings.delete(id);
     loadFindings();
@@ -414,20 +427,83 @@ async function loadScanHistory() {
 // Finding detail modal
 function showFindingDetail(id) {
   fetch(API + '/api/findings/' + id).then(r => r.json()).then(f => {
-    document.getElementById('modal-title').textContent = '[' + f.severity.toUpperCase() + '] ' + f.provider + ' — ' + (f.secret_type || f.secretType);
-    document.getElementById('modal-body').innerHTML =
-      '<p><strong>File:</strong> <code>' + (f.file_path || f.filePath) + (f.line ? ':' + f.line : '') + '</code>' +
-        ' <a href="#" onclick="openFileView(\'' + f.repoId + '\',\'' + (f.file_path || f.filePath) + '\',' + (f.line || 0) + ');return false" style="color:var(--accent);font-size:12px">(view source)</a></p>' +
-      '<p><strong>Repo:</strong> ' + (f.repo_name || '-') + '</p>' +
+    var fp = f.masked_fingerprint || f.maskedFingerprint;
+    var path = f.file_path || f.filePath;
+    var note = f.acknowledged_note || f.acknowledgedNote || '';
+    var line = f.line || 0;
+    var repoId = f.repoId || f.repo_id || '';
+    var repoName = f.repo_name || '-';
+    var severity = (f.severity || '').toUpperCase();
+    var provider = f.provider || '';
+    var secretType = f.secret_type || f.secretType || '';
+    var evidence = f.evidence_note || f.evidenceNote || '-';
+    var remediation = f.remediation || '-';
+    var detected = new Date(f.detected_at || f.detectedAt).toLocaleString();
+    var sources = (f.llmSources || f.llm_sources || []).join(', ') || '-';
+
+    var detailHtml =
+      '<p><strong>File:</strong> <code>' + path + (line ? ':' + line : '') + '</code>' +
+      ' <a href="#" onclick="openFileView(\'' + repoId + '\',\'' + path + '\',' + line + ');return false" style="color:var(--accent);font-size:12px">(view)</a>' +
+      ' <button class="btn" onclick="copyDetail()" style="margin-left:8px;font-size:11px">Copy</button>' +
+      ' <button class="btn" onclick="downloadMD()" style="font-size:11px">MD</button></p>' +
+      '<p><strong>Repo:</strong> ' + repoName + '</p>' +
       '<p><strong>Confidence:</strong> ' + f.confidence + '</p>' +
-      '<p><strong>Fingerprint:</strong> <code>' + (f.masked_fingerprint || f.maskedFingerprint) + '</code></p>' +
-      '<p><strong>Evidence:</strong> ' + (f.evidence_note || f.evidenceNote || '-') + '</p>' +
-      '<p><strong>Remediation:</strong> ' + (f.remediation || '-') + '</p>' +
-      '<p><strong>Detected:</strong> ' + new Date(f.detected_at || f.detectedAt).toLocaleString() + '</p>' +
-      (f.acknowledged_note ? '<p><strong>Resolved note:</strong> <em>' + f.acknowledged_note + '</em></p>' : '') +
-      '<p><strong>LLM Sources:</strong> ' + ((f.llmSources || f.llm_sources || []).join(', ') || '-') + '</p>';
+      '<p><strong>Fingerprint:</strong> <code>' + fp + '</code></p>' +
+      '<p><strong>Evidence:</strong> ' + evidence + '</p>' +
+      '<p><strong>Remediation:</strong> ' + remediation + '</p>' +
+      '<p><strong>Detected:</strong> ' + detected + '</p>' +
+      (note ? '<p><strong>Resolution note:</strong> <em>' + note + '</em></p>' : '') +
+      '<p><strong>LLM Sources:</strong> ' + sources + '</p>';
+
+    document.getElementById('modal-title').textContent = '[' + severity + '] ' + provider + ' — ' + secretType;
+    document.getElementById('modal-body').innerHTML = detailHtml;
+
+    // store for copy/download
+    window._modalFinding = {
+      severity, provider, secretType, path, line, fp, repoName, evidence, remediation, note, detected, sources
+    };
+
     document.getElementById('finding-modal').style.display = 'flex';
   }).catch(err => console.error(err));
+}
+
+function copyDetail() {
+  var f = window._modalFinding;
+  if (!f) return;
+  var text = '[' + f.severity + '] ' + f.provider + ' — ' + f.secretType + '\n' +
+    'File: ' + f.path + (f.line ? ':' + f.line : '') + '\n' +
+    'Repo: ' + f.repoName + '\n' +
+    'Fingerprint: ' + f.fp + '\n' +
+    'Evidence: ' + f.evidence + '\n' +
+    'Remediation: ' + f.remediation + '\n' +
+    'Detected: ' + f.detected + '\n' +
+    (f.note ? 'Resolution: ' + f.note + '\n' : '');
+  navigator.clipboard.writeText(text).then(function() {
+    alert('Copied to clipboard');
+  }).catch(function() {
+    prompt('Copy manually:', text);
+  });
+}
+
+function downloadMD() {
+  var f = window._modalFinding;
+  if (!f) return;
+  var md = '# [' + f.severity + '] ' + f.provider + ' — ' + f.secretType + '\n\n' +
+    '| Field | Value |\n|-------|-------|\n' +
+    '| File | `' + f.path + (f.line ? ':' + f.line : '') + '` |\n' +
+    '| Repo | ' + f.repoName + ' |\n' +
+    '| Fingerprint | `' + f.fp + '` |\n' +
+    '| Confidence | ' + (window._modalFinding.confidence || '') + ' |\n' +
+    '| Evidence | ' + f.evidence + ' |\n' +
+    '| Remediation | ' + f.remediation + ' |\n' +
+    '| Detected | ' + f.detected + ' |\n' +
+    (f.note ? '| Resolution | ' + f.note + ' |\n' : '') +
+    '\n---\n';
+  var blob = new Blob([md], { type: 'text/markdown' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'finding-' + f.path.replace(/[^a-zA-Z0-9]/g, '_') + '.md';
+  a.click();
 }
 
 function closeModal() {
