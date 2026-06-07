@@ -136,9 +136,9 @@ LAON_VaultGuard/
 
 ## 알람 순서 (구현 우선순위)
 
-1. **웹 대시보드** — 로컬 서버 REST API + 실시간 SSE
-2. **Telegram Bot** — 개인/팀 채널로 탐지 알림
-3. **Slack** — 웹훅 기반 채널 알림
+1. **웹 대시보드** ✅ — 로컬 서버 REST API + 실시간 SSE
+2. **Telegram Bot** ✅ — 개인/팀 채널로 탐지 알림
+3. **Slack** ✅ — 웹훅 기반 채널 알림 (Block Kit)
 4. **이메일** — 일일/주간 요약 리포트
 
 ## 데이터베이스
@@ -159,8 +159,8 @@ SQLite (`data/vaultguard.db`) — 제로 설정, 파일 기반.
 - [ ] Result aggregation (다수결 엔진)
 - [ ] SQLite 저장 · 이력 조회
 - [ ] 웹 대시보드 (REST API + UI)
-- [ ] Telegram 봇 알람
-- [ ] Slack 알람
+- [x] Telegram 봇 알람
+- [x] Slack 알람 (Block Kit)
 - [ ] 이메일 리포트
 - [ ] 크로스플랫폼 패키징 (pkg or electron)
 - [ ] GitHub App / GitLab App 연동 (OAuth)
