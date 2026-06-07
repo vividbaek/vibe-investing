@@ -136,7 +136,7 @@ async function callSingleLLM(
     apiKey: provider.apiKey,
     baseURL: provider.baseUrl,
     timeout: config.scan.timeoutMs,
-    maxRetries: 1,
+    maxRetries: 3,
   });
 
   // ── Differential Privacy: mask actual secret values before LLM ──

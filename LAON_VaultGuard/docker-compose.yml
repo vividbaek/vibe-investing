@@ -22,6 +22,7 @@ services:
     environment:
       - PORT=${PORT:-3101}
       - HOST=0.0.0.0
+      - DASHBOARD_TOKEN=${DASHBOARD_TOKEN:-}
       - DB_PATH=/app/data
       - STORAGE_ENGINE=${STORAGE_ENGINE:-sqlite}
       - DP_ENABLED=${DP_ENABLED:-true}

@@ -1,5 +1,8 @@
-// db-json.ts — file-based JSON storage (legacy backend)
+// db-json.ts — file-based JSON storage (legacy backend, single-device only)
 // Structure: data/repos.json, data/findings.json, data/logs/
+//
+// NOTE: JSON storage is limited to single-user/single-device use.
+// For multi-user or concurrent access, use STORAGE_ENGINE=sqlite.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,22 +15,74 @@ const DB_PATH = path.join(DATA_DIR, 'vaultguard.db');
 
 export { DATA_DIR, DB_PATH };
 
+const LOCK_TIMEOUT_MS = 3000;
+const LOCK_RETRY_MS = 50;
+
 function ensureDir(dir: string) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
+// ── file locking (lightweight, no external dependency) ──
+
+const activeLocks = new Set<string>();
+
+function acquireLock(filePath: string): boolean {
+  const lockPath = filePath + '.lock';
+  const deadline = Date.now() + LOCK_TIMEOUT_MS;
+
+  if (activeLocks.has(lockPath)) return true; // already locked by this process
+
+  while (Date.now() < deadline) {
+    try {
+      fs.writeFileSync(lockPath, String(process.pid), { flag: 'wx' }); // exclusive create
+      activeLocks.add(lockPath);
+      return true;
+    } catch {
+      // lock exists, wait and retry
+      const waited = Date.now();
+      while (Date.now() - waited < LOCK_RETRY_MS) { /* spin */ }
+    }
+  }
+  return false;
+}
+
+function releaseLock(filePath: string) {
+  const lockPath = filePath + '.lock';
+  try {
+    if (activeLocks.has(lockPath)) {
+      fs.unlinkSync(lockPath);
+      activeLocks.delete(lockPath);
+    }
+  } catch { /* lock already gone */ }
+}
+
 export function readJson<T>(filePath: string, fallback: T): T {
+  acquireLock(filePath);
   try {
     if (fs.existsSync(filePath)) {
       return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as T;
     }
   } catch { /* corrupt file, return fallback */ }
+  finally { releaseLock(filePath); }
   return fallback;
 }
 
 export function writeJson(filePath: string, data: unknown) {
-  ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  if (!acquireLock(filePath)) {
+    const fallbackPath = filePath + '.' + Date.now() + '.tmp';
+    ensureDir(path.dirname(fallbackPath));
+    fs.writeFileSync(fallbackPath, JSON.stringify(data, null, 2), 'utf-8');
+    console.error(`[LAON] WARNING: Could not acquire lock for ${filePath}. Written to ${fallbackPath}`);
+    return;
+  }
+  try {
+    ensureDir(path.dirname(filePath));
+    const tmpPath = filePath + '.tmp';
+    fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tmpPath, filePath); // atomic replace
+  } finally {
+    releaseLock(filePath);
+  }
 }
 
 // ── Repos ──

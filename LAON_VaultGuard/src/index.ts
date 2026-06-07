@@ -30,6 +30,22 @@ app.use((_req, res, next) => {
   next();
 });
 
+// ── Dashboard Auth (optional token) ──
+const DASHBOARD_TOKEN = process.env.DASHBOARD_TOKEN || '';
+if (DASHBOARD_TOKEN) {
+  app.use((req, res, next) => {
+    // public endpoints: status, dashboard page, events, static files
+    if (req.method === 'GET' && (req.path === '/api/status' || req.path === '/dashboard' || req.path === '/api/events' || req.path.startsWith('/public'))) {
+      return next();
+    }
+    const auth = req.headers.authorization;
+    if (!auth || auth !== `Bearer ${DASHBOARD_TOKEN}`) {
+      return res.status(401).json({ error: 'Unauthorized. Use Authorization: Bearer <token>' });
+    }
+    next();
+  });
+}
+
 // ── Static files ──
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -58,7 +74,7 @@ const HOST = config.host;
 app.listen(PORT, HOST, () => {
   const banner = `
 ╔══════════════════════════════════════════╗
-║       🛡 LAON VaultGuard v0.4.0         ║
+║       🛡 LAON VaultGuard v0.5.0         ║
 ║  LLM-based Observer for Non-public Keys  ║
 ╠══════════════════════════════════════════╣
 ║  Server:  http://${HOST}:${PORT}
