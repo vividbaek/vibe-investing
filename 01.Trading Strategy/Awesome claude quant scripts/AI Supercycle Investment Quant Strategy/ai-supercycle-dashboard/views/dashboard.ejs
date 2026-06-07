@@ -150,23 +150,18 @@
     <!-- Investment Scenarios (detail view) -->
     <h2 id="hScenarioDetail">리스크 프로필별 상세 전략</h2>
     <div class="scenario-tabs" id="scenarioTabs">
-      <div class="scenario-tab active" onclick="switchScenario('conservative')"><span data-ko="보수 (Conservative)" data-en="Conservative (보수)">보수 (Conservative)</span></div>
+      <div class="scenario-tab" onclick="switchScenario('conservative')"><span data-ko="보수 (Conservative)" data-en="Conservative (보수)">보수 (Conservative)</span></div>
       <div class="scenario-tab" onclick="switchScenario('moderate')"><span data-ko="중도 (Moderate)" data-en="Moderate (중도)">중도 (Moderate)</span></div>
       <div class="scenario-tab" onclick="switchScenario('aggressive')"><span data-ko="공격 (Aggressive)" data-en="Aggressive (공격)">공격 (Aggressive)</span></div>
-      <div class="scenario-tab" onclick="switchScenario('destructive')"><span data-ko="파괴 (Destructive)" data-en="Destructive (파괴)">파괴 (Destructive)</span></div>
+      <div class="scenario-tab active" onclick="switchScenario('destructive')"><span data-ko="파괴 (Destructive)" data-en="Destructive (파괴)">파괴 (Destructive)</span></div>
     </div>
 
     <div id="scenarioPanels">
-      <div class="scenario-content active" id="scenario-conservative"><div class="loading"><div class="spinner"></div><span id="tLoadingScenario">전략 로딩 중...</span></div></div>
+      <div class="scenario-content" id="scenario-conservative"><div class="loading"><div class="spinner"></div><span id="tLoadingScenario">전략 로딩 중...</span></div></div>
       <div class="scenario-content" id="scenario-moderate"><div class="loading"><div class="spinner"></div><span id="tLoadingScenario2">전략 로딩 중...</span></div></div>
       <div class="scenario-content" id="scenario-aggressive"><div class="loading"><div class="spinner"></div><span id="tLoadingScenario3">전략 로딩 중...</span></div></div>
-      <div class="scenario-content" id="scenario-destructive"><div class="loading"><div class="spinner"></div><span id="tLoadingScenario4">전략 로딩 중...</span></div></div>
+      <div class="scenario-content active" id="scenario-destructive"><div class="loading"><div class="spinner"></div><span id="tLoadingScenario4">전략 로딩 중...</span></div></div>
     </div>
-
-    <!-- Price Targets -->
-    <h2 id="hPrice">가격 결정 모델 & 시나리오 투영</h2>
-    <div id="pricePanel"><div class="loading"><div class="spinner"></div><span id="tLoadingPrice">가격 타겟 계산 중...</span></div></div>
-
     <!-- Recommended Portfolio Outlook -->
     <h2 id="hPortfolio">추천 포트폴리오: 1개월 / 3개월 / 12개월 전망</h2>
     <div id="portfolioPanel"><div class="loading"><div class="spinner"></div><span>포트폴리오 전망 계산 중...</span></div></div>
@@ -424,7 +419,7 @@
       if (btn) btn.style.opacity = llmConnected ? '1' : '0.5';
     }
 
-    let currentScenario = 'conservative';
+    let currentScenario = 'destructive';
     let allStocksData = null;
 
     // ---- Language Toggle ----
@@ -507,7 +502,7 @@
       setStatus(false);
       document.getElementById('statusText').textContent = llmConnected ? $('statusLoad') : $('llmDisconnected');
       try {
-        await Promise.all([loadStocks(), loadStrategyComparison(), loadPriceTargets(), loadPortfolioOutlook(), loadStrategy(currentScenario)]);
+        await Promise.all([loadStocks(), loadStrategyComparison(), loadStrategy(currentScenario)]);
         setStatus(true);
         if (!llmConnected) {
           document.getElementById('statusText').textContent = $('llmDisconnected');
