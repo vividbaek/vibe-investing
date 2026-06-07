@@ -177,37 +177,46 @@ interface AggregatedResult {
 
 ## 4. 개발 단계
 
-### Phase 1: 코어 엔진 (1~2주)
+### Phase 1: 코어 엔진 (1~2주) ✅ 완료
 
-- [ ] `tsconfig.json`, `package.json`, `esbuild` 설정
-- [ ] `config.ts` — .env 로드
-- [ ] `types.ts` — 인터페이스 정의
-- [ ] `db.ts` — better-sqlite3 초기화 + 마이그레이션
-- [ ] `git-monitor.ts` — 로컬 레포 git log/diff 수집
-- [ ] `diff-extractor.ts` — 변경 파일·라인 추출
-- [ ] `candidate-filter.ts` — git grep 필터
-- [ ] `llm-harness.ts` — 단일 LLM 연동 (OpenAI 우선)
-- [ ] `scheduler.ts` — node-cron 등록
+- [x] `tsconfig.json`, `package.json`, `esbuild` 설정
+- [x] `config.ts` — .env 로드 + STORAGE_ENGINE
+- [x] `types.ts` — 인터페이스 정의
+- [ ] `db.ts` — better-sqlite3 초기화 + 마이그레이션 (→ v0.5)
+- [x] `git-monitor.ts` — 로컬 레포 git log/diff 수집
+- [x] `diff-extractor.ts` — 변경 파일·라인 추출
+- [x] `candidate-filter.ts` — git grep 필터
+- [x] `llm-harness.ts` — 단일 LLM 연동 (OpenAI 우선)
+- [x] `scheduler.ts` — node-cron 등록
 
-### Phase 2: 알람 + 대시보드 (1주)
+### Phase 2: 알람 + 대시보드 (1주) ✅ 완료
 
-- [ ] `routes/api.ts` — REST API
-- [ ] `public/index.html` + SSE 실시간 업데이트
-- [ ] `alert-engine.ts` — Telegram 봇 연동
+- [x] `routes/api.ts` — REST API
+- [x] `public/index.html` + SSE 실시간 업데이트
+- [x] `alert-engine.ts` — Telegram 봇 연동
 
-### Phase 3: 멀티 LLM + 확장 (1주)
+### Phase 3: 멀티 LLM + 확장 (1주) ✅ 완료
 
-- [ ] 멀티 LLM 병렬 호출 (DeepSeek, MiniMax 추가)
-- [ ] 다수결 엔진
-- [ ] Slack 알람
-- [ ] 이메일 리포트
+- [x] 멀티 LLM 병렬 호출 (DeepSeek, MiniMax 추가)
+- [x] 다수결 엔진
+- [x] Slack 알람
+- [x] 이메일 리포트
 
-### Phase 4: 완성도 (1~2주)
+### Phase 4: 완성도 (1~2주) ✅ 완료
 
-- [ ] GitHub/GitLab API 원격 레포 지원
-- [ ] 크로스플랫폼 검증 (macOS, Linux, Windows)
-- [ ] 단위 테스트 작성 (vitest)
-- [ ] README / 가이드 문서 완성
+- [x] GitHub/GitLab API 원격 레포 지원
+- [x] 크로스플랫폼 검증 (macOS, Linux, Windows)
+- [~] 단위 테스트 작성 (vitest) — 일부 작성됨, v0.5에서 확장
+- [x] README / 가이드 문서 완성
+
+### Phase 5: v0.5 — 프로덕션 배포 준비 (진행 중)
+
+- [ ] Docker 이미지 (SQLite + Ollama + 대시보드 사전 구성)
+- [ ] SQLite 마이그레이션 (`findings.json` → SQLite WAL)
+- [ ] SARIF 결과 내보내기
+- [ ] Differential Privacy 전처리
+- [ ] 오탐 피드백 루프
+- [ ] Prometheus 메트릭
 
 ## 5. 테스트 전략
 

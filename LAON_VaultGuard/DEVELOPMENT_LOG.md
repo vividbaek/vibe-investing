@@ -2,6 +2,27 @@
 
 > macOS / Linux / Windows (WSL) · Node.js/TypeScript · LLM 기반 시크릿 탐지 감사 도구
 
+## 2026-06-07 — v0.5 설치 마법사 + Ollama 멀티 모델 + 스토리지 엔진
+
+### 완료
+- [x] `src/setup.ts` — 대화형 설치 마법사 전면 개편 (LLM 다중 선택, Ollama 설치·모델 pull)
+- [x] `src/config.ts` — `STORAGE_ENGINE` 필드 추가 (sqlite/json, 기본 sqlite)
+- [x] `.env.example` — `STORAGE_ENGINE=sqlite` 항목 추가
+- [x] `docs/Storage_Engine_Comparison.md` — SQLite vs RocksDB 전문 비교 평가 (304줄)
+- [x] Ollama 5종 모델 비교표 + 추천: deepseek-r1:8b, llama3.1, mistral, codestral, securereview-7b
+- [x] 보안 파인튜닝 모델 `vitorallo/securereview-7b-mlx-4bit` 지원 (Apple Silicon 자동 감지)
+- [x] 멀티 Ollama 교차검증 가이드 (LLM_PROVIDERS=ollama,ollama-secondary, LLM_MODE=majority)
+- [x] `package.json` → `0.5.0`, 모든 README/DEVELOPMENT_LOG 갱신
+- [x] `README.md`, `README_EN.md` — v0.4→v0.5 로드맵 + 업데이트 내역 갱신
+
+### v0.5 계획
+1. [ ] Docker 이미지 (SQLite + Ollama + 대시보드)
+2. [ ] SQLite 마이그레이션 (JSON → SQLite WAL)
+3. [ ] SARIF 결과 내보내기
+4. [ ] Differential Privacy 전처리
+5. [ ] 오탐 피드백 루프
+6. [ ] Prometheus 메트릭
+
 ## 2026-06-07 — v0.4 코드 리뷰 버그 패치 + 문서 갱신
 
 ### 완료

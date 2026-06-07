@@ -254,14 +254,44 @@ LAON_VaultGuard/
 - [x] CI/CD 통합 가이드: GitHub Actions, GitLab CI, pre-commit hook
 - [x] 보안 표준 매핑: OWASP Top 10, CWE, KISA, NIST CSF
 
-### v0.4 (계획)
+### v0.4 — 설치 마법사 + 스토리지 엔진 + Ollama 멀티 모델
 
+- [x] `STORAGE_ENGINE` 설정: SQLite (ACID, WAL) / JSON (레거시) 선택 가능
+- [x] 대화형 설치 마법사(`npm run setup`) — LLM 제공자 다중 선택 + 마스킹 API 키 입력
+- [x] Ollama 자동 감지 + 미설치 시 OS별 설치 가이드 (brew/curl/download)
+- [x] Ollama 모델 5종 추천 + 비교표 — deepseek-r1, llama3.1, mistral, codestral, securereview-7b
+- [x] 보안 특화 파인튜닝 모델 지원: `vitorallo/securereview-7b-mlx-4bit` (Apple Silicon)
+- [x] 멀티 Ollama 교차검증 가이드 — 2개 모델로 다수결 모드
+- [x] SQLite vs RocksDB 스토리지 엔진 비교 평가 (`docs/Storage_Engine_Comparison.md`)
+- [x] 2026-06-07 코드 리뷰 버그 7건 패치 (llm-harness, cli, scan-runner, candidate-filter, git-monitor)
+
+### v0.5 (계획)
+
+- [ ] Docker 이미지: SQLite + Ollama + 대시보드 사전 구성
+- [ ] SQLite 마이그레이션 (`findings.json` / `repos.json` → SQLite WAL)
+- [ ] 결과 내보내기 (SARIF)
 - [ ] Differential Privacy: LLM 전송 전 코드 마스킹 전처리
 - [ ] 오탐/진탐 피드백 루프
-- [ ] 정규식 스캐너(gitleaks/trufflehog) 벤치마크 비교
-- [ ] VSCode 확장
+- [ ] Prometheus 메트릭 (`/metrics`)
 
 ## 업데이트 내역
+
+### 2026-06-07 — v0.5 설치 마법사 + Ollama 멀티 모델 + 스토리지 엔진
+
+**대화형 설치 마법사 (`npm run setup`)**
+- LLM 제공자 다중 선택: DeepSeek, Claude, ChatGPT, Ollama
+- 마스킹 API 키 입력 + 키 등록 URL 안내
+- Ollama 자동 감지 + OS별 설치 가이드 (macOS `brew`, Linux `curl`, Windows 다운로드)
+- 모델 5종 비교표 + 추천 (deepseek-r1:8b, llama3.1, mistral, codestral, securereview-7b)
+- 보안 파인튜닝 모델 `vitorallo/securereview-7b-mlx-4bit` 지원 (Apple Silicon)
+- 멀티 Ollama 교차검증 구성 가이드 (LLM_PROVIDERS=ollama,ollama-secondary, LLM_MODE=majority)
+
+**스토리지 엔진**
+- `STORAGE_ENGINE=sqlite|json` 환경 변수 추가
+- `docs/Storage_Engine_Comparison.md` — SQLite vs RocksDB 종합 평가
+
+**구성**
+- 버전 `0.4.0` → `0.5.0`
 
 ### 2026-06-07 — v0.4 버그 패치 + 설계 개선 검토
 

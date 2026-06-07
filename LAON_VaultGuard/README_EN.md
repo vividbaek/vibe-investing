@@ -251,12 +251,42 @@ Cloud targets: AWS, Azure, GCP, **KT Cloud**, **Naver Cloud Platform (NCP)**
 - [x] CI/CD integration: GitHub Actions, GitLab CI, pre-commit hook
 - [x] Security standards mapping: OWASP Top 10, CWE, KISA, NIST CSF
 
-### v0.4 (Planned)
+### v0.4 — Setup Wizard + Storage Engine + Ollama Multi-Model
 
+- [x] `STORAGE_ENGINE` config: SQLite (ACID, WAL) / JSON (legacy) selectable
+- [x] Interactive setup wizard (`npm run setup`) — multi-select LLM providers + masked API key input
+- [x] Ollama auto-detection + OS-specific install guide (brew/curl/download)
+- [x] 5 model recommendations with comparison table — deepseek-r1, llama3.1, mistral, codestral, securereview-7b
+- [x] Security fine-tuned model support: `vitorallo/securereview-7b-mlx-4bit` (Apple Silicon)
+- [x] Multi-Ollama cross-validation guide — majority voting with 2 local models
+- [x] SQLite vs RocksDB storage engine evaluation (`docs/Storage_Engine_Comparison.md`)
+- [x] 2026-06-07 code review: 7 bug fixes (llm-harness, cli, scan-runner, candidate-filter, git-monitor)
+
+### v0.5 (Planned)
+
+- [ ] Docker image: SQLite + Ollama + dashboard pre-configured
+- [ ] SQLite migration (`findings.json` / `repos.json` → SQLite WAL)
+- [ ] SARIF export
 - [ ] Differential Privacy: code masking before LLM transmission
-- [ ] False positive/true positive feedback loop
-- [ ] Regex scanner (gitleaks/trufflehog) benchmark comparison
-- [ ] VSCode extension
+- [ ] False positive feedback loop
+- [ ] Prometheus metrics (`/metrics`)
+
+## Update History
+
+### 2026-06-07 — v0.5 Setup Wizard + Ollama Multi-Model
+
+- Multi-select LLM providers (DeepSeek, Claude, ChatGPT, Ollama) with masked key input
+- Ollama auto-detection, install guide, model comparison table (5 models)
+- Security fine-tuned model `vitorallo/securereview-7b-mlx-4bit` support
+- Multi-Ollama cross-validation (LLM_PROVIDERS=ollama,ollama-secondary, LLM_MODE=majority)
+- `STORAGE_ENGINE=sqlite|json` config + `Storage_Engine_Comparison.md`
+- Version bump: 0.4.0 → 0.5.0
+
+### 2026-06-07 — v0.4 Bug Patch + Design Review
+
+- 7 code-level bug fixes (llm-harness timeout, cli version, scan-runner md5→sha256, etc.)
+- DEVELOPMENT.md §8~§9 design improvements + priority actions
+- 01.Trading Strategy/ARDS-Defense/ duplicate lowercase readme.md removed
 
 ## License
 
