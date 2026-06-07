@@ -272,14 +272,18 @@ Dashboard (REST API + 정적 프론트)
 ## 기술 스택
 
 | 계층 | 기술 |
-|---|---|
+|---|------|
 | 런타임 | Node.js ≥18, TypeScript |
 | 웹 프레임워크 | Express.js |
-| 저장소 | JSON 파일 (`data/`) — 로컬 용도로 충분, DB 불필요 |
-| Git 연동 | `simple-git`, `@octokit/rest` (GitHub), `@gitbeaker/rest` (GitLab) |
+| 저장소 | **SQLite** (WAL, ACID) / JSON (레거시) — 설정으로 전환 |
+| Git 연동 | `simple-git`, `@octokit/rest` (GitHub) |
 | 스케줄러 | `node-cron` |
-| LLM | OpenAI SDK (ChatGPT, DeepSeek, MiniMax, Mimo — OpenAI 호환 API) |
-| 알람 | Slack Webhook, Telegram Bot API, Nodemailer |
+| LLM | OpenAI SDK (ChatGPT, DeepSeek, Claude, Ollama — OpenAI 호환 API) |
+| 보안 | Differential Privacy (14개 시크릿 패턴 마스킹) |
+| 알람 | Slack Webhook, Telegram Bot API, Nodemailer, Discord, Teams |
+| 메트릭 | Prometheus `/metrics` (카운터, 게이지, 히스토그램) |
+| 익스포트 | SARIF v2.1.0 (GitHub Code Scanning 호환) |
+| 배포 | Docker, docker-compose, npm (`npx create-laon-vaultguard`) |
 | 프론트 | Vanilla HTML/JS + Server-Sent Events (실시간) |
 
 ## 디렉토리 구조
