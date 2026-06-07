@@ -377,3 +377,9 @@ const publicDir = path.resolve(__dirname, '../../public');
 apiRouter.get('/dashboard', (_req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
 });
+
+// ── Prometheus Metrics ──
+
+import { metricsMiddleware } from '../metrics.js';
+
+apiRouter.get('/metrics', metricsMiddleware as unknown as Parameters<typeof apiRouter.get>[1]);
