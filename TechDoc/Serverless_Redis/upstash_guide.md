@@ -1,4 +1,4 @@
-# Redis SaaS Upstash 및 경쟁 플래솦ㅁ 종합 평가 및 비교 가이드
+# Redis SaaS Upstash 및 경쟁 플랫폼 종합 평가 및 비교 가이드
 
 > 마지막 업데이트: 2026년 6월 10일
 
