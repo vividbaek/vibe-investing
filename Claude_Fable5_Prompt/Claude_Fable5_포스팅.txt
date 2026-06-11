@@ -1,0 +1,74 @@
+# ============================================================
+# LinkedIn (한국어) - 전문가용, 1200자 내외
+# ============================================================
+
+Claude Fable 5의 전체 내부 시스템 프롬프트가 유출됐습니다.
+
+누군가 CL4R1T4S 프로젝트를 통해 Claude Fable 5의 방대한 시스템 지시문을 추출했고, 저는 이걸 Claude 3.5 Sonnet부터 Fable 5까지 12개 버전과 비교 분석했습니다. 결과물을 GitHub에 정리했으니, LLM을 제품/서비스에 활용하는 분들에게 도움이 되길 바랍니다.
+
+분석에서 드러난 핵심 3가지입니다.
+
+1. Fable 5 = Mythos 5 + 안전 하네스
+Fable 5와 Mythos 5는 완전히 동일한 기반 모델입니다. Fable은 하네스를 씌운 공개 버전, Mythos는 승인 조직에만 제공되는 무제약 버전. Anthropic은 이미 더 높은 성능의 모델을 내부 보유 중이라는 의미입니다. 프롬프트에 "Mythos-class model tier that sits above Claude Opus in capability"라고 명시되어 있어요.
+
+2. "무조건 검색" 정책의 롤백
+Opus 4.7까지는 "검색이 먼저다"라는 공격적인 지침이 있었는데, Fable 5에서 전통적인 4단계 카테고리(Never Search -> Offer -> Single Search -> Research)로 회귀했습니다. 과도한 검색이 오히려 응답 품질과 UX를 떨어뜨린다는 실험 결과가 반영된 걸로 보입니다.
+
+3. 저작권은 15단어가 한계선
+프롬프트 안에 대문자로 박혀 있습니다. "15+ words from any single source is a SEVERE VIOLATION." 출처당 인용은 단 1회. 가사/시는 절대 재생산 불가. Anthropic의 법무팀이 저작권 리스크에 얼마나 민감한지 단적으로 보여주는 대목입니다.
+
+실무자 관점에서 Fable 5를 어떻게 최적화해 쓸 수 있는지, 프로그래머/디자이너/생산성 활용 가이드도 포함해 두었습니다. 분석 데이터 일부는 다음과 같습니다.
+- 12개 Claude 버전의 시스템 프롬프트가 어떻게 진화했는지
+- 프롬프트 구조, 안전 정책, 검색 전략의 버전별 변화
+- Anthropic이 내부적으로 사용하는 Skill System 아키텍처
+
+https://github.com/gameworkerkim/vibe-investing/tree/main/Claude_Fable5_Prompt
+
+#ClaudeFable5 #Anthropic #LLM #PromptEngineering #AIAgent #SystemPrompt #AILeak #Mythos #프롬프트엔지니어링 #AI개발
+
+
+# ============================================================
+# LinkedIn (English) - Professional, ~1200 chars
+# ============================================================
+
+Claude Fable 5's entire internal system prompt has been leaked.
+
+Someone extracted it via the CL4R1T4S project, and I analyzed and compared it across all 12 Claude versions -- from 3.5 Sonnet to Fable 5. If you build on LLMs, this is directly actionable.
+
+Three key findings from the analysis.
+
+1. Fable 5 = Mythos 5 with safety guardrails.
+They share the exact same base model. Fable is the safety-harnessed public release; Mythos is the unconstrained version available only to approved organizations. The prompt explicitly states this is a "Mythos-class model tier that sits above Claude Opus in capability." Anthropic already has higher-performing models running internally.
+
+2. The "Search First" doctrine was rolled back.
+Opus 4.7 pushed aggressive search-before-everything behavior. Fable 5 returned to the traditional 4-tier category system (Never Search -> Offer -> Single Search -> Research). Over-searching measurably degraded response quality and UX.
+
+3. Copyright policy is a 15-word HARD LIMIT.
+The prompt states in all caps: "15+ words from any single source is a SEVERE VIOLATION." One quote per source. Song lyrics and poetry are flat-out banned. Their legal team built this into the model's DNA.
+
+The repo also includes a practical optimization guide for programmers, designers, and knowledge workers, along with extracted prompt patterns, skill system architecture breakdown, and version evolution maps across all 12 Claude releases.
+
+https://github.com/gameworkerkim/vibe-investing/tree/main/Claude_Fable5_Prompt
+
+#ClaudeFable5 #Anthropic #LLM #PromptEngineering #AIAgent #SystemPrompt #AILeak #Mythos
+
+
+# ============================================================
+# Facebook (한국어) - 캐주얼, 공유 친화적, 짧게
+# ============================================================
+
+Claude Fable 5 내부 시스템 프롬프트 통째로 유출됐습니다.
+
+누군가 리버스 엔지니어링해서 추출한 건데, 읽어보니까 진짜 LLM 쓰는 사람들한테는 금광이더라고요. Claude 3.5부터 Fable 5까지 12개 버전 비교 분석해서 GitHub에 정리했습니다.
+
+몇 가지만 찔러보면:
+
+- Fable 5 = Mythos 5랑 똑같은 모델. 안전장치 씌운 게 Fable, 풀성능은 Mythos (승인 조직 전용)
+- 저작권 규칙이 진짜 빡셈. 소스당 인용 15단어 제한, 1회만 가능, 가사/시는 절대 금지
+- "무조건 검색" 정책 도입했다가 Fable 5에서 다시 롤백. 과도한 검색이 UX 망친다는 걸 깨달은 듯
+
+프로그래머/디자이너/생산성별로 Fable 5 최적화 가이드도 만들어 넣었으니 관심 있으신 분은 레포 구경 오세요.
+
+https://github.com/gameworkerkim/vibe-investing/tree/main/Claude_Fable5_Prompt
+
+#ClaudeFable5 #Anthropic #LLM #AI #PromptEngineering #AI프롬프트 #시스템프롬프트유출
